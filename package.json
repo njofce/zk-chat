@@ -13,6 +13,7 @@
   ],
   "scripts": {
     "build": "yarn workspaces run build",
-    "server": "yarn workspace server start"
+    "server": "yarn workspace server start",
+    "app": "yarn workspace app start"
   }
 }
