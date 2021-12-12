@@ -1,0 +1,10 @@
+node_modules
+coverage
+dist
+redis-data
+mongo-db
+misc
+
+.vscode
+.idea
+.env

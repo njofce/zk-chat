@@ -1,0 +1,27 @@
+version: '3.1'
+
+services:
+  mongo:
+    image: mongo:5.0.4-focal
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - ./mongo-db:/data/db
+
+  mongo-express:
+    image: mongo-express:0.54.0
+    restart: always
+    ports:
+      - 9091:8081
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://mongo:27017/
+
+  redis:
+    image: redis:6.2.6-alpine
+    ports:
+      - 6379:6379
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+      - ./redis-data:/data

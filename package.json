@@ -1,0 +1,18 @@
+{
+  "name": "rln-anonymous-chat",
+  "version": "1.0.0",
+  "description": "An anonymous chat using RLN and InterRep",
+  "main": "index.js",
+  "author": "Nasi Jofche",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "server",
+    "rln-client-lib",
+    "app"
+  ],
+  "scripts": {
+    "build": "yarn workspaces run build",
+    "server": "yarn workspace server start"
+  }
+}

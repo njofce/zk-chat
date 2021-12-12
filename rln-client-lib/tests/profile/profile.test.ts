@@ -1,0 +1,478 @@
+import { IProfile } from '../../src/profile/interfaces';
+import { StorageProvider } from '../../src/storage/interfaces';
+import { jest, test, expect, describe, beforeAll, beforeEach } from '@jest/globals'
+import { ICryptography, IKeyPair } from '../../src/crypto/interfaces';
+import ProfileManager from '../../src/profile/index';
+import { deepClone } from '../../src/util';
+
+class TestStorageProvider implements StorageProvider {
+
+    private data = {}
+
+    constructor() { }
+
+    public async save(key: string, data: string) {
+        this.data[key] = data;
+    };
+
+    public async load(key: string): Promise<string> {
+        const retrievedItem = this.data[key];
+
+        return new Promise((res, rej) => {
+            if (retrievedItem)
+                res(retrievedItem)
+            else
+                rej("Requested item was not found");
+        })
+    };
+
+}
+
+class LocalTestCryptography implements ICryptography {
+
+    private seed: number;
+
+    constructor(seed: number) {
+        this.seed = seed;
+    }
+
+    generateSymmetricKey = async (): Promise<string> => {
+        return (this.seed * 10000).toString();
+    };
+
+    generateKeyPair = async (): Promise<IKeyPair> => {
+        const privateKey = this.seed * 10000;
+        const publicKey = (this.seed * 12345) ^ privateKey;
+
+        return {
+            publicKey: publicKey.toString(),
+            privateKey: privateKey.toString()
+        }
+    };
+
+    encryptMessageSymmetric = async (message: string, symmetricKey: string): Promise<string> => {
+        return message + "___" + symmetricKey;
+    }
+
+    decryptMessageSymmetric = async (cyphertext: string, symmetricKey: string): Promise<string> => {
+        return cyphertext.substr(0, cyphertext.indexOf('___'));
+    }
+
+    encryptMessageAsymmetric = async (message: string, publicKey: string): Promise<string> => {
+        return message + "___" + publicKey;
+    };
+
+    decryptMessageAsymmetric = async (cyphertext: string, privateKey: string): Promise<string> => {
+        return cyphertext.substr(0, cyphertext.indexOf('___'));
+    }
+}
+
+describe('Test profile', () => {
+
+    const testProfile: IProfile = {
+        rln_identity_commitment: "test_id_commitment_1",
+        rln_identity_secret: ["123", "1234"],
+        root_hash: "test",
+        auth_path: "auth path",
+        user_private_key: "priv",
+        user_public_key: "pub",
+        rooms: {
+            public: [],
+            private: [],
+            direct: []
+        }
+    }
+
+    let crypto: ICryptography;
+    let storage: StorageProvider;
+
+    let profileManager: ProfileManager;
+
+    beforeAll(async () => {
+        crypto = new LocalTestCryptography(123);
+        storage = new TestStorageProvider();
+        profileManager = new ProfileManager(storage, crypto);
+    });
+
+    beforeEach(async () => {
+        storage.save("PROFILE", "");
+        profileManager = new ProfileManager(storage, crypto);
+    });
+
+    test('load profile - exists', async () => {
+        jest.spyOn(storage, "load").mockResolvedValue(JSON.stringify(testProfile));
+
+        const loadedProfile = await profileManager.loadProfile();
+        expect(loadedProfile).toBeTruthy();
+    });
+
+    test('load profile - not exists', async () => {
+        jest.spyOn(storage, "load").mockRejectedValue(null);
+        const loadedProfile = await profileManager.loadProfile();
+        expect(loadedProfile).toBeFalsy();
+    });
+
+    test('init profile', async () => {
+        await profileManager.initProfile("id1", ["sha-1", "sha-2"], "root1", "auth_path_1");
+
+        expect(await profileManager.profileExists()).toBeTruthy();
+    });
+
+    test('validate format', async () => {
+        const formatInvalid1 = await profileManager.validateFormat(JSON.stringify({"key": "val1"}));
+        expect(formatInvalid1).toBeFalsy();
+
+        const formatInvalid2 = await profileManager.validateFormat(
+            { 
+                "key1": "val1" ,
+                "key2": "val1",
+                "key3": "val1",
+                "key4": "val1",
+                "key5": "val1",
+                "key6": "val1",
+                "key7": "val1",
+            });
+        expect(formatInvalid2).toBeFalsy();
+
+        const formatInvalid3 = await profileManager.validateFormat(
+            {
+                "rln_identity_commitment": "val1",
+                "rln_identity_secret": "val1",
+                "root_hash": "val1",
+                "auth_path": "val1",
+                "user_private_key": "val1",
+                "user_public_key": "val1",
+                "rooms": {},
+            });
+        expect(formatInvalid3).toBeFalsy();
+
+        const formatValid = await profileManager.validateFormat(
+            {
+                "rln_identity_commitment": "val1",
+                "rln_identity_secret": "val1",
+                "root_hash": "val1",
+                "auth_path": "val1",
+                "user_private_key": "val1",
+                "user_public_key": "val1",
+                "rooms": {
+                    "public": [],
+                    "private": [],
+                    "direct": []
+                },
+            });
+        expect(formatValid).toBeTruthy();
+
+    });
+
+    test('recover profile', async () => {
+        await profileManager.recoverProfile(testProfile);
+
+        expect(await profileManager.profileExists()).toBeTruthy();
+
+        const profile = profileManager.getProfile();
+        expect(profile.root_hash).toEqual(testProfile.root_hash);
+    });
+
+    test('export profile', async () => {
+        await profileManager.recoverProfile(testProfile);
+        const profile: string = await profileManager.exportProfile();
+        expect(JSON.stringify(testProfile)).toStrictEqual(profile)
+    });
+
+    test('get public key', async () => {
+        await profileManager.recoverProfile(testProfile);
+        const key: string = await profileManager.getPublicKey();
+        expect(testProfile.user_public_key).toStrictEqual(key)
+    });
+
+    test('get public key - not exists', async () => {
+        try {
+            const key: string = await profileManager.getPublicKey();
+            expect(testProfile.user_public_key).toStrictEqual(key);
+            expect(false).toBeTruthy();
+        } catch(e) {
+            expect(true).toBeTruthy();
+        }
+    });
+
+    test('get private key', async () => {
+        await profileManager.recoverProfile(testProfile);
+        const key: string = await profileManager.getPrivateKey();
+        expect(testProfile.user_private_key).toStrictEqual(key)
+    });
+
+    test('get private key - not exists', async () => {
+        try {
+            const key: string = await profileManager.getPrivateKey();
+            expect(testProfile.user_private_key).toStrictEqual(key);
+            expect(false).toBeTruthy();
+        } catch (e) {
+            expect(true).toBeTruthy();
+        }
+    });
+
+    test('get rln root', async () => {
+        await profileManager.recoverProfile(testProfile);
+        const root: string = await profileManager.getRlnRoot();
+        expect(testProfile.root_hash).toStrictEqual(root);
+    });
+
+    test('get identity commitment', async () => {
+        await profileManager.recoverProfile(testProfile);
+        const id: string = await profileManager.getIdentityCommitment();
+        expect(testProfile.rln_identity_commitment).toStrictEqual(id);
+    });
+
+    test('get identity secret', async () => {
+        await profileManager.recoverProfile(testProfile);
+        const secret: bigint[] = await profileManager.getIdentitySecret();
+        expect(testProfile.rln_identity_secret).toEqual(secret.map(x => x.toString()));
+    });
+
+    test('get auth path', async () => {
+        await profileManager.recoverProfile(testProfile);
+        const path: string = await profileManager.getAuthPath();
+        expect(testProfile.auth_path).toStrictEqual(path);
+    });
+
+    test('update root hash', async () => {
+        await profileManager.recoverProfile(testProfile);
+
+        await profileManager.updateRootHash("updated");
+
+        const root_hash = await profileManager.getRlnRoot();
+        expect(root_hash).toEqual("updated");
+    });
+
+    test('update auth path', async () => {
+        await profileManager.recoverProfile(testProfile);
+
+        await profileManager.updateAuthPath("updated");
+
+        const path = await profileManager.getAuthPath();
+        expect(path).toEqual("updated");
+    });
+
+    test('add public room', async () => {
+        await profileManager.recoverProfile(testProfile);
+
+        const room = {
+            name: "test",
+            id: "test-1",
+            type: "PUBLIC",
+            symmetric_key: "test key"
+        };
+
+        await profileManager.addPublicRoom(room);
+
+        const profile = profileManager.getProfile();
+        expect(profile.rooms.public.length).toEqual(1);
+        expect(profile.rooms.public[0].id).toEqual("test-1");
+    });
+
+    test('add private room', async () => {
+        await profileManager.recoverProfile(testProfile);
+
+        const room = {
+            name: "test",
+            id: "test-1",
+            type: "PRIVATE",
+            symmetric_key: "test key"
+        };
+
+        await profileManager.addPrivateRoom(room);
+
+        const profile = profileManager.getProfile();
+        expect(profile.rooms.private.length).toEqual(1);
+        expect(profile.rooms.private[0].id).toEqual("test-1");
+    });
+
+    test('add direct room', async () => {
+        await profileManager.recoverProfile(testProfile);
+
+        const room = {
+            name: "test",
+            id: "test-1",
+            type: "PRIVATE",
+            recepient_public_key: "test key"
+        };
+
+        await profileManager.addDirectRoom(room);
+
+        const profile = profileManager.getProfile();
+        expect(profile.rooms.direct.length).toEqual(1);
+        expect(profile.rooms.direct[0].id).toEqual("test-1");
+    });
+
+    test('get rooms', async () => {
+        await profileManager.recoverProfile(deepClone(testProfile));
+
+        const room = {
+            name: "test",
+            id: "test-1",
+            type: "PRIVATE",
+            recepient_public_key: "test key"
+        };
+
+        await profileManager.addDirectRoom(room);
+
+        const rooms = await profileManager.getRooms();
+        expect(rooms.public.length).toEqual(0);
+        expect(rooms.private.length).toEqual(0);
+        expect(rooms.direct.length).toEqual(1);
+    });
+
+    test('get rooms - empty', async () => {
+        const rooms = await profileManager.getRooms();
+        expect(rooms.public.length).toEqual(0);
+        expect(rooms.private.length).toEqual(0);
+        expect(rooms.direct.length).toEqual(0);
+    });
+
+    test('get room ids', async () => {
+        await profileManager.recoverProfile(deepClone(testProfile));
+
+        const room = {
+            name: "test",
+            id: "test-1",
+            type: "PRIVATE",
+            recepient_public_key: "test key"
+        };
+
+        await profileManager.addDirectRoom(room);
+
+        const roomIds: string[] = await profileManager.getRoomIds();
+        expect(roomIds).toStrictEqual(["test-1"]);
+    });
+
+    test('get room by id - direct', async () => {
+        await profileManager.recoverProfile(deepClone(testProfile));
+
+        const room = {
+            name: "test",
+            id: "test-1",
+            type: "PRIVATE",
+            recepient_public_key: "test key"
+        };
+
+        await profileManager.addDirectRoom(room);
+
+        const retrievedRoom = await profileManager.getRoomById("test-1");
+        expect(retrievedRoom).toStrictEqual(room);
+
+
+        // doesn't exist
+        try {
+            await profileManager.getRoomById("test-1");
+            expect(false).toBeTruthy();
+        } catch(e) {
+            expect(true).toBeTruthy();
+        }
+    });
+
+    test('get room by id - public', async () => {
+        await profileManager.recoverProfile(deepClone(testProfile));
+
+        const room = {
+            name: "test",
+            id: "test-1",
+            type: "PRIVATE",
+            symmetric_key: "test key"
+        };
+
+        await profileManager.addPublicRoom(room);
+
+        const retrievedRoom = await profileManager.getRoomById("test-1");
+        expect(retrievedRoom).toStrictEqual(room);
+
+    });
+
+    test('get room by id - private', async () => {
+        await profileManager.recoverProfile(deepClone(testProfile));
+
+        const room = {
+            name: "test",
+            id: "test-1",
+            type: "PRIVATE",
+            symmetric_key: "test key"
+        };
+
+        await profileManager.addPrivateRoom(room);
+
+        const retrievedRoom = await profileManager.getRoomById("test-1");
+        expect(retrievedRoom).toStrictEqual(room);
+
+    });
+
+    test('encrypt message for room', async () => {
+        await profileManager.recoverProfile(deepClone(testProfile));
+
+        const room1 = {
+            name: "test",
+            id: "test-1",
+            type: "PUBLIC",
+            symmetric_key: "test key 1"
+        };
+
+        const room2 = {
+            name: "test",
+            id: "test-2",
+            type: "PRIVATE",
+            symmetric_key: "test key 2"
+        };
+
+        const room3 = {
+            name: "test",
+            id: "test-3",
+            type: "DIRECT",
+            recepient_public_key: "test key 3"
+        };
+
+        await profileManager.addPublicRoom(room1);
+        await profileManager.addPrivateRoom(room2);
+        await profileManager.addDirectRoom(room3);
+
+        const encrypted_room_1 = await profileManager.encryptMessageForRoom("test-1", "test message");
+        const encrypted_room_2 = await profileManager.encryptMessageForRoom("test-2", "test message");
+        const encrypted_room_3 = await profileManager.encryptMessageForRoom("test-3", "test message");
+
+        expect(encrypted_room_1).toEqual("test message___test key 1");
+        expect(encrypted_room_2).toEqual("test message___test key 2");
+        expect(encrypted_room_3).toEqual("test message___test key 3");
+    });
+
+    test('get user rooms for chat type', async () => {
+        await profileManager.recoverProfile(deepClone(testProfile));
+
+        const room1 = {
+            name: "test",
+            id: "test-1",
+            type: "PUBLIC",
+            symmetric_key: "test key 1"
+        };
+
+        const room2 = {
+            name: "test",
+            id: "test-2",
+            type: "PRIVATE",
+            symmetric_key: "test key 2"
+        };
+
+        const room3 = {
+            name: "test",
+            id: "test-3",
+            type: "DIRECT",
+            recepient_public_key: "test key 3"
+        };
+
+        await profileManager.addPublicRoom(room1);
+        await profileManager.addPrivateRoom(room2);
+        await profileManager.addDirectRoom(room3);
+
+        expect(await (await profileManager.getUserRoomsForChatType("PUBLIC")).length).toEqual(1);
+        expect(await (await profileManager.getUserRoomsForChatType("PRIVATE")).length).toEqual(1);
+        expect(await (await profileManager.getUserRoomsForChatType("DIRECT")).length).toEqual(1);
+        expect(await (await profileManager.getUserRoomsForChatType("XX")).length).toEqual(0);
+    });
+
+});

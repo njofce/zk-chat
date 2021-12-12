@@ -1,0 +1,41 @@
+{
+    "name": "rln-client-lib",
+    "version": "1.0.0",
+    "description": "Chat client library",
+    "main": "dist/src/index.js",
+    "author": "Nasi Jofche",
+    "license": "MIT",
+    "dependencies": {
+        "@libsem/identity": "^1.0.19",
+        "@libsem/protocols": "^1.0.24",
+        "arraybuffer-to-string": "^1.0.2",
+        "axios": "^0.24.0",
+        "dotenv": "^10.0.0",
+        "string-to-arraybuffer": "^1.0.2",
+        "uuid": "^8.3.2",
+        "ws": "^8.3.0"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.16.0",
+        "@babel/preset-env": "^7.16.4",
+        "@babel/preset-typescript": "^7.16.0",
+        "@peculiar/webcrypto": "^1.2.3",
+        "@types/crypto-js": "^4.0.2",
+        "@types/jest": "^27.0.3",
+        "@types/node": "^16.11.12",
+        "@types/uuid": "^8.3.3",
+        "babel-jest": "^27.3.1",
+        "jest": "27.0.3",
+        "jest-localstorage-mock": "^2.4.18",
+        "mockdate": "^3.0.5",
+        "ts-jest": "27.0.3",
+        "tslint": "^6.1.3",
+        "tslint-jest": "^1.0.5",
+        "typescript": "^4.5.2"
+    },
+    "scripts": {
+        "build": "tsc",
+        "start": "node main-test.js",
+        "test": "jest --runInBand"
+    }
+}
