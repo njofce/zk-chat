@@ -5284,7 +5284,7 @@ circomlib@0.5.1:
     ffjavascript "0.1.0"
     web3-utils "^1.3.0"
 
-circomlib@^0.5.1:
+circomlib@0.5.5, circomlib@^0.5.1:
   version "0.5.5"
   resolved "https://registry.yarnpkg.com/circomlib/-/circomlib-0.5.5.tgz#aa2f91100b2bbc5208201f381e2c04b843f73890"
   integrity sha512-5FUw6AnEw+65suAgEQCucVepxOm96wnIo89vBldeX1DjeSV8zpP88Tje3BLBTLz0C1U6SkRnwqULrtiA5IVtZQ==
@@ -5294,11 +5294,6 @@ circomlib@^0.5.1:
     circom "0.5.33"
     ffjavascript "0.2.38"
     web3-utils "^1.3.0"
-
-circomlib@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/circomlib/-/circomlib-2.0.2.tgz#98ebb2b98f50953623e6251d8e338ad33ec4a0d2"
-  integrity sha512-hg6HnKAqAhx1NZc5kXuDOOgyOZYa6TQIKbITnuY7dgvBtIFPWh5aNRJhNUBrxrx+wHX3sZvhu0igmFKfaXoLsQ==
 
 circomlibjs@^0.0.8:
   version "0.0.8"

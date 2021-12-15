@@ -13,13 +13,17 @@ To prevent the spamming problem, social reputation is used as a collateral by us
 - It enables strong anti spam measures as the spammer's identity commitment will be revealed and will be banned from the application.
 - Sybil-attack possibilities are drastically reduced because the user needs to own a reputable social media account, which means they can't easily register themselves multiple times.
 
+
+
 The full technical specification for this project can be found at (this url)[https://www.notion.so/njofce/Technical-Specification-6649797a76ed4858933015360fc76650]
 
 ## Steps to run locally
 
 In order to run the application locally, you need to have installed Docker and docker-compose. 
 1. Run `docker-compose up -d` in order to spin up Redis and Mongo DB
-2. For `app` and `server` projects, copy `.env.example` to `.env` and modify the values to your choice. Default values should work fine.
-3. Run `yarn build`
-4. Run `yarn server` in a terminal
-5. Run `yarn app` in another terminal
+2. Install `tsc` and `react-scripts` globally.
+3. For `app` and `server` projects, copy `.env.example` to `.env` and modify the values to your choice. Default values should work fine.
+4. Run `yarn install`
+5. Run `yarn build`
+6. Run `yarn server` in a terminal
+7. Run `yarn app` in another terminal
