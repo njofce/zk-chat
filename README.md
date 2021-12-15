@@ -1,4 +1,9 @@
-## Anonymous instant chat application using RLN
+<p align="center">
+    <h1 align="center">
+        RLN Anonymous Chat
+    </h1>
+    <p align="center">Anonymous instant chat application using RLN</p>
+</p>
 
 A spam resistant instant messaging application for private and anonymous communication. It has the following general properties:
 
