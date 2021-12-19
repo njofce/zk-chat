@@ -147,8 +147,12 @@ class LocalTestCryptography implements ICryptography {
 describe('Test main', () => {
 
     beforeEach(async () => {
-        jest.clearAllMocks();
+        jest.restoreAllMocks();
     });
+
+    afterAll(async() => {
+        jest.restoreAllMocks();
+    })
 
     test('init - default params, no profile exists', async () => {
         jest.spyOn(ServerCommunication.prototype, "init").mockImplementation(() => {

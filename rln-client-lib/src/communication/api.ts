@@ -61,17 +61,11 @@ class RLNServerApi {
         }
     };
 
-    public getChatHistory = async (room_ids: string[]): Promise<any | null> => {
-        if (room_ids.length == 0)
-            return null;
-
+    public getChatHistory = async (): Promise<any | null> => {
         try {
             const res = await axios({
-                method: 'POST',
+                method: 'GET',
                 url: this.server_url + "/api/v1/chat/chat_history",
-                data: {
-                    room_ids: room_ids
-                },
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',

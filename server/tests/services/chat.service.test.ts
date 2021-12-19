@@ -18,7 +18,7 @@ describe('Test chat service', () => {
 
     test('get daily messages - no messages', async () => {
         const chatService = new ChatService();
-        const data: IMessage[] = await chatService.getDailyMessages([])
+        const data: IMessage[] = await chatService.getDailyMessages()
         expect(data.length).toEqual(0);
     });
 
@@ -28,7 +28,7 @@ describe('Test chat service', () => {
         MockDate.set(new Date(timestampTodayMs));
         await insertMessage(1, timestampTodayMs + 50);
 
-        const data: IMessage[] = await chatService.getDailyMessages(['some-id-1']);
+        const data: IMessage[] = await chatService.getDailyMessages();
         expect(data.length).toEqual(1);
     });
 
@@ -44,7 +44,7 @@ describe('Test chat service', () => {
         MockDate.set(new Date(timestampTodayMs));
         await insertMessage(2, timestampTodayMs + 50);
         
-        const data: IMessage[] = await chatService.getDailyMessages(['some-id-1', 'some-id-2']);
+        const data: IMessage[] = await chatService.getDailyMessages();
         expect(data.length).toEqual(1);
     });
 

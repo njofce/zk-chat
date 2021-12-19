@@ -39,8 +39,8 @@ export class ServerCommunication {
         return await this.rln_server.createPublicRoom(room_id, room_name, symmetric_key);
     }
 
-    public async getChatHistory(room_ids: string[]) {
-        return await this.rln_server.getChatHistory(room_ids);
+    public async getChatHistory() {
+        return await this.rln_server.getChatHistory();
     }
 
     public async getRlnRoot() {

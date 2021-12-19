@@ -105,7 +105,7 @@ describe('Test server communication', () => {
     test('get chat history', async () => {
         const testSpy = jest.spyOn(server, "getChatHistory");
         testSpy.mockResolvedValue([]);
-        await communication.getChatHistory([]);
+        await communication.getChatHistory();
 
         expect(testSpy).toHaveBeenCalled();
     });

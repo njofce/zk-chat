@@ -3,9 +3,8 @@ import { IMessage } from './../persistence/model/message/message.types';
 
 class ChatService {
 
-    public async getDailyMessages(roomIds: string[]): Promise<IMessage[]> {
+    public async getDailyMessages(): Promise<IMessage[]> {
         return (await Message.getDailyMessages())
-            .filter(m => roomIds.indexOf(m.uuid) != -1)
             .map(message => {
                 return {
                     uuid: message.uuid,

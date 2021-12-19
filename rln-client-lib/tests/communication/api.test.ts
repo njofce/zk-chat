@@ -18,6 +18,10 @@ describe('Test api', () => {
         rlnServerApi = new RLNServerApi("");
     })
 
+    beforeEach(async() => {
+        jest.restoreAllMocks();
+    })
+
     test('get all public rooms', async() => {
         const server_rooms: any[] = [
             {
@@ -71,7 +75,10 @@ describe('Test api', () => {
     });
 
     test('get chat history - null', async () => {
-        const history: any = await rlnServerApi.getChatHistory([]);
+        mockAxios.mockResolvedValue({
+            data: null
+        });
+        const history: any = await rlnServerApi.getChatHistory();
         expect(history).toBeNull();
     });
 

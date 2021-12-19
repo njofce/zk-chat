@@ -218,9 +218,7 @@ const get_chat_history = async () => {
     if (generated_cryptography == null || communication == null || profile_manager == null)
         throw "init() not called";
 
-    const room_ids: string[] = await profile_manager.getRoomIds();
-
-    const daily_chat_history: any[] = await communication.getChatHistory(room_ids)
+    const daily_chat_history: any[] = await communication.getChatHistory()
     const decrypted_messages: any[] = [];
 
     for (let message of daily_chat_history) {

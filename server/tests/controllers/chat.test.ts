@@ -47,10 +47,7 @@ describe('Test chat controller', () => {
 
     test('get chat history', (done) => {
         request(app)
-            .post('/chat/chat_history')
-            .send({
-                room_ids: ['id-1']
-            })
+            .get('/chat/chat_history')
             .expect('Content-Type', /json/)
             .expect(200)
             .then((response: any) => {
