@@ -105,7 +105,8 @@ const main = async () => {
         id: "test-1",
         name: "direct room 1",
         type: "PUBLIC",
-        recepient_public_key: "some key"
+        symmetric_key: "some other key",
+        recipient_public_key: "some key"
     })
 
     await chat.sendMessage("test-1", "This is a raw test message");

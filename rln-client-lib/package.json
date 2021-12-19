@@ -35,7 +35,7 @@
     },
     "scripts": {
         "build": "tsc",
-        "start": "node main-test.js",
+        "start-local": "node dist/src/main-test.js",
         "test": "jest --runInBand"
     }
 }

@@ -218,11 +218,12 @@ describe('Chat test', () => {
             {
                 "id": "test-1",
                 "type": "DIRECT",
-                "recepient_public_key": "test_public_key"
+                "symmetric_key": "test_symm_key",
+                "recipient_public_key": "test_public_key"
             }
         ]);
 
-        jest.spyOn(crypto, "decryptMessageAsymmetric").mockResolvedValue("decrypted message");
+        jest.spyOn(crypto, "decryptMessageSymmetric").mockResolvedValue("decrypted message");
 
         const decrypted = await chatManager.decryptMessage({
             chat_type: "DIRECT",
@@ -283,11 +284,12 @@ describe('Chat test', () => {
             {
                 "id": "test-1",
                 "type": "DIRECT",
-                "recepient_public_key": "test_public_key"
+                "symmetric_key": "test_symm_key",
+                "recipient_public_key": "test_public_key"
             }
         ]);
 
-        jest.spyOn(crypto, "decryptMessageAsymmetric").mockImplementation((data) => {
+        jest.spyOn(crypto, "decryptMessageSymmetric").mockImplementation((data) => {
             throw "error"
         });
 

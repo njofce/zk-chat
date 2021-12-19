@@ -93,6 +93,10 @@ const receive_message = async(receive_msg_callback: (message: any, chat_room_id:
 const create_public_room = async(name: string) => {
     if (generated_cryptography == null || communication == null || profile_manager == null)
         throw "init() not called";
+
+    if (name.length > ProfileManager.ROOM_NAME_MAX_LENGTH)
+        throw "Room name cannot have more than " + ProfileManager.ROOM_NAME_MAX_LENGTH + " characters";
+
     const room_id = uuidv4();
     const symmetric_key: string = await generated_cryptography.generateSymmetricKey();
     const created = await communication.createPublicRoom(room_id, name, symmetric_key);
@@ -108,9 +112,37 @@ const create_public_room = async(name: string) => {
     });
 }
 
+const join_public_room = async(room_id: string) => {
+    if (generated_cryptography == null || communication == null || profile_manager == null)
+        throw "init() not called";
+
+    try {
+        await profile_manager.getRoomById(room_id);
+    } catch(e) {
+        const room_from_server = await communication.getPublicRoom(room_id);
+
+        if (room_from_server != null) {
+            await profile_manager.addPublicRoom({
+                id: room_from_server.uuid,
+                name: room_from_server.name,
+                type: "PUBLIC",
+                symmetric_key: room_from_server.symmetric_key,
+            });
+            return;
+        } else {
+            throw "Unknown room";
+        }
+    }
+    throw "Room already exists as part of your profile.";
+    
+}
+
 const create_private_room = async (name: string) => {
     if (generated_cryptography == null || communication == null || profile_manager == null)
         throw "init() not called";
+
+    if (name.length > ProfileManager.ROOM_NAME_MAX_LENGTH)
+        throw "Room name cannot have more than " + ProfileManager.ROOM_NAME_MAX_LENGTH + " characters";
 
     const room_id = uuidv4();
     const symmetric_key: string = await generated_cryptography.generateSymmetricKey();
@@ -127,9 +159,11 @@ const invite_private_room = async (room_id: string, recipient_public_key: string
     if (generated_cryptography == null || communication == null || profile_manager == null)
         throw "init() not called";
 
-    const room = await profile_manager.getRoomById(room_id);
+    const room: IPrivateRoom = await profile_manager.getRoomById(room_id);
 
-    return await generated_cryptography.encryptMessageAsymmetric(JSON.stringify(room), recipient_public_key);
+    const data_to_encrypt = JSON.stringify([room.symmetric_key, room.id, room.name]);
+
+    return await generated_cryptography.encryptMessageAsymmetric(data_to_encrypt, recipient_public_key);
 }
 
 const join_private_room = async (encrypted_invite: string) => {
@@ -137,22 +171,46 @@ const join_private_room = async (encrypted_invite: string) => {
         throw "init() not called";
 
     const user_private_key = await profile_manager.getPrivateKey();
-    const decryptedRoomData: IPrivateRoom = JSON.parse(await generated_cryptography.decryptMessageAsymmetric(encrypted_invite, user_private_key));
+    const [room_symmetric_key, room_id, room_name] = JSON.parse(await generated_cryptography.decryptMessageAsymmetric(encrypted_invite, user_private_key));
 
-    await profile_manager.addPrivateRoom(decryptedRoomData);
+    await profile_manager.addPrivateRoom({
+        id: room_id,
+        name: room_name,
+        type: "PRIVATE",
+        symmetric_key: room_symmetric_key
+    });
+}
+
+const generate_encrypted_invite_direct_room = async(room_id: string) => {
+    if (generated_cryptography == null || communication == null || profile_manager == null)
+        throw "init() not called";
+
+    return await profile_manager.generateEncryptedInviteDirectRoom(room_id);
+}
+
+const update_direct_room_key = async (room_id: string, encrypted_symmetric_key: string) => {
+    if (generated_cryptography == null || communication == null || profile_manager == null)
+        throw "init() not called";
+
+    return await profile_manager.updateDirectRoomKey(room_id, encrypted_symmetric_key);
 }
 
 const create_direct_room = async (name: string, receiver_public_key: string) => {
     if (generated_cryptography == null || communication == null || profile_manager == null)
         throw "init() not called";
 
+    if (name.length > ProfileManager.ROOM_NAME_MAX_LENGTH)
+        throw "Room name cannot have more than " + ProfileManager.ROOM_NAME_MAX_LENGTH + " characters";
+
     const room_id = uuidv4();
+    const symmetric_key: string = await generated_cryptography.generateSymmetricKey();
 
     await profile_manager.addDirectRoom({
         id: room_id,
         name: name,
         type: "DIRECT",
-        recepient_public_key: receiver_public_key
+        symmetric_key: symmetric_key,
+        recipient_public_key: receiver_public_key
     });
 }
 
@@ -168,11 +226,13 @@ const get_chat_history = async () => {
     for (let message of daily_chat_history) {
         const [decrypted, roomId] = await chat_manager.decryptMessage(message);
 
-        if (decrypted != null && roomId != null)
-            decrypted_messages.push(decrypted)
+        if (decrypted != null && roomId != null) {
+            decrypted['room_id'] = roomId;
+            decrypted_messages.push(decrypted);
+        }
     }
 
-    return groupBy(decrypted_messages, "uuid");
+    return groupBy(decrypted_messages, "room_id");
 }
 
 const get_public_key = async() => {
@@ -213,9 +273,12 @@ export {
     send_message, 
     receive_message, 
     create_public_room, 
+    join_public_room,
     create_private_room, 
     invite_private_room, 
     join_private_room, 
+    generate_encrypted_invite_direct_room,
+    update_direct_room_key,
     create_direct_room, 
     get_chat_history, 
     get_public_key,
