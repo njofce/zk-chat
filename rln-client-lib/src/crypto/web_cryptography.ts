@@ -8,17 +8,24 @@ const str2ab = require('string-to-arraybuffer');
  */
 class WebCryptography implements ICryptography {
 
+    public static AES_KEY_LENGTH: number = 128;
+
+    /**
+     * THe maximum length of content that can be encrypted with RSA-OAEP used will be (4096/8) - 42 bytes.
+     */
+    public static RSA_MODULUS_LENGTH: number = 4096;
+
     constructor() {
         if (!window)
             throw "This module is intended to work only in the browser";
     }
 
-    public generateSymmetricKey = async(): Promise<string> => {
+    public async generateSymmetricKey(): Promise<string> {
 
         const key = await window.crypto.subtle.generateKey(
             {
                 name: "AES-GCM",
-                length: 256
+                length: WebCryptography.AES_KEY_LENGTH
             },
             true,
             ["encrypt", "decrypt"]
@@ -34,11 +41,11 @@ class WebCryptography implements ICryptography {
         throw "Could not generate symmetric key";
     }
     
-    public generateKeyPair = async (): Promise<IKeyPair> => {
+    public async generateKeyPair(): Promise<IKeyPair> {
         let keyPair = await window.crypto.subtle.generateKey(
             {
                 name: "RSA-OAEP",
-                modulusLength: 2048,
+                modulusLength: WebCryptography.RSA_MODULUS_LENGTH,
                 publicExponent: new Uint8Array([1, 0, 1]),
                 hash: "SHA-256"
             },
@@ -59,7 +66,7 @@ class WebCryptography implements ICryptography {
         throw "Could not generate key pairs";
     }
 
-    public encryptMessageSymmetric = async (message: string, symmetricKey: string): Promise<string> => {
+    public async encryptMessageSymmetric(message: string, symmetricKey: string): Promise<string> {
         const importedSymmetricKey = await window.crypto.subtle.importKey(
             "jwk",
             JSON.parse(symmetricKey),
@@ -80,7 +87,7 @@ class WebCryptography implements ICryptography {
         return ab2str(encrypted, "base64");
     }
 
-    public decryptMessageSymmetric = async (cyphertext: string, symmetricKey: string): Promise<string> => {
+    public async decryptMessageSymmetric(cyphertext: string, symmetricKey: string): Promise<string> {
         const importedSymmetricKey = await window.crypto.subtle.importKey(
             "jwk",
             JSON.parse(symmetricKey),
@@ -101,7 +108,7 @@ class WebCryptography implements ICryptography {
         return ab2str(decrypted);
     }
 
-    public encryptMessageAsymmetric = async (message: string, publicKey: string): Promise<string> => {
+    public async encryptMessageAsymmetric(message: string, publicKey: string): Promise<string> {
         const importedPublicKey = await window.crypto.subtle.importKey(
             "spki",
             str2ab(publicKey), 
@@ -120,7 +127,7 @@ class WebCryptography implements ICryptography {
         return ab2str(encryptedBytes, "base64");
     }
     
-    public decryptMessageAsymmetric = async (cyphertext: string, privateKey: string): Promise<string> => {
+    public async decryptMessageAsymmetric(cyphertext: string, privateKey: string): Promise<string> {
         const importedPrivateKey = await window.crypto.subtle.importKey(
             "pkcs8",
             str2ab(privateKey),

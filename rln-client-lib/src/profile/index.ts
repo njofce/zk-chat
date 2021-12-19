@@ -7,6 +7,7 @@ import { IProfile, IRooms } from './interfaces';
 class ProfileManager {
 
     private static PROFILE_STORAGE_KEY: string = "PROFILE";
+    public static ROOM_NAME_MAX_LENGTH: number = 200;
 
     private storageProvider: StorageProvider;
     private cryptography: ICryptography;
@@ -167,6 +168,12 @@ class ProfileManager {
 
     public async addPublicRoom(room: IPublicRoom) {
         if (this.inMemoryProfile != null) {
+
+            const indexOfExistingRoomIfAny = this.inMemoryProfile.rooms.public.findIndex(r => r.symmetric_key == room.symmetric_key);
+
+            if (indexOfExistingRoomIfAny != -1)
+                throw "Room already exists";
+
             this.inMemoryProfile.rooms.public.push(room);
             await this.persistProfile();
         }
@@ -174,6 +181,12 @@ class ProfileManager {
 
     public async addPrivateRoom(room: IPrivateRoom) {
         if (this.inMemoryProfile != null) {
+
+            const indexOfExistingRoomIfAny = this.inMemoryProfile.rooms.private.findIndex(r => r.symmetric_key == room.symmetric_key);
+
+            if (indexOfExistingRoomIfAny != -1)
+                throw "Room already exists";
+
             this.inMemoryProfile.rooms.private.push(room);
             await this.persistProfile();
         }
@@ -181,6 +194,12 @@ class ProfileManager {
 
     public async addDirectRoom(room: IDirectRoom) {
         if (this.inMemoryProfile != null) {
+
+            const indexOfExistingRoomIfAny = this.inMemoryProfile.rooms.direct.findIndex(r => r.recipient_public_key == room.recipient_public_key);
+
+            if (indexOfExistingRoomIfAny != -1)
+                throw "Room already exists";
+
             this.inMemoryProfile.rooms.direct.push(room);
             await this.persistProfile();
         }
@@ -213,17 +232,17 @@ class ProfileManager {
 
         const publicIndex = this.inMemoryProfile.rooms.public.findIndex(r => r.id == id);
         if (publicIndex != -1) {
-            return this.inMemoryProfile.rooms.public[publicIndex];
+            return deepClone(this.inMemoryProfile.rooms.public[publicIndex]);
         }
 
         const privateIndex = this.inMemoryProfile.rooms.private.findIndex(r => r.id == id);
         if (privateIndex != -1) {
-            return this.inMemoryProfile.rooms.private[privateIndex];
+            return deepClone(this.inMemoryProfile.rooms.private[privateIndex]);
         }
 
         const directIndex = this.inMemoryProfile.rooms.direct.findIndex(r => r.id == id);
         if (directIndex != -1) {
-            return this.inMemoryProfile.rooms.direct[directIndex];
+            return deepClone(this.inMemoryProfile.rooms.direct[directIndex]);
         }
 
         throw "Room doesn't exist";
@@ -248,7 +267,7 @@ class ProfileManager {
         const directIndex = this.inMemoryProfile.rooms.direct.findIndex(r => r.id == id);
         if (directIndex != -1) {
             const room: IDirectRoom = this.inMemoryProfile.rooms.direct[directIndex];
-            return this.cryptography.encryptMessageAsymmetric(message, room.recepient_public_key);
+            return this.cryptography.encryptMessageSymmetric(message, room.symmetric_key);
         }
 
         throw "Room doesn't exist";
@@ -259,15 +278,44 @@ class ProfileManager {
             throw "Profile doesn't exist";
 
         if (type == "PUBLIC") {
-            return this.inMemoryProfile.rooms.public;
+            return deepClone(this.inMemoryProfile.rooms.public);
         } else if (type == "PRIVATE") {
-            return this.inMemoryProfile.rooms.private;
+            return deepClone(this.inMemoryProfile.rooms.private);
         } else if (type == "DIRECT") {
-            return this.inMemoryProfile.rooms.direct;
+            return deepClone(this.inMemoryProfile.rooms.direct);
         } else {
             return [];
         }
     }
+
+    public async generateEncryptedInviteDirectRoom(room_id: string): Promise<string> {
+        if (this.inMemoryProfile == null)
+            throw "Profile doesn't exist";
+
+        const directIndex = this.inMemoryProfile.rooms.direct.findIndex(r => r.id == room_id);
+        if (directIndex == -1)
+            throw "Room doesn't exist";
+        const room: IDirectRoom = this.inMemoryProfile.rooms.direct[directIndex];
+
+        return this.cryptography.encryptMessageAsymmetric(room.symmetric_key, room.recipient_public_key);
+    }
+
+    public async updateDirectRoomKey(room_id: string, encrypted_symmetric_key: string): Promise<void> {
+        if (this.inMemoryProfile == null)
+            throw "Profile doesn't exist";
+
+        const directIndex = this.inMemoryProfile.rooms.direct.findIndex(r => r.id == room_id);
+        if (directIndex == -1)
+            throw "Room doesn't exist";
+
+        const room: IDirectRoom = this.inMemoryProfile.rooms.direct[directIndex];
+
+        const decrypted_symm_key = await this.cryptography.decryptMessageAsymmetric(encrypted_symmetric_key, room.recipient_public_key);
+
+        room.symmetric_key = decrypted_symm_key;
+        await this.persistProfile();
+    }
+
 }
 
 export default ProfileManager

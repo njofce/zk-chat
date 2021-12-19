@@ -17,7 +17,6 @@ module.exports = {
         'src/**/*.ts',
         '!src/main-test.ts',
         '!src/communication/websocket.ts',
-        '!src/index.ts',
         '!src/hasher.ts'
     ],
     setupFilesAfterEnv: ['./tests/jest.setup.ts'],

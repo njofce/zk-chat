@@ -11,7 +11,7 @@ export class ServerCommunication {
         this.socket_client = socketClient;
     }
 
-    public async init() {
+    public async init(): Promise<void> {
         await this.socket_client.waitForConnections();
     }
 
@@ -19,39 +19,39 @@ export class ServerCommunication {
         await this.socket_client.sendMessage(message);
     }
 
-    public receiveMessage = async (callback: (message: string) => void) => {
+    public async receiveMessage(callback: (message: string) => void) {
         await this.socket_client.receiveMessage(callback);
     }
 
-    public receiveEvent = async (callback: (event: string) => void) => {
+    public async receiveEvent(callback: (event: string) => void) {
         await this.socket_client.receiveEvent(callback);
     }
 
-    public getPublicRooms = async() => {
+    public async getPublicRooms() {
         return await this.rln_server.getAllPublicRooms();
     }
 
-    public getPublicRoom = async (room_id: string) => {
+    public async getPublicRoom(room_id: string) {
         return await this.rln_server.getPublicRoom(room_id);
     }
 
-    public createPublicRoom = async (room_id: string, room_name: string, symmetric_key: string) => {
+    public async createPublicRoom(room_id: string, room_name: string, symmetric_key: string) {
         return await this.rln_server.createPublicRoom(room_id, room_name, symmetric_key);
     }
 
-    public getChatHistory = async (room_ids: string[]) => {
+    public async getChatHistory(room_ids: string[]) {
         return await this.rln_server.getChatHistory(room_ids);
     }
 
-    public getRlnRoot = async () => {
+    public async getRlnRoot() {
         return await this.rln_server.getRlnRoot();
     }
 
-    public getUserAuthPath = async (id_commitment: string) => {
+    public async getUserAuthPath(id_commitment: string) {
         return await this.rln_server.getUserAuthPath(id_commitment);
     }
 
-    public getBannedUsers = async () => {
+    public async getBannedUsers() {
         return await this.rln_server.getBannedUsers();
     }
 }

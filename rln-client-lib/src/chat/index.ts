@@ -5,6 +5,9 @@ import { ServerCommunication } from '../communication/index';
 import ProfileManager from "../profile";
 import Hasher from "../hasher";
 
+/**
+ * TODO: Add docs
+ */
 class ChatManager {
     
     private root_up_to_date: boolean = true;
@@ -29,19 +32,19 @@ class ChatManager {
 
         this.hasher = new Hasher();
 
-        this.prover_key_path = path.join("./circuitFiles/rln", "rln_final.zkey");
-        this.circuit_path = path.join("./circuitFiles/rln", "rln.wasm");
+        this.prover_key_path = path.join("circuitFiles/rln", "rln_final.zkey");
+        this.circuit_path = path.join("circuitFiles/rln", "rln.wasm");
     }
 
-    setRootObsolete = async() => {
+    public async setRootObsolete() {
         this.root_up_to_date = false;
     }
 
-    isRootObsolete = () => {
+    public isRootObsolete() {
         return !this.root_up_to_date;
     }
 
-    sendMessage = async (chat_room_id: string, raw_message: string) => {
+    public async sendMessage(chat_room_id: string, raw_message: string) {
         await this.checkRootUpToDate();
 
         // Generate proof
@@ -83,57 +86,39 @@ class ChatManager {
         this.communication_manager.sendMessage(JSON.stringify(message));
     }
 
-    registerReceiveMessageHandler = async (receive_msg_callback: (message: any, chat_room_id: string) => void) => {
+    public async registerReceiveMessageHandler(receive_msg_callback: (message: any, chat_room_id: string) => void) {
         this.message_callback = receive_msg_callback;
         this.communication_manager.receiveMessage(this.messageHandlerForRooms.bind(this))
     }
 
-    private messageHandlerForRooms = async (message: string) => {
-        const [decryptedMessage, room_id] = await this.decryptMessage(message);
+    private async messageHandlerForRooms(message: string) {
+        const [decryptedMessage, room_id] = await this.decryptMessage(JSON.parse(message));
 
         if (decryptedMessage != null && room_id != null) {
             this.message_callback(decryptedMessage, room_id);
         }
     }
 
-    decryptMessage = async (message: any): Promise<any> => {
+    public async decryptMessage(message: any): Promise<any> {
         const room_type = message.chat_type;
 
         const user_rooms_for_type: any[] = await this.profile_manager.getUserRoomsForChatType(room_type);
 
         if (user_rooms_for_type.length > 0) {
             for (let room of user_rooms_for_type) {
-
-                if (room.type == "DIRECT") {
-                    try {
-                        const decrypted: string = await this.cryptography.decryptMessageAsymmetric(message.message_content, room.recepient_public_key);
-                        return [
-                            {
-                                uuid: message.uuid,
-                                epoch: message.epoch,
-                                chat_type: message.chat_type,
-                                message_content: decrypted
-                            },
-                            room.id
-                        ];
-                    } catch(e){
-
-                    }
-                } else {
-                    try {
-                        const decrypted: string = await this.cryptography.decryptMessageSymmetric(message.message_content, room.symmetric_key);
-                        return [
-                            {
-                                uuid: message.uuid,
-                                epoch: message.epoch,
-                                chat_type: message.chat_type,
-                                message_content: decrypted
-                            },
-                            room.id
-                        ];
-                    } catch (e) {
-
-                    }
+                try {
+                    const decrypted: string = await this.cryptography.decryptMessageSymmetric(message.message_content, room.symmetric_key);
+                    return [
+                        {
+                            uuid: message.uuid,
+                            epoch: message.epoch,
+                            chat_type: message.chat_type,
+                            message_content: decrypted
+                        },
+                        room.id
+                    ];
+                } catch (e) {
+                    // Do nothing, try the next room
                 }
             }
         }
@@ -144,7 +129,7 @@ class ChatManager {
     /**
      * Refresh root hash and auth path when needed, only if the root is obsolete.
      */
-    checkRootUpToDate = async() => {
+    public async checkRootUpToDate() {
         if (this.isRootObsolete()) {
 
             const new_rln_root = await this.communication_manager.getRlnRoot();
