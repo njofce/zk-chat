@@ -2,6 +2,9 @@
 import PublicChatRoom from "../persistence/model/public_chat_room/public_chat_room.model"
 import { IPublicChatRoom } from "../persistence/model/public_chat_room/public_chat_room.types";
 
+/**
+ * Encapsulates the functionality of handling public rooms.
+ */
 class PublicRoomService {
 
     public async saveRoom(uuid: string, name: string, symmetric_key: string) {

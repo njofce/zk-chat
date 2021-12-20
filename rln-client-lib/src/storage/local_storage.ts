@@ -1,5 +1,8 @@
 import { StorageProvider } from './interfaces';
 
+/**
+ * Uses browser's local storage to store/retrieve the current user's profile.
+ */
 export class LocalStorageProvider implements StorageProvider {
 
     constructor() { }

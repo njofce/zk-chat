@@ -72,8 +72,7 @@ describe('Test socket server', () => {
     test('Test message proper serialization - bad', async () => {
         console.log = jest.fn();
         testConfig.message(null, 125, false);
-        expect(console.log).toHaveBeenCalledTimes(3);
-        expect(console.log).toHaveBeenLastCalledWith('message invalid');
+        expect(console.log).toHaveBeenCalledTimes(1);
     });
 
     test('Test broadcast', async () => {

@@ -1,9 +1,14 @@
 import express from "express";
 import { chatRouter, roomRouter, userRouter } from "./controllers";
 
+var cors = require("cors");
+
 const createServer = () => {
 
     const app = express();
+    app.use(cors());
+    app.options("*", cors());
+    
     app.use(express.json());
 
     app.get("/health", (req, res) => {

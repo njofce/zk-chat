@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 import styled from "styled-components";
 import * as Colors from "../../constants/colors";
+import { joinPrivateRoomAction } from "../../redux/actions/actionCreator";
+import { useAppDispatch } from "../../redux/hooks/useAppDispatch";
 
 const StyledTextarea = styled.textarea`
   border: 1px solid #f0f2f5;
@@ -37,10 +39,18 @@ const JoinPrivateRoomModal = ({
   setToggleJoinPrivateRoom
 }: any) => {
   const [roomInvite, setRoomInvite] = useState("");
+  const dispatch = useAppDispatch();
 
   const handleModalClosing = () => {
     setRoomInvite("");
     setToggleJoinPrivateRoom(false);
+  };
+
+  const handleRoomCreation = () => {
+    if (roomInvite) {
+      dispatch(joinPrivateRoomAction(roomInvite));
+      handleModalClosing();
+    }
   };
 
   return (
@@ -55,10 +65,7 @@ const JoinPrivateRoomModal = ({
         />
       </ModalBody>
       <ModalFooter>
-        <StyledButton
-          color={Colors.ANATRACITE}
-          //   onClick={() => handleRoomCreation(modalContent, { name: roomName })}
-        >
+        <StyledButton color={Colors.ANATRACITE} onClick={handleRoomCreation}>
           Join
         </StyledButton>
       </ModalFooter>

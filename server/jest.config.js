@@ -28,7 +28,7 @@ module.exports = {
             "branches": 80,
             "functions": 80,
             "lines": 80,
-            "statements": 50
+            "statements": 80
         }
     },
     verbose: true

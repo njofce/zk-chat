@@ -27,7 +27,6 @@ class SocketServer {
         
         this.wsApp = uWS.App()
         .ws('/' + this.serverConfig.messageChannel, {
-
             idleTimeout: SocketServer.IDLE_TIMEOUT,
             maxBackpressure: SocketServer.MAX_BACKPRESSURE,
             maxPayloadLength: SocketServer.MAX_PAYLOAD_LENGTH,
@@ -38,49 +37,39 @@ class SocketServer {
             },
 
             message: async (ws, message, isBinary) => {
-                console.log("message received!");
                 try {
                     const bufferData = Buffer.from(message);
-                    console.log("Processing message", bufferData.toString());
                     await this.messageHandler(bufferData.toString());
-                    console.log('message processed!')
                 } catch(e) {
-                    console.log(e);
-                    console.log("message invalid");
-                    this.broadcastMessage("Broadcasting message");
-                    this.broadcastEvent("Broadcasting event");
+                    console.log("Error");
                 }
             }
         })
         .ws('/' + this.serverConfig.messageBroadcastChannel, {
-
             idleTimeout: SocketServer.IDLE_TIMEOUT,
             maxBackpressure: SocketServer.MAX_BACKPRESSURE,
             maxPayloadLength: SocketServer.MAX_PAYLOAD_LENGTH,
             compression: uWS.SHARED_COMPRESSOR,
 
             open: (ws) => {
-                console.log("client connected on message broadcast!");
                 ws.subscribe(this.serverConfig.messageBroadcastChannel);
             }
         })
         .ws('/' + this.serverConfig.updatesChannel, {
-
             idleTimeout: SocketServer.IDLE_TIMEOUT,
             maxBackpressure: SocketServer.MAX_BACKPRESSURE,
             maxPayloadLength: SocketServer.MAX_PAYLOAD_LENGTH,
             compression: uWS.SHARED_COMPRESSOR,
 
             open: (ws) => {
-                console.log("client connected on updates broadcast!");
                 ws.subscribe(this.serverConfig.updatesChannel);
             }
         })
-        .listen(3001, (token) => {
+        .listen(this.serverConfig.port, (token) => {
             if (token) {
-                console.log('Socket server is istening on port ' + 3001);
+                console.log(`Socket server is istening on port ${this.serverConfig.port}`);
             } else {
-                console.log('Failed to listen on port ' + 3001);
+                console.log(`Failed to listen on port ${this.serverConfig.port}`);
             }
         });
     }

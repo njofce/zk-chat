@@ -71,7 +71,7 @@ class InterRepSynchronizer {
             }
         }
 
-        // Test only
+        // A test user
         if (groupsInDb.findIndex(g => g.group_id == "local-test-group") == -1) {
             await this.userService.appendUsers([
                 {

@@ -1,12 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import * as Colors from "../../constants/colors";
-import { faPaperPlane, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { roomTypes } from "../../constants/constants";
 import { useAppDispatch } from "../../redux/hooks/useAppDispatch";
 import { addActiveChatRoom } from "../../redux/actions/actionCreator";
 import InviteModal from "../Modals/inviteModal";
+import { useAppSelector } from "../../redux/hooks/useAppSelector";
+import Input from "../Input";
+import ExcangeKeysModal from "../Modals/exchangeKeysModal";
+import ReactTooltip from "react-tooltip";
 
 const StyledChatContainer = styled.div`
   background: white;
@@ -40,17 +44,7 @@ const StyledMessagesWrapper = styled.div`
     background: #f0f2f5;
   }
 `;
-const StyledInput = styled.input`
-  border: 1px solid #f0f2f5;
-  border-radius: 20px;
-  width: 100%;
-  position: relative;
-  padding: 8px 12px;
-  &:focus,
-  &:active {
-    outline: none;
-  }
-`;
+
 const StyledChatDetailsWrapper = styled.div`
   display: flex;
   justify-content: space-between;
@@ -66,18 +60,7 @@ const StyledChatRoomsTitle = styled.p`
   font-weight: 600;
   font-size: 24px;
 `;
-const StyledChatFooterWrapper = styled.div`
-  display: flex;
-  svg {
-    position: relative;
-    top: 8px;
-    left: 5px;
-    cursor: pointer;
-    path {
-      fill: ${Colors.ANATRACITE};
-    }
-  }
-`;
+
 const StyledButton = styled.button`
   background: ${Colors.BERRY_PINK};
   border-radius: 8px;
@@ -90,105 +73,23 @@ const StyledButton = styled.button`
     transition: 0.15s;
     box-shadow: 0px 0px 15px 0px ${Colors.BERRY_PINK};
   }
-  width: 130px;
+  width: 180px;
 `;
 
 type ChatMessagesProps = {
-  chatRoomDetails: any;
-  setToggleChatMessages: (shouldToggle: boolean) => void;
   currentActiveRoom: any;
 };
 
-type ChatMessageType = {
-  id?: number;
-  text: string;
-};
-
-const hardcodedMessages: Array<ChatMessageType> = [
-  {
-    text:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim  ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut  aliquip ex ea commodo consequat."
-  },
-  {
-    text:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore magna aliqua. "
-  },
-  {
-    text:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore magna aliqua."
-  },
-  {
-    text:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore magna aliqua."
-  },
-  {
-    text:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore magna aliqua."
-  },
-  {
-    text: "Lorem ipsum dolor sit amet."
-  },
-  {
-    text:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore magna aliqua."
-  },
-  {
-    text:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor."
-  },
-  {
-    text: "Lorem ipsum dolor sit amet, consectetur."
-  },
-  {
-    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-  },
-  {
-    text:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore magna aliqua.  "
-  },
-  {
-    text:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim  ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut  aliquip ex ea commodo consequat."
-  },
-  { text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit" },
-  { text: "Lorem ipsum dolor sit amet" },
-  {
-    text: "Lorem ipsum dolor sit amet."
-  },
-  {
-    text:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore magna aliqua."
-  },
-  {
-    text:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor."
-  },
-  {
-    text: "Lorem ipsum dolor sit amet, consectetur."
-  },
-  {
-    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-  },
-  {
-    text:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore magna aliqua.  "
-  },
-  {
-    text:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim  ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut  aliquip ex ea commodo consequat."
-  },
-  { text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit" },
-  { text: "Lorem ipsum dolor sit amet" }
-];
-
-const ChatMessages = ({
-  chatRoomDetails,
-  setToggleChatMessages,
-  currentActiveRoom
-}: ChatMessagesProps) => {
-  const [chatMessages, setChatMessages] = useState<ChatMessageType[]>([]);
-  const [currentInputValue, setCurrentInputValue] = useState("");
+const ChatMessages = ({ currentActiveRoom }: ChatMessagesProps) => {
   const [toggleInviteModal, setToggleInviteModal] = useState(false);
+  const [toggleExchangeKeysModal, setToggleExchangeKeysModal] = useState(false);
+  const [isPublicRoomInviteCopied, setIsPublicRoomInviteCopied] = useState(
+    false
+  );
+  //@ts-ignore
+  const chatHistoryByRoom: any[] = useAppSelector(
+    state => state.ChatReducer.chatHistory[currentActiveRoom.id]
+  );
   const chatRef = useRef<HTMLDivElement>(null);
   const dispatch = useAppDispatch();
 
@@ -200,70 +101,82 @@ const ChatMessages = ({
   };
 
   useEffect(() => {
-    if (chatRoomDetails) {
-      //fetch the latest messages and store them in local state
-    }
-    //move this into the conditional when BE data is ready
-    setChatMessages(hardcodedMessages);
-  }, []);
-
-  useEffect(() => {
     scrollToBottom();
-  }, [chatMessages]);
-
-  const handleMessageSubmit = () => {
-    if (currentInputValue) {
-      const newMessages = [...chatMessages, { text: currentInputValue }];
-      setChatMessages(newMessages);
-      setCurrentInputValue("");
-    }
-  };
+  }, [chatHistoryByRoom]);
 
   const handleActiveChatClosing = () => {
-    dispatch(addActiveChatRoom("", { name: "" }));
-    setToggleChatMessages(false);
+    dispatch(addActiveChatRoom(undefined));
+  };
+
+  const handleGenerateInvitePublicRoomLink = () => {
+    const publicRoomInviteLink = `${process.env.REACT_APP_ENV}public/${currentActiveRoom.id}`;    
+    navigator.clipboard.writeText(publicRoomInviteLink).then(() => {
+      setIsPublicRoomInviteCopied(true)
+      setTimeout(() => setIsPublicRoomInviteCopied(false), 4000);
+    });
   };
 
   return (
     <StyledChatContainer className="col">
       <StyledChatDetailsWrapper>
-        <StyledChatRoomsTitle>
-          {" "}
-          {currentActiveRoom.roomName ? currentActiveRoom.roomName : "Room 1"}
-        </StyledChatRoomsTitle>{" "}
+        <StyledChatRoomsTitle>{currentActiveRoom.name}</StyledChatRoomsTitle>
         <div>
-          {currentActiveRoom.roomType === roomTypes.private && (
-            <StyledButton onClick={() => setToggleInviteModal(true)}>
+          {currentActiveRoom.type.toLowerCase() === roomTypes.private && (
+            <>
+              <StyledButton onClick={() => setToggleInviteModal(true)}>
+                {" "}
+                Invite{" "}
+              </StyledButton>
+            </>
+          )}
+          {currentActiveRoom.type.toLowerCase() === roomTypes.oneOnOne && (
+            <StyledButton onClick={() => setToggleExchangeKeysModal(true)}>
               {" "}
-              Invite{" "}
+              Exchange keys{" "}
             </StyledButton>
+          )}
+          {currentActiveRoom.type.toLowerCase() === roomTypes.public && (
+            <>
+              <StyledButton
+                onClick={handleGenerateInvitePublicRoomLink}
+                data-tip
+                data-for="CopyInviteLinkButton"
+              >
+                {" "}
+                Generate invite link{" "}
+              </StyledButton>
+              <ReactTooltip
+                event="mouseenter"
+                eventOff="mouseleave"
+                id="CopyInviteLinkButton"
+                backgroundColor={Colors.ANATRACITE}
+              >
+                {" "}
+                {isPublicRoomInviteCopied
+                  ? "Your invite link is ready to be shared!"
+                  : "Generate and copy public room invite link"}{" "}
+              </ReactTooltip>
+            </>
           )}
           <FontAwesomeIcon icon={faTimes} onClick={handleActiveChatClosing} />
         </div>
       </StyledChatDetailsWrapper>{" "}
       <StyledMessagesWrapper ref={chatRef}>
-        {chatMessages.length > 0 &&
-          chatMessages.map(message => (
-            <StyledSingleMessage>{message.text}</StyledSingleMessage>
+        {chatHistoryByRoom?.length > 0 &&
+          chatHistoryByRoom.map(messageObj => (
+            <StyledSingleMessage key={messageObj.uuid}>
+              {messageObj.message_content}
+            </StyledSingleMessage>
           ))}
       </StyledMessagesWrapper>
-      <StyledChatFooterWrapper>
-        <StyledInput
-          placeholder={"Write down your message..."}
-          value={currentInputValue}
-          onChange={e => setCurrentInputValue(e.target.value)}
-        />
-        <div>
-          {" "}
-          <FontAwesomeIcon
-            icon={faPaperPlane}
-            onClick={handleMessageSubmit}
-          />{" "}
-        </div>
-      </StyledChatFooterWrapper>
+      <Input currentActiveRoom={currentActiveRoom} />
       <InviteModal
         toggleInviteModal={toggleInviteModal}
         setToggleInviteModal={setToggleInviteModal}
+      />
+      <ExcangeKeysModal
+        toggleExchangeKeysModal={toggleExchangeKeysModal}
+        setToggleExchangeKeysModal={setToggleExchangeKeysModal}
       />
     </StyledChatContainer>
   );

@@ -1,5 +1,13 @@
+import React, { useEffect } from "react";
 import styled from "styled-components";
-import * as Colors from "../../constants/colors"; 
+import * as Colors from "../../constants/colors";
+import {
+  addActiveChatRoom,
+  getRoomsAction,
+  Room
+} from "../../redux/actions/actionCreator";
+import { useAppDispatch } from "../../redux/hooks/useAppDispatch";
+import { useAppSelector } from "../../redux/hooks/useAppSelector";
 import RoomHandlingButtons from "../RoomHandlingButtons";
 
 const StyledChatRoomWrapper = styled.div`
@@ -24,10 +32,11 @@ const StyledChatRoomCell = styled.div`
     box-shadow: 0px 0px 15px 0px ${Colors.DARK_YELLOW};
   }
 `;
-const StyledChatRoomsTitle = styled.p`
+export const StyledChatRoomsTitle = styled.p`
   color: ${Colors.DARK_YELLOW};
   font-weight: 600;
-  font-size: 24px; 
+  font-size: 24px;
+  text-transform: capitalize;
 `;
 const StyledChatRoomsWrapper = styled.div`
   overflow-y: scroll;
@@ -39,125 +48,37 @@ const StyledChatRoomsWrapper = styled.div`
   height: 85%;
 `;
 
-type ChatRoomProps = {
-  setToggleChatMessages: (shouldToggle: boolean) => void;
-  setChatRoomDetails: (chatDetails: any) => void;
-};
+const ChatRooms = () => {
+  const rooms: any = useAppSelector(state => state.ChatReducer.rooms);
+  const dispatch = useAppDispatch();
 
-const ChatRooms = ({
-  setToggleChatMessages,
-  setChatRoomDetails
-}: ChatRoomProps) => {
-  // const dispatch = useAppDispatch();
-  const handleChatRoomCellClick = () => {
-    // send the neccessary data for fetching the chat messages and open the chat
-    setToggleChatMessages(true);
-    // dispatch(addActiveChatRoom() )
-    setChatRoomDetails({});
+  useEffect(() => {
+    dispatch(getRoomsAction());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleChatRoomCellClick = (room: Room) => {
+    dispatch(addActiveChatRoom(room));
   };
-  //export, generate public key, join
 
   return (
     <>
       <StyledChatRoomWrapper className="col-sm-12 col-md-12 col-lg-4 col-xl-4 h-100">
         <StyledChatRoomsTitle> Chat rooms </StyledChatRoomsTitle>
         <StyledChatRoomsWrapper>
-          <StyledChatRoomCell onClick={handleChatRoomCellClick}>
-            {" "}
-            Room 1
-          </StyledChatRoomCell>
-          <StyledChatRoomCell onClick={handleChatRoomCellClick}>
-            {" "}
-            Room 2
-          </StyledChatRoomCell>
-          <StyledChatRoomCell onClick={handleChatRoomCellClick}>
-            {" "}
-            Room 3
-          </StyledChatRoomCell>
-          <StyledChatRoomCell onClick={handleChatRoomCellClick}>
-            {" "}
-            Room 4
-          </StyledChatRoomCell>
-          {/* <StyledChatRoomCell onClick={handleChatRoomCellClick}>
-            {" "}
-            Room 1
-          </StyledChatRoomCell>
-          <StyledChatRoomCell onClick={handleChatRoomCellClick}>
-            {" "}
-            Room 2
-          </StyledChatRoomCell>
-          <StyledChatRoomCell onClick={handleChatRoomCellClick}>
-            {" "}
-            Room 3
-          </StyledChatRoomCell>
-          <StyledChatRoomCell onClick={handleChatRoomCellClick}>
-            {" "}
-            Room 4
-          </StyledChatRoomCell>
-          <StyledChatRoomCell onClick={handleChatRoomCellClick}>
-            {" "}
-            Room 1
-          </StyledChatRoomCell>
-          <StyledChatRoomCell onClick={handleChatRoomCellClick}>
-            {" "}
-            Room 2
-          </StyledChatRoomCell>
-          <StyledChatRoomCell onClick={handleChatRoomCellClick}>
-            {" "}
-            Room 3
-          </StyledChatRoomCell>
-          <StyledChatRoomCell onClick={handleChatRoomCellClick}>
-            {" "}
-            Room 4
-          </StyledChatRoomCell>
-          <StyledChatRoomCell onClick={handleChatRoomCellClick}>
-            {" "}
-            Room 1
-          </StyledChatRoomCell>
-          <StyledChatRoomCell onClick={handleChatRoomCellClick}>
-            {" "}
-            Room 2
-          </StyledChatRoomCell>
-          <StyledChatRoomCell onClick={handleChatRoomCellClick}>
-            {" "}
-            Room 3
-          </StyledChatRoomCell>
-          <StyledChatRoomCell onClick={handleChatRoomCellClick}>
-            {" "}
-            Room 4
-          </StyledChatRoomCell>
-          <StyledChatRoomCell onClick={handleChatRoomCellClick}>
-            {" "}
-            Room 1
-          </StyledChatRoomCell>
-          <StyledChatRoomCell onClick={handleChatRoomCellClick}>
-            {" "}
-            Room 2
-          </StyledChatRoomCell>
-          <StyledChatRoomCell onClick={handleChatRoomCellClick}>
-            {" "}
-            Room 3
-          </StyledChatRoomCell>
-          <StyledChatRoomCell onClick={handleChatRoomCellClick}>
-            {" "}
-            Room 4
-          </StyledChatRoomCell>
-          <StyledChatRoomCell onClick={handleChatRoomCellClick}>
-            {" "}
-            Room 1
-          </StyledChatRoomCell>
-          <StyledChatRoomCell onClick={handleChatRoomCellClick}>
-            {" "}
-            Room 2
-          </StyledChatRoomCell>
-          <StyledChatRoomCell onClick={handleChatRoomCellClick}>
-            {" "}
-            Room 3
-          </StyledChatRoomCell>
-          <StyledChatRoomCell onClick={handleChatRoomCellClick}>
-            {" "}
-            Room 4
-          </StyledChatRoomCell> */}
+          {Object.keys(rooms).map(key => (
+            <React.Fragment key={key}>
+              <StyledChatRoomsTitle>{`${key}: ${rooms[key].length}`}</StyledChatRoomsTitle>
+              {rooms[key].map((room: Room) => (
+                <StyledChatRoomCell
+                  key={room.id}
+                  onClick={() => handleChatRoomCellClick(room)}
+                >
+                  {room.name}
+                </StyledChatRoomCell>
+              ))}
+            </React.Fragment>
+          ))}
         </StyledChatRoomsWrapper>
         <RoomHandlingButtons />
       </StyledChatRoomWrapper>

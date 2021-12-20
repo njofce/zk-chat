@@ -1,4 +1,7 @@
+import { useState } from "react";
+import { useNavigate } from "react-router";
 import { Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
+import { recover_profile } from "rln-client-lib";
 import styled from "styled-components";
 import * as Colors from "../../constants/colors";
 
@@ -29,7 +32,6 @@ const StyledInput = styled.input`
   &:active {
     outline: none;
   }
-  
 `;
 
 type RecoverModalProps = {
@@ -40,9 +42,12 @@ const RecoverModal = ({
   setToggleRecoverModal,
   toggleRecoverModal
 }: RecoverModalProps) => {
+  const navigate = useNavigate();
+  const [userData, setUserData] = useState("");
 
-  const onReaderLoad = (e: any) => {     
-    const userObj = JSON.parse(e.target.result);     
+  const onReaderLoad = (e: any) => {
+    const userObj = e.target.result;
+    setUserData(userObj);
   };
 
   const handleFileUpload = (e: any) => {
@@ -51,6 +56,18 @@ const RecoverModal = ({
     reader.readAsText(e.target.files[0]);
   };
 
+  const handleRecoverClick = () => {
+    recoverProfile();
+    setToggleRecoverModal(false);
+  };
+
+  const recoverProfile = async () => {
+    try {
+      await recover_profile(userData).then(() => navigate("/dashboard"));
+    } catch (error) {
+      navigate("/r-procedure");
+    }
+  };
   return (
     <Modal centered isOpen={toggleRecoverModal}>
       <ModalHeader toggle={() => setToggleRecoverModal(false)}>
@@ -63,7 +80,7 @@ const RecoverModal = ({
 
       <ModalFooter>
         {" "}
-        <StyledButton>Recover</StyledButton>
+        <StyledButton onClick={handleRecoverClick}>Recover</StyledButton>
       </ModalFooter>
     </Modal>
   );

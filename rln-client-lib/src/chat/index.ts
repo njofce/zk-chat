@@ -6,7 +6,9 @@ import ProfileManager from "../profile";
 import Hasher from "../hasher";
 
 /**
- * TODO: Add docs
+ * The core component that is responsible for creating valid ZK proofs for a message, encrypting and dispatching it, as well as receiving and decrypting messages
+ * for specific rooms. 
+ * This component also takes care of updating the tree root and auth path in case it becomes obsolete.
  */
 class ChatManager {
     
@@ -23,7 +25,12 @@ class ChatManager {
     private prover_key_path: string;
     private circuit_path: string;
 
-    private static RLN_IDENTIFIER = BigInt("1234");
+    /**
+     * Same RLN identifier as the one in server.
+     */
+    private static RLN_IDENTIFIER = BigInt("518137101");
+
+    public static NUM_SHARES: number = 10;
 
     constructor(profile_manager: ProfileManager, communication_manager: ServerCommunication, cryptography: ICryptography) {
         this.profile_manager = profile_manager;
@@ -64,7 +71,7 @@ class ChatManager {
             identitySecret,
             BigInt(externalNullifier),
             xShare,
-            10,
+            ChatManager.NUM_SHARES,
             ChatManager.RLN_IDENTIFIER
         );
 

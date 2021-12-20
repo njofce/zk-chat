@@ -20,6 +20,9 @@ class WebCryptography implements ICryptography {
             throw "This module is intended to work only in the browser";
     }
 
+    /**
+     * Generates AES-GCM symmetric key with AES_KEY_LENGTH bytes.
+     */
     public async generateSymmetricKey(): Promise<string> {
 
         const key = await window.crypto.subtle.generateKey(
@@ -41,6 +44,9 @@ class WebCryptography implements ICryptography {
         throw "Could not generate symmetric key";
     }
     
+    /**
+     * Generates a RSA key pair with a modulus of RSA_MODULUS_LENGTH
+     */
     public async generateKeyPair(): Promise<IKeyPair> {
         let keyPair = await window.crypto.subtle.generateKey(
             {
@@ -66,6 +72,10 @@ class WebCryptography implements ICryptography {
         throw "Could not generate key pairs";
     }
 
+    /**
+     * Encrypts a message using a provided symmetric key.
+     * Throws an exception if the key is invalid
+     */
     public async encryptMessageSymmetric(message: string, symmetricKey: string): Promise<string> {
         const importedSymmetricKey = await window.crypto.subtle.importKey(
             "jwk",
@@ -87,6 +97,10 @@ class WebCryptography implements ICryptography {
         return ab2str(encrypted, "base64");
     }
 
+    /**
+     * Decrypts a message using a provided symmetric key.
+     * Throws an exception if the key is invalid
+     */
     public async decryptMessageSymmetric(cyphertext: string, symmetricKey: string): Promise<string> {
         const importedSymmetricKey = await window.crypto.subtle.importKey(
             "jwk",
@@ -108,6 +122,11 @@ class WebCryptography implements ICryptography {
         return ab2str(decrypted);
     }
 
+    /**
+     * Encrypts a message using a provided public key.
+     * Throws an exception if the key is invalid.
+     * Throws an exception if the message length is longer than the supported length, mentioned above.
+     */
     public async encryptMessageAsymmetric(message: string, publicKey: string): Promise<string> {
         const importedPublicKey = await window.crypto.subtle.importKey(
             "spki",
@@ -127,6 +146,10 @@ class WebCryptography implements ICryptography {
         return ab2str(encryptedBytes, "base64");
     }
     
+    /**
+     * Decrypts a message using a provided public key.
+     * Throws an exception if the key is invalid.
+     */
     public async decryptMessageAsymmetric(cyphertext: string, privateKey: string): Promise<string> {
         const importedPrivateKey = await window.crypto.subtle.importKey(
             "pkcs8",

@@ -1,10 +1,13 @@
 import { useState } from "react";
-import { Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
+import { Modal, ModalBody, ModalHeader } from "reactstrap";
 import styled from "styled-components";
 import * as Colors from "../../constants/colors";
 import { faCopy } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ReactTooltip from "react-tooltip";
+import { invite_private_room } from "rln-client-lib";
+import { useAppSelector } from "../../redux/hooks/useAppSelector";
+import { Room } from "../../redux/actions/actionCreator";
 
 const StyledButton = styled.button`
   background: ${Colors.ANATRACITE};
@@ -35,11 +38,13 @@ const StyledTextarea = styled.textarea`
     outline: none;
   }
 `;
+
 const StyledInviteCodeOuterWrapper = styled.div`
   color: ${Colors.ANATRACITE};
   margin: 8px;
   display: flex;
   align-items: center;
+  
   svg {
     font-size: 30px;
     cursor: pointer;
@@ -54,10 +59,9 @@ const StyledInviteCodeInnerWrapper = styled.div`
   border-radius: 20px;
   padding: 8px 12px;
   margin: 10px 0;
+  word-break: break-all;
 `;
-const uuid =
-  "1f4e1f17-2f1a-4446-82af-8814da3952c4bb 11758729-c8d1-452e-b460-1d36a4c7a05a 700ea381-7e9c-4384-8674-cea3b2f20f06 7efb56fd-a09c-4119-bb2c-d49f1b6a244b";
-
+ 
 type InviteModalProps = {
   setToggleInviteModal: (shouldToggle: boolean) => void;
   toggleInviteModal: boolean;
@@ -70,13 +74,25 @@ const InviteModal = ({
   const [keyValue, setKeyValue] = useState("");
   const [generatedInvite, setDisplayGeneratedInvite] = useState("");
   const [isInviteCopied, setIsInviteCopied] = useState(false);
-
+  //@ts-ignore
+  const currentActiveRoom: Room   = useAppSelector(
+    state => state.ChatReducer.currentActiveRoom
+  );
   const handleInviteCopying = () => {
     setIsInviteCopied(true);
     navigator.clipboard.writeText(generatedInvite).then(() => {
       setTimeout(() => setIsInviteCopied(false), 4000);
     });
   };
+
+  const handleGenerateInvite = async () => {     
+    try {
+      await invite_private_room(currentActiveRoom?.id, keyValue).then(invite => setDisplayGeneratedInvite(invite)
+    );
+    } catch (error) {
+      console.log(error)
+    }
+  }; 
 
   return (
     <Modal centered isOpen={toggleInviteModal}>
@@ -90,7 +106,7 @@ const InviteModal = ({
           onChange={e => setKeyValue(e.target.value)}
           placeholder="Enter your recipient's public key..."
         />
-        <StyledButton onClick={() => setDisplayGeneratedInvite(uuid)}>
+        <StyledButton onClick={handleGenerateInvite}>
           Generate invite
         </StyledButton>
         {generatedInvite && (

@@ -11,7 +11,7 @@ import ChatManager from './chat';
 import { v4 as uuidv4 } from 'uuid';
 import { groupBy } from './util';
 import RLNServerApi from './communication/api';
-import { IPrivateRoom } from './room/interfaces';
+import { IPrivateRoom, IDirectRoom } from './room/interfaces';
 import WebsocketClient from './communication/websocket';
 import WsSocketClient from './communication/ws-socket';
 
@@ -104,12 +104,16 @@ const create_public_room = async(name: string) => {
     if (created == null)
         throw "Server error! Room could not be created";
 
-    await profile_manager.addPublicRoom({
+    const room = {
         id: room_id,
         name: name,
         type: "PUBLIC",
         symmetric_key: symmetric_key
-    });
+    };
+
+    await profile_manager.addPublicRoom(room);
+
+    return room;
 }
 
 const join_public_room = async(room_id: string) => {
@@ -147,12 +151,16 @@ const create_private_room = async (name: string) => {
     const room_id = uuidv4();
     const symmetric_key: string = await generated_cryptography.generateSymmetricKey();
 
-    await profile_manager.addPrivateRoom({
+    const room: IPrivateRoom = {
         id: room_id,
         name: name,
         type: "PRIVATE",
         symmetric_key: symmetric_key
-    });
+    };
+
+    await profile_manager.addPrivateRoom(room);
+
+    return room;
 }
 
 const invite_private_room = async (room_id: string, recipient_public_key: string) => {
@@ -192,7 +200,7 @@ const update_direct_room_key = async (room_id: string, encrypted_symmetric_key: 
     if (generated_cryptography == null || communication == null || profile_manager == null)
         throw "init() not called";
 
-    return await profile_manager.updateDirectRoomKey(room_id, encrypted_symmetric_key);
+    await profile_manager.updateDirectRoomKey(room_id, encrypted_symmetric_key);
 }
 
 const create_direct_room = async (name: string, receiver_public_key: string) => {
@@ -205,13 +213,16 @@ const create_direct_room = async (name: string, receiver_public_key: string) => 
     const room_id = uuidv4();
     const symmetric_key: string = await generated_cryptography.generateSymmetricKey();
 
-    await profile_manager.addDirectRoom({
+    const room: IDirectRoom = {
         id: room_id,
         name: name,
         type: "DIRECT",
         symmetric_key: symmetric_key,
         recipient_public_key: receiver_public_key
-    });
+    };
+
+    await profile_manager.addDirectRoom(room);
+    return room;
 }
 
 const get_chat_history = async () => {
@@ -225,8 +236,10 @@ const get_chat_history = async () => {
         const [decrypted, roomId] = await chat_manager.decryptMessage(message);
 
         if (decrypted != null && roomId != null) {
-            decrypted['room_id'] = roomId;
-            decrypted_messages.push(decrypted);
+            decrypted_messages.push({
+                ...decrypted,
+                room_id: roomId
+            });
         }
     }
 
@@ -257,6 +270,9 @@ const recover_profile = async (profile_data: string) => {
         throw "Profile data invalid";
 
     await profile_manager.recoverProfile(parsed_profile_data);
+    
+    await chat_manager.setRootObsolete();
+    await chat_manager.checkRootUpToDate();
 }
 
 const syncRlnData = (event: string) => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import ChatRooms from "../ChatRooms";
 import ChatMessages from "../ChatMessages";
@@ -10,30 +10,15 @@ const StyledDashboardWrapper = styled.div`
 `;
 
 const Dashboard = () => {
-  const [toggleChatMessages, setToggleChatMessages] = useState(false);
-  const [chatRoomDetails, setChatRoomDetails] = useState({});
   const currentActiveRoom: any = useAppSelector(
-    state => state.TestReducer.currentActiveRoom
+    state => state.ChatReducer.currentActiveRoom
   );
-  const rooms: any = useAppSelector(state => state.TestReducer.rooms);
-
-  useEffect(() => {
-    if (currentActiveRoom.roomName) setToggleChatMessages(true);
-  }, [currentActiveRoom, rooms]);
 
   return (
     <StyledDashboardWrapper className="row">
-      <ChatRooms
-        setToggleChatMessages={setToggleChatMessages}
-        setChatRoomDetails={setChatRoomDetails}
-      />
-      {/* <RoomHandlingButtons /> */}
-      {toggleChatMessages && (
-        <ChatMessages
-          chatRoomDetails={chatRoomDetails}
-          setToggleChatMessages={setToggleChatMessages}
-          currentActiveRoom={currentActiveRoom}
-        />
+      <ChatRooms />
+      {currentActiveRoom && (
+        <ChatMessages currentActiveRoom={currentActiveRoom} />
       )}
     </StyledDashboardWrapper>
   );

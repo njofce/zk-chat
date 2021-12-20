@@ -3,7 +3,15 @@ import { useNavigate } from "react-router";
 import styled from "styled-components";
 import * as Colors from "../../constants/colors";
 import RecoverModal from "../Modals/recoverModal";
-import {init} from 'rln-client-lib';
+import { init } from "rln-client-lib";
+import { useDispatch } from "react-redux";
+import { getRoomsAction } from "../../redux/actions/actionCreator";
+import {
+  identityCommitment,
+  identitySecret,
+  serverUrl,
+  socketUrl
+} from "../../constants/constants";
 
 const StyledRegisterWrapper = styled.div`
   background: ${Colors.ANATRACITE};
@@ -15,7 +23,6 @@ const StyledRegisterWrapper = styled.div`
 const StyledButtonsContainer = styled.div`
   margin: 0 auto;
   min-width: 400px;
-  // box-shadow: 0px 8px 14px 0px gray;
   border-radius: 27px;
   display: flex;
   flex-direction: column;
@@ -36,26 +43,50 @@ const StyledRButton = styled.button`
 `;
 
 const RegisterOrRecover = () => {
-  const [toggleRecoverModal, setToggleRecoverModal] = useState(false)
+  const [toggleRecoverModal, setToggleRecoverModal] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  init({
-    serverUrl: "http://localhost:3000",
-    socketUrl: "ws://localhost:3001"
-  })
+  const handleRegisterClick = () => {
+    initializeApp();
+  };
+
+  const initializeApp = async () => {
+    try {
+      await init(
+        {
+          serverUrl,
+          socketUrl
+        },
+        identityCommitment,
+        identitySecret
+      ).then(() => {
+        dispatch(getRoomsAction());
+        navigate("/dashboard");
+      });
+    } catch (error) {
+      navigate("/r-procedure");
+    }
+  };
 
   return (
     <StyledRegisterWrapper>
       <StyledButtonsContainer>
-        <StyledRButton
-          color={Colors.DARK_YELLOW}
-          onClick={() => navigate("/dashboard")}
-        >
+        <StyledRButton color={Colors.DARK_YELLOW} onClick={handleRegisterClick}>
           {" "}
           Register{" "}
         </StyledRButton>
-        <StyledRButton color={Colors.PASTEL_RED} onClick={()=>setToggleRecoverModal(true)}> Recover </StyledRButton>
-        <RecoverModal toggleRecoverModal={toggleRecoverModal} setToggleRecoverModal={setToggleRecoverModal}/> 
+        <StyledRButton
+          color={Colors.PASTEL_RED}
+          onClick={() => setToggleRecoverModal(true)}
+        >
+          {" "}
+          Recover{" "}
+        </StyledRButton>
+        <RecoverModal
+          toggleRecoverModal={toggleRecoverModal}
+          setToggleRecoverModal={setToggleRecoverModal}
+        />
       </StyledButtonsContainer>
     </StyledRegisterWrapper>
   );

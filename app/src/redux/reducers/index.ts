@@ -1,8 +1,8 @@
 import { AnyAction, combineReducers } from "redux";
-import TestReducer from "./test";
+import ChatReducer from "./chat";
 
 const appReducer = combineReducers({
-  TestReducer
+  ChatReducer
 });
 
 const rootReducer = (state: any, action: AnyAction) => {

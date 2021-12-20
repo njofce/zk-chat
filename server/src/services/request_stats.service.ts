@@ -1,6 +1,9 @@
 import RequestStats from "../persistence/model/request_stats/request_stats.model"
 import { RLNMessage } from "../util/types";
 
+/**
+ * Encapsulates the functionality of handling the request stats, for detecting spam and duplicates.
+ */
 class RequestStatsService {
 
     public async saveMessage(message: RLNMessage) {

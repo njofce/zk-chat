@@ -1,6 +1,9 @@
 import RLNServerApi from './api';
 import { SocketClient } from './interfaces';
 
+/**
+ * Encapsulates the HTTP and Websocket based communication with the server.
+ */
 export class ServerCommunication {
 
     private rln_server: RLNServerApi;

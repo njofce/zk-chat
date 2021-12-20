@@ -10,6 +10,7 @@
         "@libsem/protocols": "^1.0.25",
         "axios": "^0.24.0",
         "circomlib": "0.5.5",
+        "cors": "^2.8.5",
         "dotenv": "^10.0.0",
         "express": "^4.17.1",
         "express-validator": "^6.13.0",

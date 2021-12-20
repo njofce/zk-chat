@@ -7,6 +7,10 @@ import { ICryptography, IKeyPair } from "./crypto/interfaces";
 import ProfileManager from "./profile";
 import { StorageProvider } from "./storage/interfaces";
 
+/**
+ * A sample class used for independently testing the client library workflow with the server.
+ */
+
 class TestStorageProvider implements StorageProvider {
 
     private data = {}
@@ -63,7 +67,7 @@ class LocalTestCryptography implements ICryptography {
     }
 }
 
-const comm_manager = new ServerCommunication(new RLNServerApi("http://localhost:3000"), new SocketClient("ws://localhost:3001"));
+const comm_manager = new ServerCommunication(new RLNServerApi("http://localhost:8080"), new SocketClient("ws://localhost:8081"));
 
 const cryptography = new LocalTestCryptography();
 const storageProvider = new TestStorageProvider();

@@ -3,7 +3,11 @@ import { Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 import styled from "styled-components";
 import * as Colors from "../../constants/colors";
 import { roomTypes } from "../../constants/constants";
-import { createRoomAction } from "../../redux/actions/actionCreator";
+import {
+  createDirectRoomAction,
+  createPublicRoomAction,
+  createPrivateRoomAction
+} from "../../redux/actions/actionCreator";
 import { useAppDispatch } from "../../redux/hooks/useAppDispatch";
 
 const StyledButton = styled.button`
@@ -38,6 +42,20 @@ const StyledButtonsWrapper = styled.div`
   display: flex;
 `;
 
+const StyledTextarea = styled.textarea`
+  border: 1px solid #f0f2f5;
+  border-radius: 20px;
+  width: 100%;
+  position: relative;
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  min-height: 40px;
+  &:focus,
+  &:active {
+    outline: none;
+  }
+`;
+
 type RoomOptionsModalProps = {
   setToggleModal: (shouldToggle: boolean) => void;
   toggleModal: boolean;
@@ -58,11 +76,23 @@ const RoomOptionsModal = ({
 
   const handleRoomCreation = (roomType: string, data: any) => {
     if (data.name) {
-      dispatch(createRoomAction(roomType, data));
-      setModalContent("");
-      setToggleModal(false);
+      switch (roomType) {
+        case roomTypes.public:
+          dispatch(createPublicRoomAction(data.name));
+          break;
+        case roomTypes.private:
+          dispatch(createPrivateRoomAction(data.name));
+          break;
+        case roomTypes.oneOnOne:
+          dispatch(createDirectRoomAction(data.name, data.publicKey));
+          break;
+        default:
+          return handleModalClosing();
+      }
     }
+    handleModalClosing();
   };
+
   const handleModalClosing = () => {
     setModalContent("");
     setToggleModal(false);
@@ -193,6 +223,15 @@ const OneOnOneModal = ({
 }: RoomNameInputProps) => {
   const [roomName, setRoomName] = useState("");
   const [publicKey, setPublicKey] = useState("");
+
+  const handleDirectRoomCreation = () => {
+    if (publicKey && roomName) {
+      handleRoomCreation(roomTypes.oneOnOne, {
+        name: roomName,
+        publicKey
+      });
+    }
+  };
   return (
     <Modal isOpen={toggleModal} centered>
       <ModalHeader toggle={handleModalClosing}>
@@ -204,7 +243,7 @@ const OneOnOneModal = ({
           value={roomName}
           onChange={e => setRoomName(e.target.value)}
         />
-        <StyledInput
+        <StyledTextarea
           placeholder={"Enter your recipient's public key..."}
           value={publicKey}
           onChange={e => setPublicKey(e.target.value)}
@@ -213,12 +252,7 @@ const OneOnOneModal = ({
       <ModalFooter>
         <StyledButton
           color={Colors.ANATRACITE}
-          onClick={() =>
-            handleRoomCreation(roomTypes.oneOnOne, {
-              name: roomName,
-              publicKey
-            })
-          }
+          onClick={handleDirectRoomCreation}
         >
           Create
         </StyledButton>

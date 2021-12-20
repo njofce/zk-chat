@@ -1,6 +1,9 @@
 import Message from '../persistence/model/message/message.model';
 import { IMessage } from './../persistence/model/message/message.types';
 
+/**
+ * Encapsultes the functionality for handling chat messages.
+ */
 class ChatService {
 
     public async getDailyMessages(): Promise<IMessage[]> {

@@ -3,6 +3,9 @@ import { SocketClient } from "./interfaces";
 
 const WebSocket = require('ws');
 
+/**
+ * WS-based socket client, intended to be used for testing purposes or when the library needs to be used independencly of the browser application.
+ */
 class WsSocketClient implements SocketClient {
 
     private sockets_connected: boolean = false;

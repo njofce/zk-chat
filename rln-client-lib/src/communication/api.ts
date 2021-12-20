@@ -1,5 +1,8 @@
 import axios from 'axios';
 
+/**
+ * The main interface for communicating with the server via HTTP.
+ */
 class RLNServerApi {
 
     private server_url: string;

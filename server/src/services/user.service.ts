@@ -6,6 +6,9 @@ import config from '../config';
 import { IMerkleTreeNode, IMerkleTreeNodeDocument } from '../persistence/model/merkle_tree/merkle_tree.types';
 import Hasher from '../util/hasher';
 
+/**
+ * Encapsulates the core functionality for managing user credentials as well as viewing the banned users.
+ */
 class UserService {
 
     private hasher: Hasher;

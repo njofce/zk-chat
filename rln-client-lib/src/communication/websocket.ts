@@ -1,6 +1,9 @@
 import { serverTopics } from '.';
 import { SocketClient } from './interfaces';
 
+/**
+ * A websocket client used for in-browser socket communication.
+ */
 class WebsocketClient implements SocketClient {
     
     private sockets_connected: boolean = false;
@@ -36,17 +39,14 @@ class WebsocketClient implements SocketClient {
     }
 
     public receiveMessage = async(callback: (message: string) => void) => {
-        this.message_broadcast_socket.addEventListener('message', function message(data) {
-            const bufferData = Buffer.from(data);
-            callback(bufferData.toString());
+        this.message_broadcast_socket.addEventListener('message', function message(data: MessageEvent) {
+            callback(data.data);
         });
     };
 
     public receiveEvent = (callback: (event: string) => void) => {
-        this.updates_socket.addEventListener('message', function message(data) {
-            const bufferData = Buffer.from(data);
-            console.log("received update: ", bufferData.toString());
-            callback(bufferData.toString());
+        this.updates_socket.addEventListener('message', function message(data: MessageEvent) {
+            callback(data.data);
         });
     };
 

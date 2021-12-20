@@ -1,6 +1,9 @@
 import Group from '../persistence/model/group/group.model';
 import { IGroup } from '../persistence/model/group/group.types';
 
+/**
+ * Encapsulates the functionality for working with InterRep groups
+ */
 class GroupService {
 
     public async getGroups(): Promise<IGroup[]> {

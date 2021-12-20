@@ -21,9 +21,9 @@ const redisConfig: ClientOpts = {
  */
 const socketServerConfig: ISocketServerConfig = {
     port: config.SOCKET_SERVER_PORT,
-    messageChannel: "messages",
-    messageBroadcastChannel: "message-broadcast",
-    updatesChannel: "updates"
+    messageChannel: config.MESSAGES_CHANNEL,
+    messageBroadcastChannel: config.MESSAGES_BROADCAST,
+    updatesChannel: config.UPDATES_CHANNEL
 }
 
 /**

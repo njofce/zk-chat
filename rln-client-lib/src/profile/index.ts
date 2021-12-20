@@ -1,12 +1,23 @@
 import { ICryptography, IKeyPair } from '../crypto/interfaces';
-import { IPublicRoom, IDirectRoom, IPrivateRoom, IChatRoom } from '../room/interfaces';
+import { IPublicRoom, IDirectRoom, IPrivateRoom } from '../room/interfaces';
 import { deepClone } from '../util';
 import { StorageProvider } from '../storage/interfaces';
 import { IProfile, IRooms } from './interfaces';
 
+/**
+ * Manages the local profile of the current user. The profile is kept in-memory, and continuously synced with the profile stored in the selected
+ * storage provider.
+ */
 class ProfileManager {
 
+    /**
+     * The key that is used to store the profile data in the storage provider.
+     */
     private static PROFILE_STORAGE_KEY: string = "PROFILE";
+
+    /**
+     * Maximum length of any room's name.
+     */
     public static ROOM_NAME_MAX_LENGTH: number = 200;
 
     private storageProvider: StorageProvider;
@@ -19,10 +30,16 @@ class ProfileManager {
         this.cryptography = cryptography;
     }
 
+    /**
+     * Sync the current in-memory profile to the storage.
+     */
     private async persistProfile(): Promise<void> {
         await this.storageProvider.save(ProfileManager.PROFILE_STORAGE_KEY, JSON.stringify(this.inMemoryProfile));
     }
 
+    /**
+     * Loads the profile from storage, returns false if it doesn't exist.
+     */
     public async loadProfile(): Promise<boolean> {
         try {
             const loadedProfile = await this.storageProvider.load(ProfileManager.PROFILE_STORAGE_KEY);
@@ -36,6 +53,9 @@ class ProfileManager {
         }
     }
 
+    /**
+     * Creates a new profile for the given params, and overwrites a profile in local storage, if exists.
+     */
     public async initProfile(identityCommitment: string, identitySecret: string[], root_hash: string, auth_path: string): Promise<void> { 
         const userKeyPair: IKeyPair = await this.cryptography.generateKeyPair();
         const profile: IProfile = {
@@ -55,6 +75,9 @@ class ProfileManager {
         await this.persistProfile();
     }
 
+    /**
+     * Validates if the provided object is a valid profile data.
+     */
     public async validateFormat(parsed_profile_data: any): Promise<boolean> {
 
         const keys: string[] = Object.keys(parsed_profile_data);
@@ -88,15 +111,24 @@ class ProfileManager {
         return true;
     }
 
+    /**
+     * Stores the profile in local storage, overwriting an existing one.
+     */
     public async recoverProfile(profile: IProfile): Promise<void> {
         this.inMemoryProfile = deepClone(profile);
         await this.persistProfile();
     }
 
+    /**
+     * Check if profile exists.
+     */
     public profileExists() {
         return this.inMemoryProfile != null;
     }
 
+    /**
+     * Exports profile to string.
+     */
     public async exportProfile(): Promise<string> {
         if (this.profileExists()) {
             return JSON.stringify(this.inMemoryProfile);
@@ -104,6 +136,9 @@ class ProfileManager {
         throw "No profile exists locally";
     }
 
+    /**
+     * Returns the public key of the given profile.
+     */
     public async getPublicKey(): Promise<string> {
         if (this.inMemoryProfile != null) {
             return this.inMemoryProfile.user_public_key;
@@ -111,6 +146,9 @@ class ProfileManager {
         throw "No profile exists locally";
     }
 
+    /**
+     * Returns the private key of the given profile.
+     */
     public async getPrivateKey(): Promise<string> {
         if (this.inMemoryProfile != null) {
             return this.inMemoryProfile.user_private_key;
@@ -118,12 +156,18 @@ class ProfileManager {
         throw "No profile exists locally";
     }
 
+    /**
+     * Returns the profile, if exists.
+     */
     public getProfile(): IProfile {
         if (this.inMemoryProfile != null)
             return this.inMemoryProfile;
         throw "No profile exists";
     }
 
+    /**
+     * Returns the rln root, if exists.
+     */
     public getRlnRoot() {
         if (this.inMemoryProfile != null) {
             return this.inMemoryProfile.root_hash;
@@ -131,6 +175,9 @@ class ProfileManager {
         throw "Profile doesn't exist";
     }
 
+    /**
+     * Returns the identity commitment, if exists.
+     */
     public getIdentityCommitment() {
         if (this.inMemoryProfile != null) {
             return this.inMemoryProfile.rln_identity_commitment;
@@ -138,6 +185,9 @@ class ProfileManager {
         throw "Profile doesn't exist";
     }
 
+    /**
+     * Returns the identity secret, if exists.
+     */
     public getIdentitySecret(): bigint[] {
         if (this.inMemoryProfile != null) {
             return this.inMemoryProfile.rln_identity_secret.map(x => BigInt(x));
@@ -145,6 +195,9 @@ class ProfileManager {
         throw "Profile doesn't exist";
     }
 
+    /**
+     * Returns the auth path, if exists.
+     */
     public getAuthPath(): string {
         if (this.inMemoryProfile != null) {
             return this.inMemoryProfile.auth_path;
@@ -152,6 +205,9 @@ class ProfileManager {
         throw "Profile doesn't exist";
     }
 
+    /**
+     * Updates the root hash, if profile exists.
+     */
     public async updateRootHash(hash: string) {
         if (this.inMemoryProfile != null) {
             this.inMemoryProfile.root_hash = hash;
@@ -159,6 +215,9 @@ class ProfileManager {
         }
     } 
 
+    /**
+     * Updates the auth path, if profile exists.
+     */
     public async updateAuthPath(path: string) {
         if (this.inMemoryProfile != null) {
             this.inMemoryProfile.auth_path = path;
@@ -166,6 +225,10 @@ class ProfileManager {
         }
     }
 
+    /**
+     * Creates a public room.
+     * Throws an exception if a room with the same key exists (which means the user already is part of that room)
+     */
     public async addPublicRoom(room: IPublicRoom) {
         if (this.inMemoryProfile != null) {
 
@@ -179,6 +242,10 @@ class ProfileManager {
         }
     }
 
+    /**
+     * Creates a private room.
+     * Throws an exception if a room with the same key exists (which means the user already is part of that room)
+     */
     public async addPrivateRoom(room: IPrivateRoom) {
         if (this.inMemoryProfile != null) {
 
@@ -192,6 +259,10 @@ class ProfileManager {
         }
     }
 
+    /**
+     * Creates a direct room.
+     * Throws an exception if a room with the same recepient public key exists (which means the user already is part of that room)
+     */
     public async addDirectRoom(room: IDirectRoom) {
         if (this.inMemoryProfile != null) {
 
@@ -205,6 +276,9 @@ class ProfileManager {
         }
     }
 
+    /**
+     * Return all rooms for the user.
+     */
     public async getRooms(): Promise<IRooms> {
         if (this.inMemoryProfile != null) {            
             return deepClone(this.inMemoryProfile.rooms);
@@ -216,6 +290,9 @@ class ProfileManager {
         };
     }
 
+    /**
+     * Return all room ids for the user.
+     */
     public async getRoomIds(): Promise<string[]> {
         if (this.inMemoryProfile != null) {
                 return Array()
@@ -226,6 +303,9 @@ class ProfileManager {
         return [];
     }
 
+    /**
+     * Return a room by id, throws an exception if no room with the given id exists.
+     */
     public async getRoomById(id: string): Promise<any> {
         if (this.inMemoryProfile == null)
             throw "Profile doesn't exist";
@@ -248,6 +328,9 @@ class ProfileManager {
         throw "Room doesn't exist";
     }
 
+    /**
+     * Encrypts a message using the target room's key.
+     */
     public async encryptMessageForRoom(id: string, message: string): Promise<string> {
         if (this.inMemoryProfile == null)
             throw "Profile doesn't exist";
@@ -273,6 +356,9 @@ class ProfileManager {
         throw "Room doesn't exist";
     }
 
+    /**
+     * Return specific rooms for the user.
+     */
     public async getUserRoomsForChatType(type: string): Promise<any[]> {
         if (this.inMemoryProfile == null)
             throw "Profile doesn't exist";
@@ -288,6 +374,9 @@ class ProfileManager {
         }
     }
 
+    /**
+     * Encrypts the direct room's symmetric key with the recepient public key.
+     */
     public async generateEncryptedInviteDirectRoom(room_id: string): Promise<string> {
         if (this.inMemoryProfile == null)
             throw "Profile doesn't exist";
@@ -300,6 +389,9 @@ class ProfileManager {
         return this.cryptography.encryptMessageAsymmetric(room.symmetric_key, room.recipient_public_key);
     }
 
+    /**
+     * Updates the direct room's symmetric key, by decrypting an invite with the user's private key.
+     */
     public async updateDirectRoomKey(room_id: string, encrypted_symmetric_key: string): Promise<void> {
         if (this.inMemoryProfile == null)
             throw "Profile doesn't exist";
@@ -310,7 +402,7 @@ class ProfileManager {
 
         const room: IDirectRoom = this.inMemoryProfile.rooms.direct[directIndex];
 
-        const decrypted_symm_key = await this.cryptography.decryptMessageAsymmetric(encrypted_symmetric_key, room.recipient_public_key);
+        const decrypted_symm_key = await this.cryptography.decryptMessageAsymmetric(encrypted_symmetric_key, this.inMemoryProfile.user_private_key);
 
         room.symmetric_key = decrypted_symm_key;
         await this.persistProfile();

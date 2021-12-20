@@ -26,6 +26,8 @@ class MessageHandlerService {
     private hasher: Hasher;
     private verifierKey: any;
 
+    private static TIMESTAMP_TOLERATED_DIFFERENCE_SECONDS: number = 60;
+
     constructor(pubSub: PubSub, userService: UserService, requestStatsService: RequestStatsService, hasher: Hasher) {
         this.pubSub = pubSub;
         this.userService = userService;
@@ -107,9 +109,9 @@ class MessageHandlerService {
 
         const messageTimestamp = new Date(message.epoch);
 
-        // Tolerate a difference of 60 seconds between client and server timestamp
+        // Tolerate a difference of TIMESTAMP_TOLERATED_DIFFERENCE_SECONDS seconds between client and server timestamp
         const difference_in_seconds = Math.abs(timeNow.getTime() - messageTimestamp.getTime()) / (1000 * 60);
-        if (difference_in_seconds > 60)
+        if (difference_in_seconds > MessageHandlerService.TIMESTAMP_TOLERATED_DIFFERENCE_SECONDS)
             return false;
 
         return this.hasher.genExternalNullifier(generatedEpoch) == this.hasher.genExternalNullifier(message.epoch);
@@ -133,7 +135,7 @@ class MessageHandlerService {
     }
 
     private areSpamRulesViolated = async (message: RLNMessage): Promise<boolean> => {
-        return this.requestStatsService.isSpam(message, 10);
+        return this.requestStatsService.isSpam(message, config.SPAM_TRESHOLD);
     }
 
     private persistMessage = async (message: RLNMessage): Promise<IMessage> => {

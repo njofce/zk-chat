@@ -681,7 +681,10 @@ describe('Test main', () => {
 
         // Success
         jest.spyOn(ProfileManager.prototype, "validateFormat").mockResolvedValue(true);
+        jest.spyOn(ChatManager.prototype, "setRootObsolete").mockImplementation(async() => {});
+        jest.spyOn(ChatManager.prototype, "checkRootUpToDate").mockImplementation(async () => { });
         const spy = jest.spyOn(ProfileManager.prototype, "recoverProfile").mockImplementation(async(pr) => {});
+
 
         await recover_profile(profile);
         expect(spy).toHaveBeenCalled();
