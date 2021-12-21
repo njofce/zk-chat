@@ -5,6 +5,22 @@
     <p align="center">Anonymous instant chat application using RLN</p>
 </p>
 
+<p align="center">
+    <a href="https://github.com/njofce/rln-anonymous-chat" target="_blank">
+        <img src="https://img.shields.io/badge/project-RLN%20Anonymous%20Chat-blue.svg?style=flat-square">
+    </a>
+    <a href="https://github.com/njofce/rln-anonymous-chat/actions/workflows/run-tests.yaml">
+        <img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/njofce/rln-anonymous-chat/test?label=test&logo=github">
+    </a>
+    <a href="https://eslint.org/" target="_blank">
+        <img alt="Linter eslint" src="https://img.shields.io/badge/linter-eslint-8080f2?style=flat-square&logo=eslint">
+    </a>
+    <a href="https://prettier.io/" target="_blank">
+        <img alt="Code style prettier" src="https://img.shields.io/badge/code%20style-prettier-f8bc45?style=flat-square&logo=prettier">
+    </a>
+    <img alt="Repository top language" src="https://img.shields.io/github/languages/top/njofce/rln-anonymous-chat?style=flat-square">
+</p>
+
 A spam resistant instant messaging application for private and anonymous communication. It has the following general properties:
 
 - **Spam Resistance**: members of all sorts of chat rooms will be removed if they spam the communication channel.
