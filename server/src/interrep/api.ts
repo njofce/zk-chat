@@ -35,10 +35,6 @@ const getMembersForGroup = async (groupHash: string, limit: number = 100, offset
                 'Accept': 'application/json',
             }
         });
-
-        if (res.status != 200) {
-            return [];
-        }
         
         return res.data.data.map((el, index) => {
             return {
