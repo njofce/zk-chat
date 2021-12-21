@@ -3,6 +3,7 @@ dotenv.config();
 
 export default {
     INTERREP_BASE_URL: process.env.INTERREP_BASE_URL || "https://api.thegraph.com/subgraphs/name/interrep/kovan",
+    INTERREP_V2: process.env.INTERREP_V2 || "https://kovan.interrep.link/api",
     REDIS_HOSTNAME: process.env.REDIS_HOSTNAME || "localhost",
     REDIS_PORT: parseInt(process.env.REDIS_PORT || "6379") || 6379,
     REDIS_PASSWORD: process.env.REDIS_PASSWORD || "password",

@@ -31,7 +31,6 @@ const AppWrapper = () => {
         socketUrl: socketUrl
       })
         .then(() => {
-          console.log('init called')
           if (!location.pathname.includes(roomTypes.public))
             navigate("/dashboard");
           dispatch(getRoomsAction());

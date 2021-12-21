@@ -13,7 +13,7 @@ jobs:
           cmd: build
       - uses: borales/actions-yarn@v2.3.0
         with:
-          cmd: test-server
+          cmd: test-lib
       - uses: borales/actions-yarn@v2.3.0
         with:
-          cmd: test-lib
+          cmd: test-server

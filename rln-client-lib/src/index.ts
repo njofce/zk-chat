@@ -28,15 +28,17 @@ const init = async (
     storage_provider?: StorageProvider, 
     cryptography?: ICryptography) => {
 
-    let socket_client: SocketClient;
-    if (window != undefined) {
-        socket_client = new WebsocketClient(server_config.socketUrl);
-    } else {
-        socket_client = new WsSocketClient(server_config.socketUrl);
-    }
+    if (communication == null) {
+        let socket_client: SocketClient;
+        if (window != undefined) {
+            socket_client = new WebsocketClient(server_config.socketUrl);
+        } else {
+            socket_client = new WsSocketClient(server_config.socketUrl);
+        }
 
-    communication = new ServerCommunication(new RLNServerApi(server_config.serverUrl), socket_client);
-    await communication.init();
+        communication = new ServerCommunication(new RLNServerApi(server_config.serverUrl), socket_client);
+        await communication.init();
+    }
     
     if (storage_provider) {
         generated_storage_provider = storage_provider;

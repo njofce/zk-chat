@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import { Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
-import { recover_profile } from "rln-client-lib";
+import { init, receive_message, recover_profile } from "rln-client-lib";
 import styled from "styled-components";
 import * as Colors from "../../constants/colors";
+import { serverUrl, socketUrl } from "../../constants/constants";
+import { addMessageToRoomAction, getChatHistoryAction, getRoomsAction } from "../../redux/actions/actionCreator";
 
 const StyledButton = styled.button`
   background: ${Colors.ANATRACITE};
@@ -43,7 +46,31 @@ const RecoverModal = ({
   toggleRecoverModal
 }: RecoverModalProps) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [userData, setUserData] = useState("");
+
+  const initializeApp = async () => {
+    try {
+      await init({
+        serverUrl: serverUrl,
+        socketUrl: socketUrl
+      })
+        .then(() => {
+          navigate("/dashboard");
+          dispatch(getRoomsAction());
+          dispatch(getChatHistoryAction());
+        })
+        .then(async () => {
+          await receive_message(receiveMessageCallback);
+        });
+    } catch (error) {
+      navigate("/r-procedure");
+    }
+  };
+
+  const receiveMessageCallback = (message: any, roomId: string) => {
+    dispatch(addMessageToRoomAction(message, roomId));
+  };
 
   const onReaderLoad = (e: any) => {
     const userObj = e.target.result;
@@ -63,7 +90,7 @@ const RecoverModal = ({
 
   const recoverProfile = async () => {
     try {
-      await recover_profile(userData).then(() => navigate("/dashboard"));
+      await recover_profile(userData).then(() => initializeApp());
     } catch (error) {
       navigate("/r-procedure");
     }

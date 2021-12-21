@@ -3,9 +3,9 @@ import { useNavigate } from "react-router";
 import styled from "styled-components";
 import * as Colors from "../../constants/colors";
 import RecoverModal from "../Modals/recoverModal";
-import { init } from "rln-client-lib";
+import { init, receive_message } from "rln-client-lib";
 import { useDispatch } from "react-redux";
-import { getRoomsAction } from "../../redux/actions/actionCreator";
+import { addMessageToRoomAction, getChatHistoryAction, getRoomsAction } from "../../redux/actions/actionCreator";
 import {
   identityCommitment,
   identitySecret,
@@ -61,12 +61,20 @@ const RegisterOrRecover = () => {
         identityCommitment,
         identitySecret
       ).then(() => {
-        dispatch(getRoomsAction());
         navigate("/dashboard");
+        dispatch(getRoomsAction());
+        dispatch(getChatHistoryAction())
+      })
+      .then(async() => {
+        await receive_message(receiveMessageCallback);
       });
     } catch (error) {
       navigate("/r-procedure");
     }
+  };
+
+  const receiveMessageCallback = (message: any, roomId: string) => {
+    dispatch(addMessageToRoomAction(message, roomId));
   };
 
   return (
