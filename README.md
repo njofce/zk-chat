@@ -9,7 +9,7 @@
     <a href="https://github.com/njofce/rln-anonymous-chat" target="_blank">
         <img src="https://img.shields.io/badge/project-RLN%20Anonymous%20Chat-blue.svg?style=flat-square">
     </a>
-    <a href="https://github.com/njofce/rln-anonymous-chat/actions/workflows/run-tests.yaml">
+    <a href="https://github.com/njofce/rln-anonymous-chat/actions/workflows/test.yaml">
         <img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/njofce/rln-anonymous-chat/test?label=test&logo=github">
     </a>
     <a href="https://eslint.org/" target="_blank">
