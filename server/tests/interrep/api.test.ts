@@ -1,7 +1,7 @@
 import { IInterRepGroupV2 } from './../../dist/src/interrep/interfaces.d';
 import axios, { AxiosStatic } from 'axios'
 import apiFunctions from '../../src/interrep/api';
-import { IGroupMember, IInterRepGroup } from '../../src/interrep/interfaces';
+import { IGroupMember } from '../../src/interrep/interfaces';
 import { clearDatabase } from '../jest.setup';
 import { jest, test, expect, describe, afterEach } from '@jest/globals'
 
@@ -64,7 +64,6 @@ describe('Test interrep sync - subgraph', () => {
         });
 
         const members: IGroupMember[] = await apiFunctions.getMembersForGroup("id1");
-        console.log(members);
         expect(members.length).toEqual(6);
         expect(members[0]).toEqual({ index: 0, identityCommitment: 'id-0' });
         expect(members[1]).toEqual({ index: 1, identityCommitment: 'id-1' });
