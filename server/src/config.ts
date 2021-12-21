@@ -13,7 +13,7 @@ export default {
     SOCKET_SERVER_PORT: parseInt(process.env.SOCKET_SERVER_PORT || "8081") || 8081,
     MERKLE_TREE_LEVELS: parseInt(process.env.MERKLE_TREE_LEVELS || "15", 10) || 15,
     SPAM_TRESHOLD: parseInt(process.env.SPAM_TRESHOLD || "10", 10) || 10,
-    INTERREP_SYNC_INTERVAL_SECONDS: parseInt(process.env.INTERREP_SYNC_INTERVAL_SECONDS || "300", 300),
+    INTERREP_SYNC_INTERVAL_SECONDS: parseInt(process.env.INTERREP_SYNC_INTERVAL_SECONDS || "300") || 300,
     ZERO_VALUE: BigInt(0),
     RLN_IDENTIFIER: parseInt(process.env.RLN_IDENTIFIER || "518137101") || 518137101,
     MESSAGES_CHANNEL: process.env.MESSAGES_CHANNEL || "messages",

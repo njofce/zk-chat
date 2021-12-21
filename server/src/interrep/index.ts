@@ -34,10 +34,10 @@ class InterRepSynchronizer {
      */
     public sync = async() => {
         await this.syncCommitmentsFromInterRep();
-        // await this.continuousSync();
+        await this.continuousSync();
     }
 
-    private syncCommitmentsFromInterRep = async() => {
+    public syncCommitmentsFromInterRep = async() => {
         // On startup
         // 1. Get all groups from interrep
         const allGroupsOnNet: IInterRepGroupV2[] = await interRepFunctions.getAllGroups();
@@ -117,8 +117,9 @@ class InterRepSynchronizer {
         return loadedMembers;
     }
 
-    private continuousSync = async () => {
+    private async continuousSync() {
         setInterval(async() => {
+            console.log("Syncing with InterRep!");
             await this.syncCommitmentsFromInterRep();
         }, config.INTERREP_SYNC_INTERVAL_SECONDS * 1000);
     }

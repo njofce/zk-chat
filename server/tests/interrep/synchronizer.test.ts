@@ -103,7 +103,7 @@ describe('Test interrep synchronizer', () => {
         let appendUsersSpy = jest.spyOn(UserService.prototype, 'appendUsers');
         appendUsersSpy.mockResolvedValue("success");
 
-        await synchronizer.sync();
+        await synchronizer.syncCommitmentsFromInterRep();
 
         expect(getGroupsSpy).toHaveBeenCalled();
         expect(saveGroupSpy).toHaveBeenCalledTimes(3 + 1);
@@ -147,7 +147,7 @@ describe('Test interrep synchronizer', () => {
 
         let appendUsersSpy = jest.spyOn(userService, 'appendUsers').mockResolvedValue("success");
 
-        await synchronizer.sync();
+        await synchronizer.syncCommitmentsFromInterRep();
 
         expect(getGroupsSpy).toHaveBeenCalled();
         // expect(saveGroupSpy).not.toHaveBeenCalled();
@@ -188,7 +188,7 @@ describe('Test interrep synchronizer', () => {
 
         let appendUsersSpy = jest.spyOn(userService, 'appendUsers').mockResolvedValue("success");
 
-        await synchronizer.sync();
+        await synchronizer.syncCommitmentsFromInterRep();
 
         expect(getGroupsSpy).toHaveBeenCalled();
         expect(saveGroupSpy).toHaveBeenCalledTimes(1 + 1);
