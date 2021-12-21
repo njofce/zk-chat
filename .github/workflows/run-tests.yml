@@ -3,20 +3,23 @@ on: [push]
 jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [16.x]
     steps:
       - uses: actions/checkout@v2
-      - uses: borales/actions-yarn@v2.3.0
+      - uses: actions/setup-node@v1
         with:
-          cmd: install
-      - uses: borales/actions-yarn@v2.3.0
-        with:
-          cmd: build
-      - uses: borales/actions-yarn@v2.3.0
-        with:
-          cmd: test-lib
-      - uses: borales/actions-yarn@v2.3.0
-        with:
-          cmd: test-server
+          node-version: "16.x"
+        
+      - uses: c-hive/gha-yarn-cache@v2
+
+      - name: Install dependencies
+        run: |
+          yarn install
+
+      - name: Build
+        run: yarn build
+
+      - name: Test client lib
+        run: yarn test-lib
+
+      - name: Test server
+        run: yarn test-server
