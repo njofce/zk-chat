@@ -1,0 +1,20 @@
+[log]
+  level = "DEBUG"
+
+[providers]
+  [providers.docker]
+    exposedByDefault = false
+  [providers.file]
+    directory = "/etc/traefik/dynamic"
+
+[entryPoints]
+  [entryPoints.http]
+    address = ":80"
+  [entryPoints.https]
+    address = ":443"
+
+[certificatesResolvers.lets-encrypt.acme]
+  storage = "/etc/traefik/acme.json"
+  email = "jofce.nasi@gmail.com"
+  caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
+  [certificatesResolvers.lets-encrypt.acme.tlsChallenge]
