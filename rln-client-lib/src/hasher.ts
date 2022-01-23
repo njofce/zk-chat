@@ -1,4 +1,4 @@
-import { NRln, genExternalNullifier, genSignalHash } from "@libsem/protocols"
+import { NRLN, genExternalNullifier, genSignalHash } from "@zk-kit/protocols"
 
 export default class Hasher {
 
@@ -13,14 +13,14 @@ export default class Hasher {
     }
 
     public genWitness(identitySecret, witness, externalNullifier, signal, rln_id) {
-        return NRln.genWitness(identitySecret, witness, externalNullifier, signal, rln_id);
+        return NRLN.genWitness(identitySecret, witness, externalNullifier, signal, rln_id);
     }
 
     public async genProof(proofWitness, circuit_path, key_path) {
-        return NRln.genProof(proofWitness, circuit_path, key_path);
+        return NRLN.genProof(proofWitness, circuit_path, key_path);
     }
 
     public calculateOutput(identitySecret, externalNullifier, xShare, share_count, rln_id) {
-        return NRln.calculateOutput(identitySecret, externalNullifier, xShare, share_count, rln_id);
+        return NRLN.calculateOutput(identitySecret, externalNullifier, xShare, share_count, rln_id);
     }
 }

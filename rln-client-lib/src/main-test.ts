@@ -1,4 +1,4 @@
-import { ZkIdentity } from "@libsem/identity";
+import { SecretType, Strategy, ZkIdentity } from "@zk-kit/identity";
 import ChatManager from "./chat";
 import { ServerCommunication } from "./communication";
 import RLNServerApi from "./communication/api";
@@ -76,10 +76,11 @@ const profile = new ProfileManager(storageProvider, cryptography);
 const chat = new ChatManager(profile, comm_manager, cryptography);
 
 const main = async () => {
-    let zkIdentity: ZkIdentity = ZkIdentity.genFromSerialized(`{
+    let zkIdentity: ZkIdentity = new ZkIdentity(Strategy.SERIALIZED ,`{
         "identityNullifier":"9dd8ec97c78ec5c26fee7791e6ecca93f68fae7d9b5a050c12dfda6181bc88",
         "identityTrapdoor":"f064ac44608d02370c8f2942d048ac040ccedd241907e0297f50279d9621d5",
-        "secret":[
+        "secret":["9dd8ec97c78ec5c26fee7791e6ecca93f68fae7d9b5a050c12dfda6181bc88", "f064ac44608d02370c8f2942d048ac040ccedd241907e0297f50279d9621d5"]
+        "multipartSecret":[
             "a56102e45e6232e9ed26face75e0ff4e0579d9c0d3ab14e3951919f486038f",
             "f658aebab17a5c7843a82270562a6cf50cd96d8b34a85b5804ec65b6333a39",
             "b126e4885dc4beb994d70d837889591c7d62dcd0e78597af3ff8e6bede7164",
@@ -92,8 +93,8 @@ const main = async () => {
             "7a8e2772c93bf114460fede8a0fe7d72521d99ae9cd92ebb563d1753a18cd1"
         ]}`);
  
-    const idSecret: bigint[] = zkIdentity.getSecret();
-    const idCommitment: BigInt = zkIdentity.genIdentityCommitmentFromSecret();
+    const idSecret: bigint[] = zkIdentity.getMultipartSecret();
+    const idCommitment: BigInt = zkIdentity.genIdentityCommitment(SecretType.MULTIPART, 10);
     
     const id_commitment = idCommitment.toString();
     await profile.initProfile(

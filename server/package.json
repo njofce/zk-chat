@@ -6,8 +6,8 @@
     "author": "Nasi Jofche",
     "license": "MIT",
     "dependencies": {
-        "@libsem/identity": "^1.0.19",
-        "@libsem/protocols": "^1.0.25",
+        "@zk-kit/identity": "^1.2.0",
+        "@zk-kit/protocols": "^1.2.0",
         "axios": "^0.24.0",
         "circomlib": "0.5.5",
         "cors": "^2.8.5",
