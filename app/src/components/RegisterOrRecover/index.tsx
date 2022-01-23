@@ -44,6 +44,7 @@ const StyledRButton = styled.button`
 
 const RegisterOrRecover = () => {
   const [toggleRecoverModal, setToggleRecoverModal] = useState(false);
+  const [zkClient, setZkClient] = useState(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -53,6 +54,7 @@ const RegisterOrRecover = () => {
 
   const initializeApp = async () => {
     try {
+      // getActiveIdentity();
       await init(
         {
           serverUrl,
@@ -72,6 +74,16 @@ const RegisterOrRecover = () => {
       navigate("/r-procedure");
     }
   };
+
+  const getActiveIdentity = async () => {
+    console.log('getting the identity');
+    const { injected } = window as any
+    const client = await injected.connect();
+    await client.openPopup();
+    const id = await client.getActiveIdentity(10);
+
+    console.log(id);
+  }
 
   const receiveMessageCallback = (message: any, roomId: string) => {
     dispatch(addMessageToRoomAction(message, roomId));
