@@ -1,0 +1,122 @@
+version: '3.1'
+
+services:
+  traefik:
+    image: traefik:2.2
+    restart: always
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ../traefik:/etc/traefik
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - apinetwork
+
+  mongo:
+    image: mongo:5.0.4-focal
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - ./mongo-db:/data/db
+    networks:
+      - dbnetwork
+
+  redis:
+    image: redis:6.2.6-alpine
+    ports:
+      - 6379:6379
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+      - ./redis-data:/data
+    networks:
+      - dbnetwork
+
+  rln-chat-server:
+    image: njofce/rln-chat-server
+    container_name: api
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    restart: always
+    expose:
+      - 8080
+      - 8081
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=rlnanonymouschat_apinetwork'
+
+      - 'traefik.http.routers.zkchathttp.rule=Host(`api.zkchat.org`)'
+      - "traefik.http.routers.zkchathttp.service=zk_chat_http"
+      - 'traefik.http.routers.zkchathttp.tls=true'
+      - 'traefik.http.routers.zkchathttp.tls.certresolver=lets-encrypt'
+
+      - "traefik.http.services.zk_chat_http.loadbalancer.server.port=8080"
+
+      - 'traefik.http.routers.zkchatws.rule=Host(`api-ws.zkchat.org`)'
+      - "traefik.http.routers.zkchatws.service=zk_chat_ws"
+      - 'traefik.http.routers.zkchatws.tls=true'
+      - 'traefik.http.routers.zkchatws.tls.certresolver=lets-encrypt'
+
+      - "traefik.http.services.zk_chat_ws.loadbalancer.server.port=8081"
+
+    environment:
+      - REDIS_HOSTNAME=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=password
+      - REDIS_CHANNEL=nodeSync
+      - INTERREP_BASE_URL=https://api.thegraph.com/subgraphs/name/interrep/kovan
+      - INTERREP_V2=https://kovan.interrep.link/api
+      - DB_CONNECTION_STRING=mongodb://mongo:27017/test
+      - SERVER_PORT=8080
+      - SOCKET_SERVER_PORT=8081
+      - MERKLE_TREE_LEVELS=15
+      - SPAM_TRESHOLD=10
+      - INTERREP_SYNC_INTERVAL_SECONDS=301
+      - RLN_IDENTIFIER=518137101
+      - MESSAGES_CHANNEL=messages
+      - MESSAGES_BROADCAST_CHANNEL=message-broadcast
+      - UPDATES_CHANNEL=updates
+    depends_on:
+      - mongo
+      - redis
+    networks:
+      - apinetwork
+      - dbnetwork
+
+
+  rln-chat-client:
+    image: njofce/rln-chat-client
+    container_name: client
+    ports:
+      - "3000:3000"
+    expose:
+      - 3000
+    restart: always
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=rlnanonymouschat_apinetwork'
+      - 'traefik.http.routers.client.rule=Host(`www.zkchat.org`)'
+      - 'traefik.http.routers.client.tls=true'
+      - 'traefik.http.routers.client.tls.certresolver=lets-encrypt'
+
+    environment:
+      - PORT=3000
+      - REACT_APP_SERVER_HOST=https://api.zkchat.org
+      - REACT_APP_SOCKET_HOST=wss://api-ws.zkchat.org
+      - REACT_APP_ENV=http://www.zkchat.org/
+    depends_on:
+      - mongo
+      - redis
+      - rln-chat-server
+    networks:
+      - apinetwork
+
+networks:
+  dbnetwork:
+    driver: bridge
+    internal: true
+  apinetwork:
+    driver: bridge

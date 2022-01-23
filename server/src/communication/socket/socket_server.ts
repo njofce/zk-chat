@@ -41,7 +41,7 @@ class SocketServer {
                     const bufferData = Buffer.from(message);
                     await this.messageHandler(bufferData.toString());
                 } catch(e) {
-                    console.log("Error");
+                    console.log("Error: ", e);
                 }
             }
         })

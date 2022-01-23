@@ -2,6 +2,7 @@
   "name": "app",
   "version": "1.0.0",
   "private": true,
+  "homepage": "",
   "dependencies": {
     "@fortawesome/fontawesome-free-regular": "^5.0.13",
     "@fortawesome/fontawesome-svg-core": "^1.2.36",
