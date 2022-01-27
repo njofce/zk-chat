@@ -10,6 +10,7 @@
         "moduleResolution": "node",
         "strict": true,
         "pretty": true,
+        "skipLibCheck": true,
         "lib": [
             "es6",
             "dom"
