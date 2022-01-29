@@ -7,40 +7,68 @@ import RequestStats from '../../src/persistence/model/request_stats/request_stat
 import { IRequestStats, IShares } from '../../src/persistence/model/request_stats/request_stats.types';
 
 const testMessage: RLNMessage = {
-    zk_proof: "test proof",
-    nullifier: "test nullifier",
+    zk_proof: {
+        proof: {
+            pi_a: [],
+            pi_b: [],
+            pi_c: [],
+            protocol: "p",
+            curve: "c"
+        },
+        publicSignals: [BigInt(123).toString(), BigInt(123).toString(), BigInt(1234).toString()]
+    },
+    x_share: BigInt(123).toString(),
     epoch: "1637837920000",
-    xShare: "x-share",
-    yShare: "y-share",
     chat_type: "PUBLIC",
     message_content: "encrypted content"
 }
 
 const testMessages: RLNMessage[] = [
     {
-        zk_proof: "test proof 0",
-        nullifier: "test nullifier 0",
+        zk_proof: {
+            proof: {
+                pi_a: [],
+                pi_b: [],
+                pi_c: [],
+                protocol: "p",
+                curve: "c"
+            },
+            publicSignals: [BigInt(123).toString(), BigInt(123).toString(), BigInt(1234).toString()]
+        },
+        x_share: BigInt(123).toString(),
         epoch: "1637837930000",
-        xShare: "x-share",
-        yShare: "y-share",
         chat_type: "PUBLIC",
         message_content: "encrypted content"
     },
     {
-        zk_proof: "test proof 1",
-        nullifier: "test nullifier 1",
+        zk_proof: {
+            proof: {
+                pi_a: [],
+                pi_b: [],
+                pi_c: [],
+                protocol: "p",
+                curve: "c"
+            },
+            publicSignals: [BigInt(123).toString(), BigInt(123).toString(), BigInt(1234).toString()]
+        },
+        x_share: BigInt(123).toString(),
         epoch: "1637837920000",
-        xShare: "x-share",
-        yShare: "y-share",
         chat_type: "PUBLIC",
         message_content: "encrypted content"
     },
     {
-        zk_proof: "test proof 2",
-        nullifier: "test nullifier 1",
+        zk_proof: {
+            proof: {
+                pi_a: [],
+                pi_b: [],
+                pi_c: [],
+                protocol: "p",
+                curve: "c"
+            },
+            publicSignals: [BigInt(123).toString(), BigInt(123).toString(), BigInt(1234).toString()]
+        },
+        x_share: BigInt(123).toString(),
         epoch: "1637837920000",
-        xShare: "x-share",
-        yShare: "y-share",
         chat_type: "PUBLIC",
         message_content: "encrypted content"
     }]
@@ -59,7 +87,7 @@ describe('Test request stats service', () => {
         const allStats: IRequestStats [] = await RequestStats.find({});
 
         expect(allStats.length).toEqual(1);
-        expect(allStats[0].nullifier).toEqual("test nullifier");
+        expect(allStats[0].nullifier).toEqual("1234");
     });
 
     test('get shares for message - exists', async () => {
@@ -93,11 +121,18 @@ describe('Test request stats service', () => {
         }
 
         const isDuplicate = await reqStats.isDuplicate({
-            zk_proof: "test proof 10",
-            nullifier: "test nullifier 1",
+            zk_proof: {
+                proof: {
+                    pi_a: [],
+                    pi_b: [],
+                    pi_c: [],
+                    protocol: "p",
+                    curve: "c"
+                },
+                publicSignals: [BigInt(123).toString(), BigInt(123).toString(), BigInt(1234).toString()]
+            },
+            x_share: BigInt(123).toString(),
             epoch: "1637837920000",
-            xShare: "x-share",
-            yShare: "y-share",
             chat_type: "PUBLIC",
             message_content: "encrypted content"
         });
@@ -111,11 +146,18 @@ describe('Test request stats service', () => {
         }
 
         const isDuplicate = await reqStats.isDuplicate({
-            zk_proof: "test proof xx",
-            nullifier: "test nullifier xx",
+            zk_proof: {
+                proof: {
+                    pi_a: [],
+                    pi_b: [],
+                    pi_c: [],
+                    protocol: "p",
+                    curve: "c"
+                },
+                publicSignals: [BigInt(123).toString(), BigInt(123).toString(), BigInt(123).toString()]
+            },
+            x_share: BigInt(123).toString(),
             epoch: "1637837140000",
-            xShare: "x-share-x",
-            yShare: "y-share-y",
             chat_type: "PUBLIC",
             message_content: "encrypted content"
         });
@@ -129,11 +171,18 @@ describe('Test request stats service', () => {
         }
 
         const isSpam = await reqStats.isSpam({
-            zk_proof: "test proof 2",
-            nullifier: "test nullifier 1",
+            zk_proof: {
+                proof: {
+                    pi_a: [],
+                    pi_b: [],
+                    pi_c: [],
+                    protocol: "p",
+                    curve: "c"
+                },
+                publicSignals: [BigInt(123).toString(), BigInt(123).toString(), BigInt(1234).toString()]
+            },
+            x_share: BigInt(123).toString(),
             epoch: "1637837920000",
-            xShare: "x-share",
-            yShare: "y-share",
             chat_type: "PUBLIC",
             message_content: "encrypted content"
         }, 2);
@@ -148,11 +197,18 @@ describe('Test request stats service', () => {
         }
 
         const isSpam = await reqStats.isSpam({
-            zk_proof: "test proof 1",
-            nullifier: "test nullifier 1",
+            zk_proof: {
+                proof: {
+                    pi_a: [],
+                    pi_b: [],
+                    pi_c: [],
+                    protocol: "p",
+                    curve: "c"
+                },
+                publicSignals: [BigInt(123).toString(), BigInt(123).toString(), BigInt(123).toString()]
+            },
+            x_share: BigInt(123).toString(),
             epoch: "1637837920000",
-            xShare: "x-share",
-            yShare: "y-share",
             chat_type: "PUBLIC",
             message_content: "encrypted content"
         }, 3);

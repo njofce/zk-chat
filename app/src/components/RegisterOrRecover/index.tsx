@@ -7,8 +7,6 @@ import { init, receive_message } from "rln-client-lib";
 import { useDispatch } from "react-redux";
 import { addMessageToRoomAction, getChatHistoryAction, getRoomsAction } from "../../redux/actions/actionCreator";
 import {
-  identityCommitment,
-  identitySecret,
   serverUrl,
   socketUrl
 } from "../../constants/constants";
@@ -44,7 +42,6 @@ const StyledRButton = styled.button`
 
 const RegisterOrRecover = () => {
   const [toggleRecoverModal, setToggleRecoverModal] = useState(false);
-  const [zkClient, setZkClient] = useState(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -54,14 +51,13 @@ const RegisterOrRecover = () => {
 
   const initializeApp = async () => {
     try {
-      // getActiveIdentity();
+      const identityCommitment = await getActiveIdentity();
       await init(
         {
           serverUrl,
           socketUrl
         },
-        identityCommitment,
-        identitySecret
+        identityCommitment
       ).then(() => {
         navigate("/dashboard");
         dispatch(getRoomsAction());
@@ -76,13 +72,11 @@ const RegisterOrRecover = () => {
   };
 
   const getActiveIdentity = async () => {
-    console.log('getting the identity');
+    console.log('getting the identity from zk-keeper');
     const { injected } = window as any
     const client = await injected.connect();
-    await client.openPopup();
-    const id = await client.getActiveIdentity(10);
-
-    console.log(id);
+    const id = await client.getActiveIdentity(1, 2);
+    return id;
   }
 
   const receiveMessageCallback = (message: any, roomId: string) => {

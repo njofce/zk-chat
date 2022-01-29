@@ -44,21 +44,10 @@ jest.mock("../../src/hasher", () => {
     return jest.fn().mockImplementation(() => {
         return {
             genSignalHash: (data: string) => {
-                return data;
+                return "111";
             },
             genExternalNullifier: (data: string): string => {
                 return data;
-            },
-            genWitness: (identitySecret, witness, externalNullifier, signal, rln_id) => {
-                return "witness_" + identitySecret[0].toString();
-            },
-            genProof: async (proofWitness, circuit_path, key_path) => {
-                return {
-                    proof: "test_proof_" + proofWitness
-                }
-            },
-            calculateOutput: (identitySecret, externalNullifier, xShare, share_count, rln_id) => {
-                return [BigInt(11111), BigInt(22222)]
             }
         }
     });
@@ -140,6 +129,21 @@ describe('Chat test', () => {
 
     let chatManager: ChatManager;
 
+    const proof_generator_callback = async (nullifier: string, signal: string, storage_artifacts: any, rln_identitifer: any): Promise<any> => {
+        return JSON.stringify({
+            fullProof: {
+                proof: {
+                    pi_a: "pi_a",
+                    pi_b: "pi_b",
+                    pi_c: "pi_c",
+                    protocol: "p",
+                    curve: "c"
+                },
+                publicSignals: ["1111", "2222", "3333", "4444"]
+            }
+        });
+    }
+
     beforeEach(async () => {
         crypto = new LocalTestCryptography(123);
         storage = new TestStorageProvider();
@@ -159,37 +163,43 @@ describe('Chat test', () => {
         expect(chatManager.isRootObsolete()).toBeTruthy();
 
         jest.spyOn(communication, "getRlnRoot").mockResolvedValue("test root");
-        jest.spyOn(communication, "getUserAuthPath").mockResolvedValue({});
+        jest.spyOn(communication, "getLeaves").mockResolvedValue(["111", "222"]);
         jest.spyOn(profileManager, "getIdentityCommitment").mockReturnValue("test id commitment");
 
         const updateHash = jest.spyOn(profileManager, "updateRootHash");
-        const updateAuthpath = jest.spyOn(profileManager, "updateAuthPath");
+        const updateLeaves = jest.spyOn(profileManager, "updateLeaves");
 
         await chatManager.checkRootUpToDate();
         expect(updateHash).toHaveBeenCalled();
-        expect(updateAuthpath).toHaveBeenCalled();
+        expect(updateLeaves).toHaveBeenCalled();
     });
 
     test('send message', async () => {
         MockDate.set(new Date(1639339320000));
         jest.spyOn(global.Math, 'random').mockReturnValue(0.1);
         
-        jest.spyOn(profileManager, "getIdentitySecret").mockReturnValue([BigInt(222), BigInt(111)]);
-        jest.spyOn(profileManager, "getAuthPath").mockReturnValue("{}");
+        jest.spyOn(profileManager, "getLeaves").mockReturnValue(["1111", "2222"]);
         jest.spyOn(profileManager, "getRoomById").mockResolvedValue({type: "PRIVATE"});
         jest.spyOn(profileManager, "encryptMessageForRoom").mockResolvedValue("encrypted message");
-        
+
         const sendMessageSpy = jest.spyOn(communication, "sendMessage").mockResolvedValue();
 
-        await chatManager.sendMessage("test-room-1", "raw message");
+        await chatManager.sendMessage("test-room-1", "raw message", proof_generator_callback);
 
         expect(sendMessageSpy).toHaveBeenCalledTimes(1);
         expect(sendMessageSpy).toHaveBeenCalledWith(JSON.stringify({
-            "zk_proof": "test_proof_witness_222",
-            "nullifier": "22222",
+            "zk_proof": {
+                "proof": {
+                    "pi_a": "pi_a",
+                    "pi_b": "pi_b",
+                    "pi_c": "pi_c",
+                    "protocol": "p",
+                    "curve": "c"
+                },
+                "publicSignals": ["1111", "2222", "3333", "4444"]
+            },
+            "x_share": "111",
             "epoch": "1639339320000",
-            "xShare": "0.1",
-            "yShare": "11111",
             "chat_type": "PRIVATE",
             "message_content": "encrypted message"
         }));

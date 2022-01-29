@@ -4,10 +4,10 @@ import {
     findZeros,
     findRoot,
     getTotalNumberOfLeaves,
+    getAllLeaves,
     findLeafByGroupIdAndHash,
     findLeafByGroupIdAndIndexInGroup,
-    findLeafByHash,
-    getAuthPath
+    findLeafByHash
 } from "./merkle_tree.statics";
 
 export interface IMerkleTreeNodeKey {
@@ -33,8 +33,8 @@ export interface IMerkleTreeNodeModel extends Model<IMerkleTreeNodeDocument> {
     findLeafByGroupIdAndIndexInGroup: typeof findLeafByGroupIdAndIndexInGroup;
     findByLevelAndIndex: typeof findByLevelAndIndex;
     findRoot: typeof findRoot;
-    getAuthPath: typeof getAuthPath;
     getTotalNumberOfLeaves: typeof getTotalNumberOfLeaves;
+    getAllLeaves: typeof getAllLeaves;
 }
 
 export interface IMerkleTreeZero {

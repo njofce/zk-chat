@@ -82,17 +82,6 @@ class InterRepSynchronizer {
             }
         }
 
-        // A test user
-        if (groupsInDb.findIndex(g => g.group_id == "local-test-group") == -1) {
-            await this.userService.appendUsers([
-                {
-                    identityCommitment: "17653365708849444179865362482568296819146357340229089950066221313927057063266",
-                    index: 0
-                }], 
-                "local-test-group");
-            await this.groupService.saveGroup("local-test-group", "test", "test", 1);
-        }
-
         // Publish event only when tree root hash changed
         if (tree_root_changed) {
             this.publishEvent();

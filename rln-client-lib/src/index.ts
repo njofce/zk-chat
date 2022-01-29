@@ -24,7 +24,6 @@ let chat_manager: ChatManager;
 const init = async (
     server_config: IServerConfig,
     identitiy_commitment?: string, 
-    identity_secret?: string[], 
     storage_provider?: StorageProvider, 
     cryptography?: ICryptography) => {
 
@@ -55,17 +54,19 @@ const init = async (
     profile_manager = new ProfileManager(generated_storage_provider, generated_cryptography);
     chat_manager = new ChatManager(profile_manager, communication, generated_cryptography);
 
-    if (identitiy_commitment && identity_secret) {
+    const root: string = await communication.getRlnRoot();
+    const leaves: string[] = await communication.getLeaves();
+
+    if (identitiy_commitment) {
         // Create a new profile
-        const auth_path = await communication.getUserAuthPath(identitiy_commitment);
-        const root = await communication.getRlnRoot();
-        await profile_manager.initProfile(identitiy_commitment, identity_secret, root, JSON.stringify(auth_path));
+        await profile_manager.initProfile(identitiy_commitment, root, leaves);
     } else {
         const loadedProfile: boolean = await profile_manager.loadProfile();
-
         if (!loadedProfile) {
             throw "No profile exists";
         }
+        await profile_manager.updateRootHash(root);
+        await profile_manager.updateLeaves(leaves);
     }
 
     // listen to events
@@ -79,10 +80,10 @@ const get_rooms = async (): Promise<IRooms> => {
     return await profile_manager.getRooms();
 }
 
-const send_message = async(chat_room_id: string, raw_message: string) => {
+const send_message = async (chat_room_id: string, raw_message: string, proof_generator_callback: (nullifier: string, signal: string, storage_artifacts: any, rln_identitifer: any) => Promise<any>) => {
     if (communication == null)
         throw "init() not called";
-    await chat_manager.sendMessage(chat_room_id, raw_message);
+    await chat_manager.sendMessage(chat_room_id, raw_message, proof_generator_callback);
 }
 
 const receive_message = async(receive_msg_callback: (message: any, chat_room_id: string) => void) => {

@@ -50,8 +50,8 @@ export class ServerCommunication {
         return await this.rln_server.getRlnRoot();
     }
 
-    public async getUserAuthPath(id_commitment: string) {
-        return await this.rln_server.getUserAuthPath(id_commitment);
+    public async getLeaves() {
+        return await this.rln_server.getLeaves();
     }
 
     public async getBannedUsers() {

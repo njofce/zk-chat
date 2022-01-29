@@ -7,9 +7,8 @@ describe('Test storage', () => {
 
     const testProfile: IProfile = {
         rln_identity_commitment: "test_id_commitment_1",
-        rln_identity_secret: ["123", "1234"],
+        leaves: ["123", "1234"],
         root_hash: "test",
-        auth_path: "auth path",
         user_private_key: "priv",
         user_public_key: "pub",
         rooms: {

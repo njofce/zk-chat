@@ -106,7 +106,7 @@ services:
       - PORT=3000
       - REACT_APP_SERVER_HOST=https://api.zkchat.org
       - REACT_APP_SOCKET_HOST=wss://api-ws.zkchat.org
-      - REACT_APP_ENV=http://www.zkchat.org/
+      - REACT_APP_ENV=http://www.zkchat.org
     depends_on:
       - mongo
       - redis
