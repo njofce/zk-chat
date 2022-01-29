@@ -1,5 +1,5 @@
 import { poseidon } from "circomlib";
-import { NRln, genExternalNullifier, FullProof } from "@libsem/protocols"
+import { NRLN, genExternalNullifier, FullProof } from "@zk-kit/protocols"
 
 /**
  * A wrapper class for circomlib & semaphore library functions.
@@ -26,13 +26,13 @@ export default class Hasher {
      * Extracts the secret by looking at X & Y shares.
      */
     public retrieveSecret(sharesX: bigint[], sharesY: bigint[]): bigint {
-        return NRln.retrieveSecret(sharesX, sharesY);
+        return NRLN.retrieveSecret(sharesX, sharesY);
     }
 
     /**
      * Verifies a RLN proof using the verifier key.
      */
     public async verifyProof(verifierKey: any, proof: FullProof): Promise<boolean> {
-        return await NRln.verifyProof(verifierKey, proof);
+        return await NRLN.verifyProof(verifierKey, proof);
     }
 }

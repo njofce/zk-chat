@@ -47,12 +47,22 @@
     "production": [
       ">0.2%",
       "not dead",
-      "not op_mini all"
+      "not op_mini all",
+      "not ie <=11",
+      "not android <10",
+      "not safari <14",
+      "not ios_saf <14",
+      "not chrome 49"
     ],
     "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
+      ">0.2%",
+      "not dead",
+      "not op_mini all",
+      "not ie <=11",
+      "not android <10",
+      "not safari <14",
+      "not ios_saf <14",
+      "not chrome 49"
     ]
   },
   "devDependencies": {
