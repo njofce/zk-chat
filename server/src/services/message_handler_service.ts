@@ -134,6 +134,8 @@ class MessageHandlerService {
     }
 
     private areSpamRulesViolated = async (message: RLNMessage): Promise<boolean> => {
+        console.log("Testing spam rules violated for message", message);
+        console.log("Testing spam rules violated with threshold", config.SPAM_TRESHOLD);
         return this.requestStatsService.isSpam(message, config.SPAM_TRESHOLD);
     }
 
