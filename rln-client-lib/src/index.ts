@@ -274,11 +274,13 @@ const recover_profile = async (profile_data: string) => {
 
     await profile_manager.recoverProfile(parsed_profile_data);
     
+    // Refresh root and leaves
     await chat_manager.setRootObsolete();
     await chat_manager.checkRootUpToDate();
 }
 
 const syncRlnData = (event: string) => {
+    console.log("Received event: ", event);
     if (chat_manager != null) {
         chat_manager.setRootObsolete();
     }

@@ -152,6 +152,7 @@ describe('Test message handle service', () => {
             }
         ]);
         jest.spyOn(userService, "getRoot").mockResolvedValue(BigInt(123).toString());
+        jest.spyOn(userService, "updateUser").mockResolvedValue();
         const removeUserSpy = jest.spyOn(userService, "removeUser").mockResolvedValue("success");
         jest.spyOn(hasher, "verifyProof").mockResolvedValue(true);
         jest.spyOn(hasher, "retrieveSecret").mockReturnValue(BigInt(100001));

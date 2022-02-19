@@ -39,9 +39,7 @@ class UserService {
     public async getLeaves(): Promise<string[]> {
         const allLeaves: string[] = (await MerkleTreeNode.getAllLeaves()).map(x => x.hash);
 
-        const bannedUsers: string[] = await (await BannedUser.getAllBannedUsers()).map(x => x.idCommitment);
-
-        return allLeaves.filter(leaf => bannedUsers.indexOf(leaf) == -1).map(x => bigintToHex(BigInt(x)));
+        return allLeaves.map(x => bigintToHex(BigInt(x)));
     }
 
     public async getPath(idCommitment: string): Promise<any> {
@@ -197,7 +195,6 @@ class UserService {
             leafIndex: treeNode.key.index,
             secret: secret.toString(),
         });
-
         await bannedUser.save();
         return idCommitment
     }

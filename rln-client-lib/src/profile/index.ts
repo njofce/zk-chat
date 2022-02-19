@@ -130,6 +130,9 @@ class ProfileManager {
      */
     public async exportProfile(): Promise<string> {
         if (this.profileExists()) {
+            const clonedProfile: IProfile = deepClone(this.inMemoryProfile);
+            clonedProfile.root_hash = "";
+            clonedProfile.leaves = [];
             return JSON.stringify(this.inMemoryProfile);
         }
         throw "No profile exists locally";

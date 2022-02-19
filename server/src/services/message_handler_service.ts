@@ -75,7 +75,18 @@ class MessageHandlerService {
             const secret: bigint = this.hasher.retrieveSecret(sharesX, sharesY);
             const idCommitment = this.hasher.poseidonHash([secret]).toString();
 
+            // Ban User
             await this.userService.removeUser(idCommitment, secret);
+
+            // Set user leaf to 0 and recalculate merkle tree
+            await this.userService.updateUser(idCommitment);
+
+            // Broadcast tree updated event
+            const treeUpdated: ISyncMessage = {
+                type: SyncType.EVENT,
+                message: "TREE_UPDATE"
+            };
+            this.pubSub.publish(treeUpdated);
 
             throw "Message is a spam, banning user and ignoring message";
         }
