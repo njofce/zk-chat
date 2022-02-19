@@ -84,7 +84,7 @@ class WebCryptography implements ICryptography {
             true,
             ['encrypt', 'decrypt']);
 
-        const iv_substring = symmetricKey.substr(0, 10);
+        const iv_substring = symmetricKey.substring(0, 10);
 
         const encrypted: ArrayBuffer = await window.crypto.subtle.encrypt(
             {
@@ -109,7 +109,7 @@ class WebCryptography implements ICryptography {
             true,
             ['encrypt', 'decrypt']);
 
-        const iv_substring = symmetricKey.substr(0, 10);
+        const iv_substring = symmetricKey.substring(0, 10);
 
         const decrypted: ArrayBuffer = await window.crypto.subtle.decrypt(
             {

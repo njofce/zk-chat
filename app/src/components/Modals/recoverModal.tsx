@@ -92,6 +92,7 @@ const RecoverModal = ({
     try {
       await recover_profile(userData).then(() => initializeApp());
     } catch (error) {
+      console.log(error);
       navigate("/r-procedure");
     }
   };
