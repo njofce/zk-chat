@@ -184,12 +184,15 @@ const join_private_room = async (encrypted_invite: string) => {
     const user_private_key = await profile_manager.getPrivateKey();
     const [room_symmetric_key, room_id, room_name] = JSON.parse(await generated_cryptography.decryptMessageAsymmetric(encrypted_invite, user_private_key));
 
-    await profile_manager.addPrivateRoom({
+    const room: IPrivateRoom = {
         id: room_id,
         name: room_name,
         type: "PRIVATE",
         symmetric_key: room_symmetric_key
-    });
+    };
+    await profile_manager.addPrivateRoom(room);
+
+    return room;
 }
 
 const generate_encrypted_invite_direct_room = async(room_id: string) => {

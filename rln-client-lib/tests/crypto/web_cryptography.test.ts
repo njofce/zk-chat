@@ -32,6 +32,19 @@ describe('Test crypto', () => {
         expect(decrypted).toEqual(data);
     });
 
+    test('encrypt with symmetric key - another message', async () => {
+        const messagesToTest = ["test", "ta", "hi", "hello!", "$# :) emojis", "text and #---123"]
+
+        for (let m in messagesToTest) {
+            const symm_key = await crypto.generateSymmetricKey();
+
+            const cyphertext = await crypto.encryptMessageSymmetric(m, symm_key);
+            expect(cyphertext).not.toEqual(m);
+            const decrypted = await crypto.decryptMessageSymmetric(cyphertext, symm_key);
+            expect(decrypted).toEqual(m);
+        }
+    });
+
     test('generate asymmetric key', async () => {
         const kp = await crypto.generateKeyPair();
         expect(kp.publicKey).not.toBeNull();

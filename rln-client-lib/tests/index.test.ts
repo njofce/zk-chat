@@ -131,7 +131,7 @@ class LocalTestCryptography implements ICryptography {
     }
 
     decryptMessageSymmetric = async (cyphertext: string, symmetricKey: string): Promise<string> => {
-        return cyphertext.substr(0, cyphertext.indexOf('||'));
+        return cyphertext.substring(0, cyphertext.indexOf('||'));
     }
 
     encryptMessageAsymmetric = async (message: string, publicKey: string): Promise<string> => {
