@@ -118,10 +118,10 @@ describe('Test server communication', () => {
         expect(testSpy).toHaveBeenCalled();
     });
 
-    test('get user auth path', async () => {
-        const testSpy = jest.spyOn(server, "getUserAuthPath");
-        testSpy.mockResolvedValue({});
-        await communication.getUserAuthPath("test-1");
+    test('get leaves', async () => {
+        const testSpy = jest.spyOn(server, "getLeaves");
+        testSpy.mockResolvedValue([]);
+        await communication.getLeaves();
 
         expect(testSpy).toHaveBeenCalled();
     });

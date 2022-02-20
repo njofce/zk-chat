@@ -56,13 +56,12 @@ class ProfileManager {
     /**
      * Creates a new profile for the given params, and overwrites a profile in local storage, if exists.
      */
-    public async initProfile(identityCommitment: string, identitySecret: string[], root_hash: string, auth_path: string): Promise<void> { 
+    public async initProfile(identityCommitment: string, root_hash: string, leaves: string[]): Promise<void> { 
         const userKeyPair: IKeyPair = await this.cryptography.generateKeyPair();
         const profile: IProfile = {
             rln_identity_commitment: identityCommitment,
-            rln_identity_secret: identitySecret,
             root_hash: root_hash,
-            auth_path: auth_path,
+            leaves: leaves,
             user_private_key: userKeyPair.privateKey,
             user_public_key: userKeyPair.publicKey,
             rooms: {
@@ -82,11 +81,11 @@ class ProfileManager {
 
         const keys: string[] = Object.keys(parsed_profile_data);
 
-        if (keys.length != 7)
+        if (keys.length != 6)
             return false;
 
         const interfaceKeys: string[] = [
-            "rln_identity_commitment", "rln_identity_secret", "root_hash", "auth_path", "user_private_key", "user_public_key", "rooms"
+            "rln_identity_commitment", "root_hash", "leaves", "user_private_key", "user_public_key", "rooms"
         ];
 
         for (let iK of interfaceKeys) {
@@ -131,6 +130,9 @@ class ProfileManager {
      */
     public async exportProfile(): Promise<string> {
         if (this.profileExists()) {
+            const clonedProfile: IProfile = deepClone(this.inMemoryProfile);
+            clonedProfile.root_hash = "";
+            clonedProfile.leaves = [];
             return JSON.stringify(this.inMemoryProfile);
         }
         throw "No profile exists locally";
@@ -186,21 +188,11 @@ class ProfileManager {
     }
 
     /**
-     * Returns the identity secret, if exists.
+     * Returns the leaves, if exists.
      */
-    public getIdentitySecret(): bigint[] {
+    public getLeaves(): string[] {
         if (this.inMemoryProfile != null) {
-            return this.inMemoryProfile.rln_identity_secret.map(x => BigInt(x));
-        }
-        throw "Profile doesn't exist";
-    }
-
-    /**
-     * Returns the auth path, if exists.
-     */
-    public getAuthPath(): string {
-        if (this.inMemoryProfile != null) {
-            return this.inMemoryProfile.auth_path;
+            return this.inMemoryProfile.leaves;
         }
         throw "Profile doesn't exist";
     }
@@ -216,11 +208,11 @@ class ProfileManager {
     } 
 
     /**
-     * Updates the auth path, if profile exists.
+     * Updates the leaves, if profile exists.
      */
-    public async updateAuthPath(path: string) {
+    public async updateLeaves(leaves: string[]) {
         if (this.inMemoryProfile != null) {
-            this.inMemoryProfile.auth_path = path;
+            this.inMemoryProfile.leaves = leaves;
             await this.persistProfile();
         }
     }

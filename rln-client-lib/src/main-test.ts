@@ -1,4 +1,4 @@
-import { SecretType, Strategy, ZkIdentity } from "@zk-kit/identity";
+import { Strategy, ZkIdentity } from "@zk-kit/identity";
 import ChatManager from "./chat";
 import { ServerCommunication } from "./communication";
 import RLNServerApi from "./communication/api";
@@ -80,28 +80,15 @@ const main = async () => {
         "identityNullifier":"9dd8ec97c78ec5c26fee7791e6ecca93f68fae7d9b5a050c12dfda6181bc88",
         "identityTrapdoor":"f064ac44608d02370c8f2942d048ac040ccedd241907e0297f50279d9621d5",
         "secret":["9dd8ec97c78ec5c26fee7791e6ecca93f68fae7d9b5a050c12dfda6181bc88", "f064ac44608d02370c8f2942d048ac040ccedd241907e0297f50279d9621d5"]
-        "multipartSecret":[
-            "a56102e45e6232e9ed26face75e0ff4e0579d9c0d3ab14e3951919f486038f",
-            "f658aebab17a5c7843a82270562a6cf50cd96d8b34a85b5804ec65b6333a39",
-            "b126e4885dc4beb994d70d837889591c7d62dcd0e78597af3ff8e6bede7164",
-            "f4798c7d87eba54d305ff674fc4e13e159b524c72462a273050551f7e86e27",
-            "db011e11fc9bb84408cc3b18aebed12fb07732a23e1721071c2c60d7c71189",
-            "e6004f0577c1cd5eb9baa81ded51c4498b2052fd3557c52534da4d701e1929",
-            "81b55f5f730811dfa0876d0957bcf7cd1fe45c50dd20326dcfcfb08f670152",
-            "5c719d0d275a808af23fe878e4ae6c505ac594cb9ae551c2198b01e9173445",
-            "679319f523bd2eb6b5f07ef4859bc73765bde093f7a28bba3a3095f0bd4be",
-            "7a8e2772c93bf114460fede8a0fe7d72521d99ae9cd92ebb563d1753a18cd1"
-        ]}`);
+    }`);
  
-    const idSecret: bigint[] = zkIdentity.getMultipartSecret();
-    const idCommitment: BigInt = zkIdentity.genIdentityCommitment(SecretType.MULTIPART, 10);
+    const idCommitment: BigInt = zkIdentity.genIdentityCommitment();
     
     const id_commitment = idCommitment.toString();
     await profile.initProfile(
         id_commitment,
-        idSecret.map(b => b.toString()),
         "17653365708849444179865362482568296819146357340229089950066221313927057063266",
-        JSON.stringify(await comm_manager.getUserAuthPath(id_commitment))
+        await comm_manager.getLeaves()
     );
 
     comm_manager.receiveMessage(messageHandler);
@@ -114,7 +101,18 @@ const main = async () => {
         recipient_public_key: "some key"
     })
 
-    await chat.sendMessage("test-1", "This is a raw test message");
+    await chat.sendMessage("test-1", "This is a raw test message", async (nullifier: string, signal: string, storage_artifacts: any, rln_identitifer: any) => {
+        return {
+            proof: {
+                pi_a: [],
+                pi_b: [],
+                pi_c: [],
+                protocol: "",
+                curve: ""
+            },
+            publicSignals: []
+        };
+    });
 
     while(true)
         await sleep();

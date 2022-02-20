@@ -1,4 +1,5 @@
 import { beforeAll, afterAll } from '@jest/globals'
+import { FullProof } from '@zk-kit/protocols';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
 import Hasher from '../src/util/hasher';
@@ -47,11 +48,19 @@ jest.mock("../src/util/hasher", () => {
             genExternalNullifier: (data: string): string => {
                 return data; // always return the same
             },
-            verifyProof: async(verifierKey: any, proof: any) => {
+            verifyProof: async (verifierKey: any, proof: FullProof) => {
                 return false;
             },
             retrieveSecret: (sharesX: bigint[], sharesY: bigint[]): bigint => {
                 return BigInt(123455);
+            },
+            generateMerkleProof: (leaves: string[], targetLeaf: string) => {
+                return {
+                    root: "root",
+                    leaf: "abc",
+                    siblings: [1, 2],
+                    pathIndices: [1, 2]
+                };
             }
         }
     });

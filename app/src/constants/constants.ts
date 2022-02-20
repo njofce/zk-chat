@@ -20,6 +20,8 @@ export const identitySecret = [
 export const identityCommitment =
   "17653365708849444179865362482568296819146357340229089950066221313927057063266";
 
+export const clientUrl = `${process.env.REACT_APP_ENV}`;
+
 export const serverUrl = `${process.env.REACT_APP_SERVER_HOST}`;
 
 export const socketUrl = `${process.env.REACT_APP_SOCKET_HOST}`

@@ -28,6 +28,9 @@ jest.mock('../../src/services/user.service', () => {
                 if (idCommitment == "existing")
                     return {"path": 1}
                 throw "Not found";
+            },
+            getLeaves: async(): Promise<string[]> => {
+                return ["1", "2", "3"];
             }
         };
     });
@@ -56,46 +59,15 @@ describe('Test user controller', () => {
             });
     });
 
-    test('get auth path - db empty', (done) => {
+    test('get leaves', (done) => {
         request(app)
-            .post('/user/auth_path')
-            .send({
-                identity_commitment: "abc"
-            })
-            .expect(404)
-            .then((response: any) => {
-                expect(response.body).toEqual("Not found");
-                done();
-            });
-    });
-
-    test('get auth path - db empty, invalid body', (done) => {
-        request(app)
-            .post('/user/auth_path')
-            .send({
-                some_key: "abc"
-            })
-            .expect(500)
-            .then((response: any) => {
-                expect(response.body).toEqual(
-                    { "errors": [{ "location": "body", "msg": "Invalid value", "param": "identity_commitment" }] }
-                );
-                done();
-            });
-    });
-
-    test('get auth path - exists', (done) => {
-        request(app)
-            .post('/user/auth_path')
-            .send({
-                identity_commitment: "existing"
-            })
+            .get('/user/leaves')
             .expect(200)
             .then((response: any) => {
-                expect(response.body).toEqual({ "path": 1 });
+                expect(response.body).toEqual(["1", "2", "3"]);
                 done();
             });
-    });
+    })
 
     test('get banned', (done) => {
         request(app)

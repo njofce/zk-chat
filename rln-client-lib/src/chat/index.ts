@@ -1,9 +1,8 @@
-import * as path from "path";
-
 import { ICryptography } from '../crypto/interfaces';
 import { ServerCommunication } from '../communication/index';
 import ProfileManager from "../profile";
 import Hasher from "../hasher";
+import { FullProof } from "@zk-kit/protocols";
 
 /**
  * The core component that is responsible for creating valid ZK proofs for a message, encrypting and dispatching it, as well as receiving and decrypting messages
@@ -22,15 +21,12 @@ class ChatManager {
 
     private message_callback;
 
-    private prover_key_path: string;
-    private circuit_path: string;
-
     /**
      * Same RLN identifier as the one in server.
      */
-    private static RLN_IDENTIFIER = BigInt("518137101");
+    private static RLN_IDENTIFIER = BigInt("11231");
 
-    public static NUM_SHARES: number = 10;
+    public static NUM_SHARES: number = 2;
 
     constructor(profile_manager: ProfileManager, communication_manager: ServerCommunication, cryptography: ICryptography) {
         this.profile_manager = profile_manager;
@@ -38,9 +34,6 @@ class ChatManager {
         this.cryptography = cryptography;
 
         this.hasher = new Hasher();
-
-        this.prover_key_path = path.join("circuitFiles/rln", "rln_final.zkey");
-        this.circuit_path = path.join("circuitFiles/rln", "rln.wasm");
     }
 
     public async setRootObsolete() {
@@ -51,29 +44,24 @@ class ChatManager {
         return !this.root_up_to_date;
     }
 
-    public async sendMessage(chat_room_id: string, raw_message: string) {
+    public async sendMessage(chat_room_id: string, raw_message: string, proof_generator_callback: (nullifier: string, signal: string, storage_artifacts: any, rln_identitifer: any) => Promise<any>) {
         await this.checkRootUpToDate();
-
         // Generate proof
         let epoch: string = this.getEpoch();
-        const externalNullifier = this.hasher.genExternalNullifier(epoch);
-        const signal: string = this.generateRandomSignal()
+
+        let externalNullifier: string = this.hasher.genExternalNullifier((epoch));
+        
+        const signal: string = this.generateRandomSignal();
+
+        const storageArtifacts = {
+            leaves: this.profile_manager.getLeaves(),
+            depth: 15,
+            leavesPerNode: 2
+        };
+
+        const proof: string = await proof_generator_callback(externalNullifier, signal, storageArtifacts, ChatManager.RLN_IDENTIFIER.toString());
+        const fullProof: FullProof = JSON.parse(proof)['fullProof'];
         const xShare: bigint = this.hasher.genSignalHash(signal);
-
-        const identitySecret: bigint[] = this.profile_manager.getIdentitySecret();
-        const witness = JSON.parse(this.profile_manager.getAuthPath());
-
-        const proofWitness = this.hasher.genWitness(identitySecret, witness, externalNullifier, signal, ChatManager.RLN_IDENTIFIER);
-    
-        const fullProof = await this.hasher.genProof(proofWitness, this.circuit_path, this.prover_key_path);
-
-        const [yShare, nullifier] = this.hasher.calculateOutput(
-            identitySecret,
-            BigInt(externalNullifier),
-            xShare,
-            ChatManager.NUM_SHARES,
-            ChatManager.RLN_IDENTIFIER
-        );
 
         // Encrypt with room's key
         const roomData: any = await this.profile_manager.getRoomById(chat_room_id);
@@ -81,11 +69,9 @@ class ChatManager {
 
         // Send message
         const message = {
-            zk_proof: fullProof.proof,
-            nullifier: nullifier.toString(),
+            zk_proof: fullProof,
+            x_share: xShare.toString(),
             epoch: epoch,
-            xShare: xShare.toString(),
-            yShare: yShare.toString(),
             chat_type: roomData.type,
             message_content: encryptedMessage
         }
@@ -140,10 +126,10 @@ class ChatManager {
         if (this.isRootObsolete()) {
 
             const new_rln_root = await this.communication_manager.getRlnRoot();
-            const new_auth_path = await this.communication_manager.getUserAuthPath(this.profile_manager.getIdentityCommitment());
+            const new_leaves = await this.communication_manager.getLeaves();
             
             this.profile_manager.updateRootHash(new_rln_root);
-            this.profile_manager.updateAuthPath(JSON.stringify(new_auth_path));
+            this.profile_manager.updateLeaves(new_leaves);
 
             this.root_up_to_date = true;
         }
@@ -152,7 +138,7 @@ class ChatManager {
     /**
      * Returns rounded timestamp to the nearest minute in milliseconds.
      */
-    private getEpoch = () => {
+    private getEpoch = (): string => {
         const timeNow = new Date();
         timeNow.setSeconds(0);
         timeNow.setMilliseconds(0);

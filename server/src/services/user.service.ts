@@ -1,3 +1,4 @@
+import { bigintToHex } from 'bigint-conversion';
 import { MerkleTreeNode, MerkleTreeZero } from './../persistence/model/merkle_tree/merkle_tree.model';
 import { IGroupMember } from "../interrep/interfaces";
 import BannedUser from "../persistence/model/banned_user/banned_user.model";
@@ -35,6 +36,12 @@ class UserService {
         throw "Root not found";
     }
 
+    public async getLeaves(): Promise<string[]> {
+        const allLeaves: string[] = (await MerkleTreeNode.getAllLeaves()).map(x => x.hash);
+
+        return allLeaves.map(x => bigintToHex(BigInt(x)));
+    }
+
     public async getPath(idCommitment: string): Promise<any> {
 
         const leafNode = await MerkleTreeNode.findLeafByHash(idCommitment);
@@ -43,9 +50,9 @@ class UserService {
             throw "The identity commitment does not exist";
         }
 
-        const authPath = await MerkleTreeNode.getAuthPath(leafNode.key);
+        const allLeaves: string[] = (await MerkleTreeNode.getAllLeaves()).map(x => x.hash);
 
-        return authPath;
+        return this.hasher.generateMerkleProof(allLeaves, leafNode.hash);
     }
 
     public async appendUsers(users: IGroupMember[], groupId: string): Promise<string> {
@@ -188,7 +195,6 @@ class UserService {
             leafIndex: treeNode.key.index,
             secret: secret.toString(),
         });
-
         await bannedUser.save();
         return idCommitment
     }

@@ -7,7 +7,7 @@ import config from "../../src/config"
 import { MerkleTreeNode, MerkleTreeZero } from '../../src/persistence/model/merkle_tree/merkle_tree.model';
 import Hasher from '../../src/util/hasher';
 
-describe('Test banned user service', () => {
+describe('Test user service', () => {
 
     afterEach(async () => {
         await clearDatabase();
@@ -27,6 +27,28 @@ describe('Test banned user service', () => {
         expect(allBannedUsers.length).toEqual(5);
         expect(total).toEqual(5);
     });
+
+    test('get leaves', async () => {
+        const user_service = new UserService();
+
+        let leaves: string[] = await user_service.getLeaves();
+
+        expect(leaves.length).toEqual(0);
+
+        await MerkleTreeNode.create({
+            key: {
+                groupId: "group1",
+                level: 0,
+                index: 0,
+                indexInGroup: 0
+            },
+            hash: "123"
+        });
+
+        leaves = await user_service.getLeaves();
+
+        expect(leaves.length).toEqual(1);
+    })
 
     test('get root - exists', async () => {
         const root = await MerkleTreeNode.create({
@@ -76,41 +98,10 @@ describe('Test banned user service', () => {
 
         const path = await user_service.getPath(BigInt(2 ^ 244).toString());
         expect(path).toEqual({
-            indices: [
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-            ],
-            pathElements: [
-                "0",
-                "120",
-                "360",
-                "840",
-                "1800",
-                "3720",
-                "7560",
-                "15240",
-                "30600",
-                "61320",
-                "122760",
-                "245640",
-                "491400",
-                "982920",
-                "1965960",
-           ],
-           root: "3932286"
+            root: "root",
+            leaf: "abc",
+            siblings: [1, 2],
+            pathIndices: [1, 2]
         });
     });
 

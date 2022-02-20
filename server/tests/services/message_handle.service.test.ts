@@ -58,11 +58,18 @@ describe('Test message handle service', () => {
         try {
             MockDate.set(new Date(timestampTodayMs + 2 * 60 * 1000)); // current date is 2 mins after the configured second
             const object = {
-                zk_proof: "proof 1",
-                nullifier: "test nullifier",
+                zk_proof: {
+                    proof: {
+                        pi_a: [],
+                        pi_b: [],
+                        pi_c: [],
+                        protocol: "p",
+                        curve: "c"
+                    },
+                    publicSignals: []
+                },
+                x_share: BigInt(123).toString(),
                 epoch: timestampTodayMs + 1 * 60 * 1000, // message second is 1 min after the configured second
-                xShare: BigInt(123).toString(),
-                yShare: BigInt(1234).toString(),
                 chat_type: "PUBLIC",
                 message_content: "encrypted message content",
             };
@@ -79,11 +86,18 @@ describe('Test message handle service', () => {
             jest.spyOn(hasher, "genExternalNullifier").mockReturnValue(timestampTodayMs + "");
             MockDate.set(new Date(timestampTodayMs + 5)); // current date is 5ms after the configured second
             const object = {
-                zk_proof: "proof 1",
-                nullifier: "test nullifier",
+                zk_proof: {
+                    proof: {
+                        pi_a: [],
+                        pi_b: [],
+                        pi_c: [],
+                        protocol: "p",
+                        curve: "c"
+                    },
+                    publicSignals: []
+                },
+                x_share: BigInt(123).toString(),
                 epoch: timestampTodayMs,
-                xShare: BigInt(123).toString(),
-                yShare: BigInt(1234).toString(),
                 chat_type: "PUBLIC",
                 message_content: "encrypted message content",
             };
@@ -98,14 +112,22 @@ describe('Test message handle service', () => {
         try {
             jest.spyOn(requestStatsService, "isDuplicate").mockResolvedValue(false);
             jest.spyOn(userService, "getRoot").mockResolvedValue(BigInt(123).toString());
+            jest.spyOn(hasher, "verifyProof").mockResolvedValue(false);
             jest.spyOn(hasher, "genExternalNullifier").mockReturnValue(timestampTodayMs + "");
             MockDate.set(new Date(timestampTodayMs + 5)); // current date is 5ms after the configured second
             const object = {
-                zk_proof: "proof 1",
-                nullifier: BigInt(123).toString(),
+                zk_proof: {
+                    proof: {
+                        pi_a: [],
+                        pi_b: [],
+                        pi_c: [],
+                        protocol: "p",
+                        curve: "c"
+                    },
+                    publicSignals: []
+                },
+                x_share: BigInt(123).toString(),
                 epoch: timestampTodayMs,
-                xShare: BigInt(123).toString(),
-                yShare: BigInt(1234).toString(),
                 chat_type: "PUBLIC",
                 message_content: "encrypted message content",
             };
@@ -130,6 +152,7 @@ describe('Test message handle service', () => {
             }
         ]);
         jest.spyOn(userService, "getRoot").mockResolvedValue(BigInt(123).toString());
+        jest.spyOn(userService, "updateUser").mockResolvedValue();
         const removeUserSpy = jest.spyOn(userService, "removeUser").mockResolvedValue("success");
         jest.spyOn(hasher, "verifyProof").mockResolvedValue(true);
         jest.spyOn(hasher, "retrieveSecret").mockReturnValue(BigInt(100001));
@@ -140,11 +163,18 @@ describe('Test message handle service', () => {
 
         try {
             const object = {
-                zk_proof: "proof 1",
-                nullifier: BigInt(123).toString(),
+                zk_proof: {
+                    proof: {
+                        pi_a: [],
+                        pi_b: [],
+                        pi_c: [],
+                        protocol: "p",
+                        curve: "c"
+                    },
+                    publicSignals: [BigInt(123).toString(), BigInt(123).toString(), BigInt(123).toString()]
+                },
+                x_share: BigInt(123).toString(),
                 epoch: timestampTodayMs,
-                xShare: BigInt(123).toString(),
-                yShare: BigInt(1234).toString(),
                 chat_type: "PUBLIC",
                 message_content: "encrypted message content",
             };
@@ -177,11 +207,18 @@ describe('Test message handle service', () => {
         jest.spyOn(hasher, "genExternalNullifier").mockReturnValue(timestampTodayMs + "");
         
         const object = {
-            zk_proof: "proof 1",
-            nullifier: BigInt(123).toString(),
+            zk_proof: {
+                proof: {
+                    pi_a: [],
+                    pi_b: [],
+                    pi_c: [],
+                    protocol: "p",
+                    curve: "c"
+                },
+                publicSignals: [BigInt(123).toString(), BigInt(123).toString(), BigInt(123).toString()]
+            },
+            x_share: BigInt(123).toString(),
             epoch: timestampTodayMs,
-            xShare: BigInt(123).toString(),
-            yShare: BigInt(1234).toString(),
             chat_type: "PUBLIC",
             message_content: "encrypted message content",
         };

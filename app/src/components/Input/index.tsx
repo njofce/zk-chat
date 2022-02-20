@@ -3,8 +3,9 @@ import React from "react";
 import styled from "styled-components";
 import * as Colors from "../../constants/colors";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
-import { send_message } from "rln-client-lib";
 import { Room } from "../../redux/actions/actionCreator";
+import { send_message } from "rln-client-lib";
+import { clientUrl } from "../../constants/constants";
 
 const StyledInput = styled.input`
   border: 1px solid #f0f2f5;
@@ -54,23 +55,35 @@ class Input extends React.Component<InputProps, InputState> {
     window.removeEventListener("keydown", this.handleKeyDown);
   }
 
-  handleKeyDown = (event: KeyboardEvent) => {
-    if (event.code === "Enter") this.handleMessageSubmit();
+  handleKeyDown = async(event: KeyboardEvent) => {
+    if (event.code === "Enter") 
+      await this.handleMessageSubmit();
   };
 
-  handleMessageSubmit = () => {
+  handleMessageSubmit = async() => {
     const { inputValue } = this.state;
     const { currentActiveRoom } = this.props;
     if (inputValue) {
       try {
-        send_message(currentActiveRoom.id, inputValue).then(() =>
-          this.setState({ inputValue: "" })
-        );
+        await send_message(currentActiveRoom.id, inputValue, this.generateProof);
+        this.setState({ inputValue: "" })
       } catch (error) {
         console.log(error);
       }
     }
   };
+
+  generateProof = async (nullifier: string, signal: string, storage_artifacts: any, rln_identitifer: string): Promise<any> => {
+    const { injected } = window as any
+    const client = await injected.connect();
+    return await client.rlnProof(
+      nullifier, 
+      signal, 
+      `${clientUrl}/circuitFiles/rln/rln.wasm`, 
+      `${clientUrl}/circuitFiles/rln/rln_final.zkey`, 
+      storage_artifacts, 
+      rln_identitifer);
+  }
 
   render() {
     const { inputValue } = this.state;

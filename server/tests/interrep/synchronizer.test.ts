@@ -1,10 +1,10 @@
 import { clearDatabase } from '../jest.setup';
-import { jest, test, expect, describe, afterEach, beforeAll, afterAll } from '@jest/globals'
+import { jest, test, expect, describe, afterEach, beforeAll } from '@jest/globals'
 import TestPubSub from '../fixtures/pubsub.mock';
 import PubSub from '../../src/communication/pub_sub';
 import UserService from '../../src/services/user.service'
 import GroupService from '../../src/services/group.service'
-import { IGroupMember, IInterRepGroup, IInterRepGroupV2 } from '../../src/interrep/interfaces';
+import { IGroupMember, IInterRepGroupV2 } from '../../src/interrep/interfaces';
 import InterRepSynchronizer from '../../src/interrep/index'
 import subgraphFunctions from '../../src/interrep/api';
 
@@ -106,8 +106,8 @@ describe('Test interrep synchronizer', () => {
         await synchronizer.syncCommitmentsFromInterRep();
 
         expect(getGroupsSpy).toHaveBeenCalled();
-        expect(saveGroupSpy).toHaveBeenCalledTimes(3 + 1);
-        expect(appendUsersSpy).toHaveBeenCalledTimes(3 + 1);
+        expect(saveGroupSpy).toHaveBeenCalledTimes(3);
+        expect(appendUsersSpy).toHaveBeenCalledTimes(3);
     });
 
     test('test sync - full db', async () => {
@@ -191,9 +191,9 @@ describe('Test interrep synchronizer', () => {
         await synchronizer.syncCommitmentsFromInterRep();
 
         expect(getGroupsSpy).toHaveBeenCalled();
-        expect(saveGroupSpy).toHaveBeenCalledTimes(1 + 1);
+        expect(saveGroupSpy).toHaveBeenCalledTimes(1);
         expect(updateSizeSpy).toHaveBeenCalledTimes(1);
-        expect(appendUsersSpy).toHaveBeenCalledTimes(2 + 1);
+        expect(appendUsersSpy).toHaveBeenCalledTimes(2);
     });
 
 });

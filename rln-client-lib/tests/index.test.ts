@@ -131,7 +131,7 @@ class LocalTestCryptography implements ICryptography {
     }
 
     decryptMessageSymmetric = async (cyphertext: string, symmetricKey: string): Promise<string> => {
-        return cyphertext.substr(0, cyphertext.indexOf('||'));
+        return cyphertext.substring(0, cyphertext.indexOf('||'));
     }
 
     encryptMessageAsymmetric = async (message: string, publicKey: string): Promise<string> => {
@@ -145,6 +145,10 @@ class LocalTestCryptography implements ICryptography {
 
 
 describe('Test main', () => {
+
+    const proof_generator_callback = async (nullifier: string, signal: string, storage_artifacts: any, rln_identitifer: any): Promise<any> => {
+        return "proof";
+    }
 
     beforeEach(async () => {
         jest.restoreAllMocks();
@@ -197,7 +201,7 @@ describe('Test main', () => {
         });
 
         jest.spyOn(ProfileManager.prototype, "loadProfile").mockResolvedValue(true);
-        jest.spyOn(ServerCommunication.prototype, "getUserAuthPath").mockResolvedValue({ "key": "path" });
+        jest.spyOn(ServerCommunication.prototype, "getLeaves").mockResolvedValue(["111", "222", "333"]);
         jest.spyOn(ServerCommunication.prototype, "getRlnRoot").mockResolvedValue("test root");
 
         const initProfileSpy = jest.spyOn(ProfileManager.prototype, "initProfile").mockResolvedValue();
@@ -207,7 +211,6 @@ describe('Test main', () => {
                 socketUrl: "ws://test2"
             }, 
             "test_id_commitment", 
-            ["share_1", "share_2", "share_3", "share_4"], 
             new TestStorageProvider(), 
             new LocalTestCryptography(1000));
         expect(initProfileSpy).toHaveBeenCalled();
@@ -236,7 +239,7 @@ describe('Test main', () => {
     test('send message', async () => {
         // No profile
         try {
-            await send_message("test-room-1", "message");
+            await send_message("test-room-1", "message", proof_generator_callback);
             expect(true).toBeFalsy();
         } catch (e) {
             expect(true).toBeTruthy();
@@ -245,7 +248,7 @@ describe('Test main', () => {
         // With profile
         await init_new_profile();
         const chatSpy = jest.spyOn(ChatManager.prototype, "sendMessage").mockResolvedValue();
-        await send_message("test-room-1", "message");
+        await send_message("test-room-1", "message", proof_generator_callback);
         expect(chatSpy).toHaveBeenCalled();
     });
 
@@ -696,7 +699,7 @@ describe('Test main', () => {
         });
 
         jest.spyOn(ProfileManager.prototype, "loadProfile").mockResolvedValue(true);
-        jest.spyOn(ServerCommunication.prototype, "getUserAuthPath").mockResolvedValue({ "key": "path" });
+        jest.spyOn(ServerCommunication.prototype, "getLeaves").mockResolvedValue(["111", "222"]);
         jest.spyOn(ServerCommunication.prototype, "getRlnRoot").mockResolvedValue("test root");
 
         const initProfileSpy = jest.spyOn(ProfileManager.prototype, "initProfile").mockResolvedValue();
@@ -704,7 +707,7 @@ describe('Test main', () => {
         await init({
             serverUrl: "test1",
             socketUrl: "ws://test2"
-        }, "test_id_commitment", ["share_1", "share_2", "share_3", "share_4"]);
+        }, "test_id_commitment");
 
         return initProfileSpy;
     }

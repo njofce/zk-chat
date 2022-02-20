@@ -68,12 +68,12 @@ services:
       - REDIS_PASSWORD=password
       - REDIS_CHANNEL=nodeSync
       - INTERREP_BASE_URL=https://api.thegraph.com/subgraphs/name/interrep/kovan
-      - INTERREP_V2=https://kovan.interrep.link/api
+      - INTERREP_V2=https://kovan.interep.link/api
       - DB_CONNECTION_STRING=mongodb://mongo:27017/test
       - SERVER_PORT=8080
       - SOCKET_SERVER_PORT=8081
       - MERKLE_TREE_LEVELS=15
-      - SPAM_TRESHOLD=10
+      - SPAM_TRESHOLD=2
       - INTERREP_SYNC_INTERVAL_SECONDS=301
       - RLN_IDENTIFIER=518137101
       - MESSAGES_CHANNEL=messages
@@ -106,7 +106,7 @@ services:
       - PORT=3000
       - REACT_APP_SERVER_HOST=https://api.zkchat.org
       - REACT_APP_SOCKET_HOST=wss://api-ws.zkchat.org
-      - REACT_APP_ENV=http://www.zkchat.org/
+      - REACT_APP_ENV=http://www.zkchat.org
     depends_on:
       - mongo
       - redis

@@ -4,7 +4,6 @@ import {
 } from "./merkle_tree.model";
 import {
     IMerkleTreeNodeDocument,
-    IMerkleTreeNodeKey,
     IMerkleTreeZeroDocument,
 } from "./merkle_tree.types";
 
@@ -39,6 +38,10 @@ export async function findLeafByHash(
     return this.findOne({ "key.level": 0, hash }).populate("parent");
 }
 
+export async function getAllLeaves(this: typeof MerkleTreeNode): Promise<IMerkleTreeNodeDocument[]> {
+    return this.find({ "key.level": 0, "hash": { $ne: "0" } }).populate("parent");
+}
+
 export async function findRoot(
     this: typeof MerkleTreeNode
 ): Promise<IMerkleTreeNodeDocument | null> {
@@ -49,74 +52,6 @@ export async function getTotalNumberOfLeaves(
     this: typeof MerkleTreeNode,
 ): Promise<number> {
     return this.countDocuments({ "key.level": 0 });
-}
-
-export async function getAuthPath(
-    this: typeof MerkleTreeNode,
-    key: IMerkleTreeNodeKey
-): Promise<any> {
-    const query = this.aggregate(
-        [
-            {
-                $match: {
-                    key,
-                },
-            },
-            {
-                $graphLookup: {
-                    from: "treeNodes",
-                    startWith: "$_id",
-                    connectFromField: "parent",
-                    connectToField: "_id",
-                    as: "path",
-                    depthField: "level",
-                },
-            },
-            {
-                $unwind: {
-                    path: "$path",
-                },
-            },
-            {
-                $project: {
-                    path: 1,
-                    _id: 0,
-                },
-            },
-            {
-                $addFields: {
-                    hash: "$path.hash",
-                    sibling: "$path.siblingHash",
-                    index: { $mod: ["$path.key.index", 2] },
-                    level: "$path.level",
-                },
-            },
-            {
-                $sort: {
-                    level: 1,
-                },
-            },
-            {
-                $project: {
-                    path: 0,
-                },
-            },
-        ]
-    );
-
-    return new Promise((resolve, reject) => {
-        query.exec((error, path) => {
-            if (error) {
-                reject(error);
-            }
-
-            const root = path.pop().hash;
-            const pathElements = path.map((n) => n.sibling);
-            const indices = path.map((n) => n.index);
-
-            resolve({ pathElements, indices, root });
-        });
-    });
 }
 
 export async function findZeros(

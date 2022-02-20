@@ -6,9 +6,10 @@
     "author": "Nasi Jofche",
     "license": "MIT",
     "dependencies": {
-        "@zk-kit/identity": "^1.2.0",
-        "@zk-kit/protocols": "^1.2.0",
+        "@zk-kit/identity": "^1.4.1",
+        "@zk-kit/protocols": "^1.6.0",
         "axios": "^0.24.0",
+        "bigint-conversion": "2.1.12",
         "circomlib": "0.5.5",
         "cors": "^2.8.5",
         "dotenv": "^10.0.0",

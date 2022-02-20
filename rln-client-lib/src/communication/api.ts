@@ -96,14 +96,11 @@ class RLNServerApi {
         }
     };
 
-    public getUserAuthPath = async (id_commitment: string): Promise<any | null> => {
+    public getLeaves = async (): Promise<string[]> => {
         try {
             const res = await axios({
-                method: 'POST',
-                url: this.server_url + "/api/v1/user/auth_path",
-                data: {
-                    identity_commitment: id_commitment
-                },
+                method: 'GET',
+                url: this.server_url + "/api/v1/user/leaves",
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
@@ -111,7 +108,7 @@ class RLNServerApi {
             });
             return res.data;
         } catch (e) {
-            return null;
+            return [];
         }
     };
 

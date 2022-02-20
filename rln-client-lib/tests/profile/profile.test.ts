@@ -71,9 +71,8 @@ describe('Test profile', () => {
 
     const testProfile: IProfile = {
         rln_identity_commitment: "test_id_commitment_1",
-        rln_identity_secret: ["123", "1234"],
+        leaves: ["123", "1234"],
         root_hash: "test",
-        auth_path: "auth path",
         user_private_key: "priv",
         user_public_key: "pub",
         rooms: {
@@ -113,7 +112,7 @@ describe('Test profile', () => {
     });
 
     test('init profile', async () => {
-        await profileManager.initProfile("id1", ["sha-1", "sha-2"], "root1", "auth_path_1");
+        await profileManager.initProfile("id1", "root1", ["sha-1", "sha-2"]);
 
         expect(await profileManager.profileExists()).toBeTruthy();
     });
@@ -137,9 +136,8 @@ describe('Test profile', () => {
         const formatInvalid3 = await profileManager.validateFormat(
             {
                 "rln_identity_commitment": "val1",
-                "rln_identity_secret": "val1",
+                "leaves": ["val1", "val2"],
                 "root_hash": "val1",
-                "auth_path": "val1",
                 "user_private_key": "val1",
                 "user_public_key": "val1",
                 "rooms": {},
@@ -149,9 +147,8 @@ describe('Test profile', () => {
         const formatValid = await profileManager.validateFormat(
             {
                 "rln_identity_commitment": "val1",
-                "rln_identity_secret": "val1",
+                "leaves": ["val1", "val2"],
                 "root_hash": "val1",
-                "auth_path": "val1",
                 "user_private_key": "val1",
                 "user_public_key": "val1",
                 "rooms": {
@@ -223,16 +220,19 @@ describe('Test profile', () => {
         expect(testProfile.rln_identity_commitment).toStrictEqual(id);
     });
 
-    test('get identity secret', async () => {
+    test('get leaves', async () => {
         await profileManager.recoverProfile(testProfile);
-        const secret: bigint[] = await profileManager.getIdentitySecret();
-        expect(testProfile.rln_identity_secret).toEqual(secret.map(x => x.toString()));
+        const leaves: string[] = await profileManager.getLeaves();
+        expect(testProfile.leaves).toEqual(leaves);
     });
 
-    test('get auth path', async () => {
+    test('update leaves', async () => {
         await profileManager.recoverProfile(testProfile);
-        const path: string = await profileManager.getAuthPath();
-        expect(testProfile.auth_path).toStrictEqual(path);
+
+        const new_leaves: string[] = ["0000", "1212", "1100"];
+        await profileManager.updateLeaves(new_leaves)
+        const leaves: string[] = await profileManager.getLeaves();
+        expect(new_leaves).toEqual(leaves);
     });
 
     test('update root hash', async () => {
@@ -242,15 +242,6 @@ describe('Test profile', () => {
 
         const root_hash = await profileManager.getRlnRoot();
         expect(root_hash).toEqual("updated");
-    });
-
-    test('update auth path', async () => {
-        await profileManager.recoverProfile(testProfile);
-
-        await profileManager.updateAuthPath("updated");
-
-        const path = await profileManager.getAuthPath();
-        expect(path).toEqual("updated");
     });
 
     test('add public room', async () => {

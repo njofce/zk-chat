@@ -1,8 +1,5 @@
 import { ICryptography, IKeyPair } from './interfaces'
 
-const ab2str = require('arraybuffer-to-string');
-const str2ab = require('string-to-arraybuffer');
-
 /**
  * Provides basic cryptographical primitives using the Web Crypto API.
  */
@@ -65,8 +62,8 @@ class WebCryptography implements ICryptography {
             const exportedPrivateKey = await window.crypto.subtle.exportKey("pkcs8", keyPair.privateKey);
 
             return {
-                publicKey: ab2str(exportedPublicKey, "base64"),
-                privateKey: ab2str(exportedPrivateKey, "base64")
+                publicKey: this.ab2str(exportedPublicKey),
+                privateKey: this.ab2str(exportedPrivateKey)
             }
         }
         throw "Could not generate key pairs";
@@ -84,17 +81,18 @@ class WebCryptography implements ICryptography {
             true,
             ['encrypt', 'decrypt']);
 
-        const iv_substring = symmetricKey.substr(0, 10);
+        const iv_substring = symmetricKey.substring(0, 10);
 
+        
         const encrypted: ArrayBuffer = await window.crypto.subtle.encrypt(
             {
                 name: "AES-GCM",
-                iv: str2ab(iv_substring)
+                iv: this.str2ab(iv_substring)
             }, 
             importedSymmetricKey, 
-            str2ab(message, "utf-8"));
+            this.str2ab(message));
 
-        return ab2str(encrypted, "base64");
+        return this.ab2str(encrypted);
     }
 
     /**
@@ -109,17 +107,17 @@ class WebCryptography implements ICryptography {
             true,
             ['encrypt', 'decrypt']);
 
-        const iv_substring = symmetricKey.substr(0, 10);
+        const iv_substring = symmetricKey.substring(0, 10);
 
         const decrypted: ArrayBuffer = await window.crypto.subtle.decrypt(
             {
                 name: "AES-GCM",
-                iv: str2ab(iv_substring, "utf-8")
+                iv: this.str2ab(iv_substring)
             },
             importedSymmetricKey,
-            str2ab(cyphertext));
+            this.str2ab(cyphertext));
 
-        return ab2str(decrypted);
+        return this.ab2str(decrypted);
     }
 
     /**
@@ -130,7 +128,7 @@ class WebCryptography implements ICryptography {
     public async encryptMessageAsymmetric(message: string, publicKey: string): Promise<string> {
         const importedPublicKey = await window.crypto.subtle.importKey(
             "spki",
-            str2ab(publicKey), 
+            this.str2ab(publicKey), 
             { name: "RSA-OAEP", hash: "SHA-256" },
             true, 
             ['encrypt']);
@@ -140,10 +138,10 @@ class WebCryptography implements ICryptography {
                 name: "RSA-OAEP"
             },
             importedPublicKey,
-            str2ab(message)
+            this.str2ab(message)
         );
 
-        return ab2str(encryptedBytes, "base64");
+        return this.ab2str(encryptedBytes);
     }
     
     /**
@@ -153,7 +151,7 @@ class WebCryptography implements ICryptography {
     public async decryptMessageAsymmetric(cyphertext: string, privateKey: string): Promise<string> {
         const importedPrivateKey = await window.crypto.subtle.importKey(
             "pkcs8",
-            str2ab(privateKey),
+            this.str2ab(privateKey),
             { name: "RSA-OAEP", hash: "SHA-256" },
             true,
             ['decrypt']);
@@ -163,10 +161,30 @@ class WebCryptography implements ICryptography {
                 name: "RSA-OAEP"
             },
             importedPrivateKey,
-            str2ab(cyphertext)
+            this.str2ab(cyphertext)
         );
 
-        return ab2str(decryptedBytes);
+        return this.ab2str(decryptedBytes);
+    }
+
+    /**
+     * Converts an array buffer to a string.
+     */
+    private ab2str(buf: ArrayBuffer) {
+        //@ts-ignore
+        return String.fromCharCode.apply(null, new Uint8Array(buf));
+    }
+
+    /**
+     * Converts a string to an array buffer.
+     */
+    private str2ab(str) {
+        var buf = new ArrayBuffer(str.length);
+        var bufView = new Uint8Array(buf);
+        for (var i = 0, strLen = str.length; i < strLen; i++) {
+            bufView[i] = str.charCodeAt(i);
+        }
+        return buf;
     }
 }
 

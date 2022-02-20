@@ -3,7 +3,7 @@ import styled from "styled-components";
 import * as Colors from "../../constants/colors";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { roomTypes } from "../../constants/constants";
+import { clientUrl, roomTypes } from "../../constants/constants";
 import { useAppDispatch } from "../../redux/hooks/useAppDispatch";
 import { addActiveChatRoom } from "../../redux/actions/actionCreator";
 import InviteModal from "../Modals/inviteModal";
@@ -109,7 +109,7 @@ const ChatMessages = ({ currentActiveRoom }: ChatMessagesProps) => {
   };
 
   const handleGenerateInvitePublicRoomLink = () => {
-    const publicRoomInviteLink = `${process.env.REACT_APP_ENV}public/${currentActiveRoom.id}`;    
+    const publicRoomInviteLink = `${clientUrl}/public/${currentActiveRoom.id}`;    
     navigator.clipboard.writeText(publicRoomInviteLink).then(() => {
       setIsPublicRoomInviteCopied(true)
       setTimeout(() => setIsPublicRoomInviteCopied(false), 4000);

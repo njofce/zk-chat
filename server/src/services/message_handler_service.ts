@@ -1,3 +1,5 @@
+import { FullProof } from '@zk-kit/protocols';
+import { getYShareFromFullProof } from './../util/types';
 import * as path from "path";
 import * as fs from "fs";
 
@@ -41,7 +43,6 @@ class MessageHandlerService {
     public handleChatMessage = async (message: string): Promise<IMessage> => {
         // Validate format of the RLN message
         const validMessage: RLNMessage | null = await this.validateFormat(message);
-
         if (validMessage == null) 
             throw "Message format invalid";
 
@@ -54,7 +55,7 @@ class MessageHandlerService {
             throw "Message is a duplicate";
 
         // Check valid proof
-        const validZkProof = await this.isZkProofValid(validMessage);
+        const validZkProof = await this.isZkProofValid(validMessage.zk_proof);
 
         if (!validZkProof) {
             throw "ZK Proof is invalid, ignoring message";
@@ -69,12 +70,23 @@ class MessageHandlerService {
             const sharesX = requestStats.map((stats) => BigInt(stats.xShare));
             const sharesY = requestStats.map((stats) => BigInt(stats.yShare));
 
-            sharesX.push(BigInt(validMessage.xShare));
-            sharesY.push(BigInt(validMessage.yShare));
+            sharesX.push(BigInt(validMessage.x_share));
+            sharesY.push(BigInt(getYShareFromFullProof(validMessage.zk_proof)));
             const secret: bigint = this.hasher.retrieveSecret(sharesX, sharesY);
             const idCommitment = this.hasher.poseidonHash([secret]).toString();
 
+            // Ban User
             await this.userService.removeUser(idCommitment, secret);
+
+            // Set user leaf to 0 and recalculate merkle tree
+            await this.userService.updateUser(idCommitment);
+
+            // Broadcast tree updated event
+            const treeUpdated: ISyncMessage = {
+                type: SyncType.EVENT,
+                message: "TREE_UPDATE"
+            };
+            this.pubSub.publish(treeUpdated);
 
             throw "Message is a spam, banning user and ignoring message";
         }
@@ -117,20 +129,7 @@ class MessageHandlerService {
         return this.hasher.genExternalNullifier(generatedEpoch) == this.hasher.genExternalNullifier(message.epoch);
     }
 
-    private isZkProofValid = async (message: RLNMessage): Promise<boolean> => {
-        const root = await this.userService.getRoot();
-        const proof = {
-            proof: message.zk_proof,
-            publicSignals: [
-                BigInt(message.yShare),
-                BigInt(root),
-                BigInt(message.nullifier),
-                BigInt(message.xShare),
-                this.hasher.genExternalNullifier(message.epoch),
-                BigInt(config.RLN_IDENTIFIER)
-            ],
-        };
-
+    private isZkProofValid = async (proof: FullProof): Promise<boolean> => {
         return await this.hasher.verifyProof(this.verifierKey, proof);
     }
 

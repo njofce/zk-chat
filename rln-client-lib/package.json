@@ -6,12 +6,10 @@
     "author": "Nasi Jofche",
     "license": "MIT",
     "dependencies": {
-        "@zk-kit/identity": "^1.2.0",
-        "@zk-kit/protocols": "^1.2.4",
-        "arraybuffer-to-string": "^1.0.2",
+        "@zk-kit/identity": "^1.4.1",
+        "@zk-kit/protocols": "^1.6.0",
         "axios": "^0.24.0",
         "dotenv": "^10.0.0",
-        "string-to-arraybuffer": "^1.0.2",
         "uuid": "^8.3.2",
         "ws": "^8.3.0"
     },

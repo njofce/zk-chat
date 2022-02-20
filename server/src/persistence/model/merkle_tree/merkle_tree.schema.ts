@@ -4,10 +4,10 @@ import {
     findZeros,
     findRoot,
     getTotalNumberOfLeaves,
+    getAllLeaves,
     findLeafByHash,
     findLeafByGroupIdAndHash,
-    findLeafByGroupIdAndIndexInGroup,
-    getAuthPath
+    findLeafByGroupIdAndIndexInGroup
 } from "./merkle_tree.statics";
 import {
     IMerkleTreeNode,
@@ -50,8 +50,8 @@ MerkleTreeNodeSchema.statics.findLeafByGroupIdAndHash = findLeafByGroupIdAndHash
 MerkleTreeNodeSchema.statics.findByLevelAndIndex = findByLevelAndIndex;
 MerkleTreeNodeSchema.statics.findLeafByHash = findLeafByHash;
 MerkleTreeNodeSchema.statics.findRoot = findRoot;
-MerkleTreeNodeSchema.statics.getAuthPath = getAuthPath;
 MerkleTreeNodeSchema.statics.getTotalNumberOfLeaves = getTotalNumberOfLeaves;
+MerkleTreeNodeSchema.statics.getAllLeaves = getAllLeaves;
 
 // Zeros
 export const MerkleTreeZeroSchemaFields: Record<keyof IMerkleTreeZero, any> = {
