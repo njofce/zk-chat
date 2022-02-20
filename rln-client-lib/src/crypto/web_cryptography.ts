@@ -58,12 +58,12 @@ class WebCryptography implements ICryptography {
 
         if (keyPair.publicKey && keyPair.privateKey) {
             
-            const exportedPublicKey = await window.crypto.subtle.exportKey("spki", keyPair.publicKey);
-            const exportedPrivateKey = await window.crypto.subtle.exportKey("pkcs8", keyPair.privateKey);
+            const exportedPublicKey: ArrayBuffer = await window.crypto.subtle.exportKey("spki", keyPair.publicKey);
+            const exportedPrivateKey: ArrayBuffer = await window.crypto.subtle.exportKey("pkcs8", keyPair.privateKey);
 
             return {
-                publicKey: this.ab2str(exportedPublicKey),
-                privateKey: this.ab2str(exportedPrivateKey)
+                publicKey: btoa(this.ab2str(exportedPublicKey)),
+                privateKey: btoa(this.ab2str(exportedPrivateKey))
             }
         }
         throw "Could not generate key pairs";
@@ -128,7 +128,7 @@ class WebCryptography implements ICryptography {
     public async encryptMessageAsymmetric(message: string, publicKey: string): Promise<string> {
         const importedPublicKey = await window.crypto.subtle.importKey(
             "spki",
-            this.str2ab(publicKey), 
+            this.str2ab(atob(publicKey)), 
             { name: "RSA-OAEP", hash: "SHA-256" },
             true, 
             ['encrypt']);
@@ -141,7 +141,7 @@ class WebCryptography implements ICryptography {
             this.str2ab(message)
         );
 
-        return this.ab2str(encryptedBytes);
+        return btoa(this.ab2str(encryptedBytes));
     }
     
     /**
@@ -151,7 +151,7 @@ class WebCryptography implements ICryptography {
     public async decryptMessageAsymmetric(cyphertext: string, privateKey: string): Promise<string> {
         const importedPrivateKey = await window.crypto.subtle.importKey(
             "pkcs8",
-            this.str2ab(privateKey),
+            this.str2ab(atob(privateKey)),
             { name: "RSA-OAEP", hash: "SHA-256" },
             true,
             ['decrypt']);
@@ -161,7 +161,7 @@ class WebCryptography implements ICryptography {
                 name: "RSA-OAEP"
             },
             importedPrivateKey,
-            this.str2ab(cyphertext)
+            this.str2ab(atob(cyphertext))
         );
 
         return this.ab2str(decryptedBytes);
