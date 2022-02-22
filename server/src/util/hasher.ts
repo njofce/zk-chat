@@ -1,5 +1,5 @@
 import { poseidon } from "circomlib";
-import { RLN, genExternalNullifier, FullProof, generateMerkleProof, MerkleProof } from "@zk-kit/protocols"
+import { RLN, genExternalNullifier, generateMerkleProof, MerkleProof, RLNFullProof } from "@zk-kit/protocols"
 import config from '../config';
 /**
  * A wrapper class for circomlib & semaphore library functions.
@@ -36,7 +36,7 @@ export default class Hasher {
     /**
      * Verifies a RLN proof using the verifier key.
      */
-    public async verifyProof(verifierKey: any, proof: FullProof): Promise<boolean> {
+    public async verifyProof(verifierKey: any, proof: RLNFullProof): Promise<boolean> {
         return await RLN.verifyProof(verifierKey, proof);
     }
 

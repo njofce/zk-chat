@@ -1,4 +1,4 @@
-import { FullProof } from '@zk-kit/protocols';
+import { RLNFullProof } from '@zk-kit/protocols';
 import { getYShareFromFullProof } from './../util/types';
 import * as path from "path";
 import * as fs from "fs";
@@ -28,8 +28,6 @@ class MessageHandlerService {
     private hasher: Hasher;
     private verifierKey: any;
 
-    private static TIMESTAMP_TOLERATED_DIFFERENCE_SECONDS: number = 60;
-
     constructor(pubSub: PubSub, userService: UserService, requestStatsService: RequestStatsService, hasher: Hasher) {
         this.pubSub = pubSub;
         this.userService = userService;
@@ -55,7 +53,8 @@ class MessageHandlerService {
             throw "Message is a duplicate";
 
         // Check valid proof
-        const validZkProof = await this.isZkProofValid(validMessage.zk_proof);
+        const merkleRoot: string = await this.userService.getRoot();
+        const validZkProof = await this.isZkProofValid(validMessage.zk_proof, merkleRoot);
 
         if (!validZkProof) {
             throw "ZK Proof is invalid, ignoring message";
@@ -114,23 +113,33 @@ class MessageHandlerService {
     }
 
     private verifyEpoch = (message: RLNMessage): boolean => {
-        const timeNow = new Date();
-        timeNow.setSeconds(0);
-        timeNow.setMilliseconds(0);
-        const generatedEpoch = timeNow.getTime().toString();
-
-        const messageTimestamp = new Date(message.epoch);
+        const serverTimestamp = new Date();
+        
+        serverTimestamp.setSeconds(Math.floor(serverTimestamp.getSeconds() / 10) * 10);
+        serverTimestamp.setMilliseconds(0);
+        const messageTimestamp = new Date(parseInt(message.epoch));
 
         // Tolerate a difference of TIMESTAMP_TOLERATED_DIFFERENCE_SECONDS seconds between client and server timestamp
-        const difference_in_seconds = Math.abs(timeNow.getTime() - messageTimestamp.getTime()) / (1000 * 60);
-        if (difference_in_seconds > MessageHandlerService.TIMESTAMP_TOLERATED_DIFFERENCE_SECONDS)
+        const difference_in_seconds = Math.abs(serverTimestamp.getTime() - messageTimestamp.getTime()) / 1000;
+        if (difference_in_seconds >= config.EPOCH_ALLOWED_DELAY_THRESHOLD)
             return false;
 
-        return this.hasher.genExternalNullifier(generatedEpoch) == this.hasher.genExternalNullifier(message.epoch);
+        return true;
     }
 
-    private isZkProofValid = async (proof: FullProof): Promise<boolean> => {
-        return await this.hasher.verifyProof(this.verifierKey, proof);
+    private isZkProofValid = async (proof: RLNFullProof, root: string): Promise<boolean> => {
+
+        return await this.hasher.verifyProof(this.verifierKey, {
+            proof: proof.proof,
+            publicSignals: {
+                yShare: proof.publicSignals.yShare,
+                merkleRoot: root,
+                internalNullifier: proof.publicSignals.internalNullifier,
+                signalHash: proof.publicSignals.signalHash,
+                epoch: proof.publicSignals.epoch,
+                rlnIdentifier: proof.publicSignals.rlnIdentifier,
+            }
+        });
     }
 
     private areSpamRulesViolated = async (message: RLNMessage): Promise<boolean> => {
