@@ -1,4 +1,3 @@
-import { RLNPublicSignals } from './../../../../zk-kit/packages/protocols/src/types/index';
 import { clearDatabase } from '../jest.setup';
 import { test, expect, describe, afterEach, jest, beforeEach } from '@jest/globals'
 import PubSub from '../../src/communication/pub_sub';
@@ -10,6 +9,7 @@ import MockDate from 'mockdate';
 import Hasher from '../../src/util/hasher';
 import Message from '../../src/persistence/model/message/message.model';
 import { IMessage } from '../../src/persistence/model/message/message.types';
+import { RLNPublicSignals } from '@zk-kit/protocols';
 
 describe('Test message handle service', () => {
 
