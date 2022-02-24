@@ -15,7 +15,14 @@ const testMessage: RLNMessage = {
             protocol: "p",
             curve: "c"
         },
-        publicSignals: [BigInt(123).toString(), BigInt(123).toString(), BigInt(1234).toString()]
+        publicSignals: {
+            yShare: BigInt(123).toString(),
+            merkleRoot: BigInt(123).toString(),
+            internalNullifier: BigInt(1234).toString(),
+            signalHash: BigInt(1234).toString(),
+            epoch: BigInt(1234).toString(),
+            rlnIdentifier: BigInt(1234).toString()
+        }
     },
     x_share: BigInt(123).toString(),
     epoch: "1637837920000",
@@ -33,7 +40,14 @@ const testMessages: RLNMessage[] = [
                 protocol: "p",
                 curve: "c"
             },
-            publicSignals: [BigInt(123).toString(), BigInt(123).toString(), BigInt(1234).toString()]
+            publicSignals: {
+                yShare: BigInt(123).toString(),
+                merkleRoot: BigInt(123).toString(),
+                internalNullifier: BigInt(1234).toString(),
+                signalHash: BigInt(1234).toString(),
+                epoch: BigInt(1234).toString(),
+                rlnIdentifier: BigInt(1234).toString()
+            }
         },
         x_share: BigInt(123).toString(),
         epoch: "1637837930000",
@@ -49,7 +63,14 @@ const testMessages: RLNMessage[] = [
                 protocol: "p",
                 curve: "c"
             },
-            publicSignals: [BigInt(123).toString(), BigInt(123).toString(), BigInt(1234).toString()]
+            publicSignals: {
+                yShare: BigInt(123).toString(),
+                merkleRoot: BigInt(123).toString(),
+                internalNullifier: BigInt(1234).toString(),
+                signalHash: BigInt(1234).toString(),
+                epoch: BigInt(1234).toString(),
+                rlnIdentifier: BigInt(1234).toString()
+            }
         },
         x_share: BigInt(123).toString(),
         epoch: "1637837920000",
@@ -65,7 +86,14 @@ const testMessages: RLNMessage[] = [
                 protocol: "p",
                 curve: "c"
             },
-            publicSignals: [BigInt(123).toString(), BigInt(123).toString(), BigInt(1234).toString()]
+            publicSignals: {
+                yShare: BigInt(123).toString(),
+                merkleRoot: BigInt(123).toString(),
+                internalNullifier: BigInt(1234).toString(),
+                signalHash: BigInt(1234).toString(),
+                epoch: BigInt(1234).toString(),
+                rlnIdentifier: BigInt(1234).toString()
+            }
         },
         x_share: BigInt(123).toString(),
         epoch: "1637837920000",
@@ -129,7 +157,14 @@ describe('Test request stats service', () => {
                     protocol: "p",
                     curve: "c"
                 },
-                publicSignals: [BigInt(123).toString(), BigInt(123).toString(), BigInt(1234).toString()]
+                publicSignals: {
+                    yShare: BigInt(123).toString(),
+                    merkleRoot: BigInt(123).toString(),
+                    internalNullifier: BigInt(1234).toString(),
+                    signalHash: BigInt(1234).toString(),
+                    epoch: BigInt(1234).toString(),
+                    rlnIdentifier: BigInt(1234).toString()
+                }
             },
             x_share: BigInt(123).toString(),
             epoch: "1637837920000",
@@ -154,7 +189,14 @@ describe('Test request stats service', () => {
                     protocol: "p",
                     curve: "c"
                 },
-                publicSignals: [BigInt(123).toString(), BigInt(123).toString(), BigInt(123).toString()]
+                publicSignals: {
+                    yShare: BigInt(123).toString(),
+                    merkleRoot: BigInt(123).toString(),
+                    internalNullifier: BigInt(123).toString(),
+                    signalHash: BigInt(1234).toString(),
+                    epoch: BigInt(1234).toString(),
+                    rlnIdentifier: BigInt(1234).toString()
+                }
             },
             x_share: BigInt(123).toString(),
             epoch: "1637837140000",
@@ -179,7 +221,14 @@ describe('Test request stats service', () => {
                     protocol: "p",
                     curve: "c"
                 },
-                publicSignals: [BigInt(123).toString(), BigInt(123).toString(), BigInt(1234).toString()]
+                publicSignals: {
+                    yShare: BigInt(123).toString(),
+                    merkleRoot: BigInt(123).toString(),
+                    internalNullifier: BigInt(1234).toString(),
+                    signalHash: BigInt(1234).toString(),
+                    epoch: BigInt(1234).toString(),
+                    rlnIdentifier: BigInt(1234).toString()
+                }
             },
             x_share: BigInt(123).toString(),
             epoch: "1637837920000",
@@ -205,7 +254,14 @@ describe('Test request stats service', () => {
                     protocol: "p",
                     curve: "c"
                 },
-                publicSignals: [BigInt(123).toString(), BigInt(123).toString(), BigInt(123).toString()]
+                publicSignals: {
+                    yShare: BigInt(123).toString(),
+                    merkleRoot: BigInt(123).toString(),
+                    internalNullifier: BigInt(123).toString(),
+                    signalHash: BigInt(1234).toString(),
+                    epoch: BigInt(1234).toString(),
+                    rlnIdentifier: BigInt(1234).toString()
+                }
             },
             x_share: BigInt(123).toString(),
             epoch: "1637837920000",

@@ -9,6 +9,7 @@ import MockDate from 'mockdate';
 import Hasher from '../../src/util/hasher';
 import Message from '../../src/persistence/model/message/message.model';
 import { IMessage } from '../../src/persistence/model/message/message.types';
+import { RLNPublicSignals } from '@zk-kit/protocols';
 
 describe('Test message handle service', () => {
 
@@ -20,7 +21,15 @@ describe('Test message handle service', () => {
     let messageHandlerService: MessageHandlerService;
 
     const timestampTodayMs = 1637837920000;
-    const msecondsPerDay = 86400000;
+
+    const publicSignals: RLNPublicSignals = {
+        yShare: BigInt(123).toString(),
+        merkleRoot: BigInt(123).toString(),
+        internalNullifier: BigInt(123).toString(),
+        signalHash: BigInt(123).toString(),
+        epoch: BigInt(123).toString(),
+        rlnIdentifier: BigInt(123).toString()
+    }
 
     beforeEach(async() => {
         pubSub = new TestPubSub();
@@ -54,9 +63,9 @@ describe('Test message handle service', () => {
         }
     });
 
-    test('epoch invalid', async () => {
+    test('epoch invalid, is after server timestamp', async () => {
         try {
-            MockDate.set(new Date(timestampTodayMs + 2 * 60 * 1000)); // current date is 2 mins after the configured second
+            MockDate.set(new Date(timestampTodayMs));
             const object = {
                 zk_proof: {
                     proof: {
@@ -66,10 +75,37 @@ describe('Test message handle service', () => {
                         protocol: "p",
                         curve: "c"
                     },
-                    publicSignals: []
+                    publicSignals: publicSignals
                 },
                 x_share: BigInt(123).toString(),
-                epoch: timestampTodayMs + 1 * 60 * 1000, // message second is 1 min after the configured second
+                epoch: String(timestampTodayMs + 50 * 1000), // message second is 50s after  the server timestamp
+                chat_type: "PUBLIC",
+                message_content: "encrypted message content",
+            };
+            console.log("Object timestamp", object.epoch);
+            await messageHandlerService.handleChatMessage(JSON.stringify(object));
+            expect(false).toBeTruthy();
+        } catch (e) {
+            expect(e).toEqual("Epoch invalid");
+        }
+    });
+
+    test('epoch invalid, is before server timestamp', async () => {
+        try {
+            MockDate.set(new Date(timestampTodayMs));
+            const object = {
+                zk_proof: {
+                    proof: {
+                        pi_a: [],
+                        pi_b: [],
+                        pi_c: [],
+                        protocol: "p",
+                        curve: "c"
+                    },
+                    publicSignals: publicSignals
+                },
+                x_share: BigInt(123).toString(),
+                epoch: timestampTodayMs - 50 * 1000, // message second is 50s before the server timestamp
                 chat_type: "PUBLIC",
                 message_content: "encrypted message content",
             };
@@ -94,7 +130,7 @@ describe('Test message handle service', () => {
                         protocol: "p",
                         curve: "c"
                     },
-                    publicSignals: []
+                    publicSignals: publicSignals
                 },
                 x_share: BigInt(123).toString(),
                 epoch: timestampTodayMs,
@@ -124,7 +160,7 @@ describe('Test message handle service', () => {
                         protocol: "p",
                         curve: "c"
                     },
-                    publicSignals: []
+                    publicSignals: publicSignals
                 },
                 x_share: BigInt(123).toString(),
                 epoch: timestampTodayMs,
@@ -171,7 +207,7 @@ describe('Test message handle service', () => {
                         protocol: "p",
                         curve: "c"
                     },
-                    publicSignals: [BigInt(123).toString(), BigInt(123).toString(), BigInt(123).toString()]
+                    publicSignals: publicSignals
                 },
                 x_share: BigInt(123).toString(),
                 epoch: timestampTodayMs,
@@ -215,7 +251,7 @@ describe('Test message handle service', () => {
                     protocol: "p",
                     curve: "c"
                 },
-                publicSignals: [BigInt(123).toString(), BigInt(123).toString(), BigInt(123).toString()]
+                publicSignals: publicSignals
             },
             x_share: BigInt(123).toString(),
             epoch: timestampTodayMs,

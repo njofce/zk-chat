@@ -139,7 +139,14 @@ describe('Chat test', () => {
                     protocol: "p",
                     curve: "c"
                 },
-                publicSignals: ["1111", "2222", "3333", "4444"]
+                publicSignals: {
+                    yShare: BigInt(123).toString(),
+                    merkleRoot: BigInt(123).toString(),
+                    internalNullifier: BigInt(123).toString(),
+                    signalHash: BigInt(123).toString(),
+                    epoch: BigInt(123).toString(),
+                    rlnIdentifier: BigInt(123).toString()
+                }
             }
         });
     }
@@ -196,7 +203,14 @@ describe('Chat test', () => {
                     "protocol": "p",
                     "curve": "c"
                 },
-                "publicSignals": ["1111", "2222", "3333", "4444"]
+                "publicSignals": {
+                    "yShare": BigInt(123).toString(),
+                    "merkleRoot": BigInt(123).toString(),
+                    "internalNullifier": BigInt(123).toString(),
+                    "signalHash": BigInt(123).toString(),
+                    "epoch": BigInt(123).toString(),
+                    "rlnIdentifier": BigInt(123).toString()
+                }
             },
             "x_share": "111",
             "epoch": "1639339320000",

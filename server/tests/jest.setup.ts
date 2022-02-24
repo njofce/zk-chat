@@ -1,5 +1,5 @@
+import { RLNFullProof } from '@zk-kit/protocols';
 import { beforeAll, afterAll } from '@jest/globals'
-import { FullProof } from '@zk-kit/protocols';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
 import Hasher from '../src/util/hasher';
@@ -48,7 +48,7 @@ jest.mock("../src/util/hasher", () => {
             genExternalNullifier: (data: string): string => {
                 return data; // always return the same
             },
-            verifyProof: async (verifierKey: any, proof: FullProof) => {
+            verifyProof: async (verifierKey: any, proof: RLNFullProof) => {
                 return false;
             },
             retrieveSecret: (sharesX: bigint[], sharesY: bigint[]): bigint => {

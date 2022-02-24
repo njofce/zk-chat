@@ -1,10 +1,10 @@
-import { FullProof } from '@zk-kit/protocols';
+import { RLNFullProof } from '@zk-kit/protocols';
 
 /**
  * The message that each client sends to the server
  */
 export interface RLNMessage {
-    zk_proof: FullProof;
+    zk_proof: RLNFullProof;
     x_share: string;
     epoch: string;
     chat_type: string;
@@ -37,10 +37,10 @@ export const constructRLNMessage = (parsedJson: any): RLNMessage => {
     }
 }
 
-export const getNullifierFromFullProof = (proof: FullProof): string => {
-    return proof.publicSignals[2].toString();
+export const getNullifierFromFullProof = (proof: RLNFullProof): string => {
+    return proof.publicSignals.internalNullifier.toString();
 }
 
-export const getYShareFromFullProof = (proof: FullProof): string => {
-    return proof.publicSignals[0].toString();
+export const getYShareFromFullProof = (proof: RLNFullProof): string => {
+    return proof.publicSignals.yShare.toString();
 }

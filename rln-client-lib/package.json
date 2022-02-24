@@ -7,7 +7,7 @@
     "license": "MIT",
     "dependencies": {
         "@zk-kit/identity": "^1.4.1",
-        "@zk-kit/protocols": "^1.6.0",
+        "@zk-kit/protocols": "^1.8.2",
         "axios": "^0.24.0",
         "dotenv": "^10.0.0",
         "uuid": "^8.3.2",

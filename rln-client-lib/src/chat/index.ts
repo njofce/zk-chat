@@ -2,7 +2,7 @@ import { ICryptography } from '../crypto/interfaces';
 import { ServerCommunication } from '../communication/index';
 import ProfileManager from "../profile";
 import Hasher from "../hasher";
-import { FullProof } from "@zk-kit/protocols";
+import { RLNFullProof } from "@zk-kit/protocols";
 
 /**
  * The core component that is responsible for creating valid ZK proofs for a message, encrypting and dispatching it, as well as receiving and decrypting messages
@@ -60,7 +60,7 @@ class ChatManager {
         };
 
         const proof: string = await proof_generator_callback(externalNullifier, signal, storageArtifacts, ChatManager.RLN_IDENTIFIER.toString());
-        const fullProof: FullProof = JSON.parse(proof)['fullProof'];
+        const fullProof: RLNFullProof = JSON.parse(proof)['fullProof'];
         const xShare: bigint = this.hasher.genSignalHash(signal);
 
         // Encrypt with room's key
@@ -136,11 +136,11 @@ class ChatManager {
     }
 
     /**
-     * Returns rounded timestamp to the nearest minute in milliseconds.
+     * Returns rounded timestamp to the nearest 10-second in milliseconds.
      */
     private getEpoch = (): string => {
         const timeNow = new Date();
-        timeNow.setSeconds(0);
+        timeNow.setSeconds(Math.floor(timeNow.getSeconds() / 10) * 10);
         timeNow.setMilliseconds(0);
 
         return timeNow.getTime().toString();

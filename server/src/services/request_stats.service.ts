@@ -10,10 +10,10 @@ class RequestStatsService {
     public async saveMessage(message: RLNMessage) {
         
         const req_stats = await RequestStats.create({
-            nullifier: getNullifierFromFullProof(message.zk_proof), // internal nullifier is the third public signal
+            nullifier: getNullifierFromFullProof(message.zk_proof),
             epoch: message.epoch,
             xShare: message.x_share,
-            yShare: getYShareFromFullProof(message.zk_proof), // y share is the first public signal
+            yShare: getYShareFromFullProof(message.zk_proof)
         })
 
         await req_stats.save();
