@@ -60,7 +60,7 @@ class ChatManager {
         };
 
         const proof: string = await proof_generator_callback(externalNullifier, signal, storageArtifacts, ChatManager.RLN_IDENTIFIER.toString());
-        const fullProof: RLNFullProof = JSON.parse(proof)['fullProof'];
+        const fullProof: RLNFullProof = JSON.parse(proof);
         const xShare: bigint = this.hasher.genSignalHash(signal);
 
         // Encrypt with room's key
