@@ -11,6 +11,9 @@ import { useAppSelector } from "../../redux/hooks/useAppSelector";
 import Input from "../Input";
 import ExcangeKeysModal from "../Modals/exchangeKeysModal";
 import ReactTooltip from "react-tooltip";
+import { ToastContainer } from 'react-toastify';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 const StyledChatContainer = styled.div`
   background: white;
@@ -178,6 +181,7 @@ const ChatMessages = ({ currentActiveRoom }: ChatMessagesProps) => {
         toggleExchangeKeysModal={toggleExchangeKeysModal}
         setToggleExchangeKeysModal={setToggleExchangeKeysModal}
       />
+      <ToastContainer />
     </StyledChatContainer>
   );
 };

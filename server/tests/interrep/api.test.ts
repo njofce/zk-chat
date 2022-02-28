@@ -22,22 +22,25 @@ describe('Test interrep sync - subgraph', () => {
     test('test get all groups', async () => {
         const testGroups: IInterRepGroupV2[] = [
             {
-                rootHash: "1",
+                root: "1",
                 provider: "github",
                 name: "GOLD",
-                size: 1
+                size: 1,
+                numberOfLeaves: 1
             },
             {
-                rootHash: "1",
+                root: "1",
                 provider: "github",
                 name: "GOLD",
-                size: 1
+                size: 1,
+                numberOfLeaves: 1
             },
             {
-                rootHash: "1",
+                root: "1",
                 provider: "github",
                 name: "GOLD",
-                size: 1
+                size: 1,
+                numberOfLeaves: 1
             }
         ];
 
