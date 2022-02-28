@@ -6,7 +6,7 @@ import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { Room } from "../../redux/actions/actionCreator";
 import { send_message } from "rln-client-lib";
 import { clientUrl } from "../../constants/constants";
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 const StyledInput = styled.input`
   border: 1px solid #f0f2f5;
