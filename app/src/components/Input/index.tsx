@@ -6,6 +6,7 @@ import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { Room } from "../../redux/actions/actionCreator";
 import { send_message } from "rln-client-lib";
 import { clientUrl } from "../../constants/constants";
+import { toast } from 'react-toastify';
 
 const StyledInput = styled.input`
   border: 1px solid #f0f2f5;
@@ -68,7 +69,7 @@ class Input extends React.Component<InputProps, InputState> {
         await send_message(currentActiveRoom.id, inputValue, this.generateProof);
         this.setState({ inputValue: "" })
       } catch (error) {
-        console.log(error);
+        toast.error("Error while sending the message. You are either banned from the chat or deleted from InteRep");
       }
     }
   };
@@ -102,6 +103,7 @@ class Input extends React.Component<InputProps, InputState> {
             onClick={this.handleMessageSubmit}
           />{" "}
         </div>
+
       </StyledChatFooterWrapper>
     );
   }

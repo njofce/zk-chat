@@ -6,10 +6,11 @@ export interface IInterRepGroup {
 }
 
 export interface IInterRepGroupV2 {
-    rootHash: string;
+    root: string;
     provider: string;
     name: string;
     size: number;
+    numberOfLeaves: number;
 }
 
 export interface IGroupMember {

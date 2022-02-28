@@ -39,7 +39,7 @@ export async function findLeafByHash(
 }
 
 export async function getAllLeaves(this: typeof MerkleTreeNode): Promise<IMerkleTreeNodeDocument[]> {
-    return this.find({ "key.level": 0, "hash": { $ne: "0" } }).populate("parent");
+    return this.find({ "key.level": 0 }).populate("parent");
 }
 
 export async function findRoot(

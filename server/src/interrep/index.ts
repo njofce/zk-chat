@@ -46,18 +46,18 @@ class InterRepSynchronizer {
         let tree_root_changed = false;
 
         // 2. For each group, check the status in database. Only load new members for group if the size in db is different than the new size of the group
-        for (let g of allGroupsOnNet) {
+        for (let    g of allGroupsOnNet) {
             const g_id = g.provider + "_" + g.name;
             const groupInDb: IGroup | undefined = groupsInDb.find(x => x.group_id == g_id && x.name == g.name && x.provider == g.provider);
 
             if (groupInDb == undefined) {
                 // Group doesn't exist, load all members for that group, paginate over 100
-                const groupMembers: IGroupMember[] = await this.loadGroupMembersWithPagination(g.rootHash, 0, g.size);
+                const groupMembers: IGroupMember[] = await this.loadGroupMembersWithPagination(g.root, 0, g.numberOfLeaves);
                 try {
                     // Add all members to the tree
                     await this.userService.appendUsers(groupMembers, g_id);
                     // Persist the group
-                    await this.groupService.saveGroup(g_id, g.provider, g.name, g.size);
+                    await this.groupService.saveGroup(g_id, g.provider, g.name, g.numberOfLeaves);
 
                     tree_root_changed = true;
                 } catch (e) {
@@ -65,14 +65,14 @@ class InterRepSynchronizer {
                 }
             } else {
                 // Group exists, load new members only if sizes differ (new members got added in InterRep)
-                if (g.size > groupInDb.size) {
-                    // Load members from groupInDb.size up to g.size
-                    const groupMembers: IGroupMember[] = await this.loadGroupMembersWithPagination(g.rootHash, groupInDb.size, g.size);
+                if (g.numberOfLeaves > groupInDb.size) {
+                    // Load members from groupInDb.size up to g.numberOfLeaves
+                    const groupMembers: IGroupMember[] = await this.loadGroupMembersWithPagination(g.root, groupInDb.size, g.numberOfLeaves);
                     try {
                         // Add group members to the tree
                         await this.userService.appendUsers(groupMembers, g_id);
                         // Update group in DB
-                        await this.groupService.updateSize(g_id, g.size);
+                        await this.groupService.updateSize(g_id, g.numberOfLeaves);
 
                         tree_root_changed = true;
                     } catch (e) {

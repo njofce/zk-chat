@@ -10,22 +10,25 @@ import subgraphFunctions from '../../src/interrep/api';
 
 const testGroups: IInterRepGroupV2[] = [
     {
-        rootHash: "1",
+        root: "1",
         provider: "github",
         name: "GOLD",
-        size: 6
+        size: 6,
+        numberOfLeaves: 6
     },
     {
-        rootHash: "2",
+        root: "2",
         provider: "twitter",
         name: "GOLD",
-        size: 10
+        size: 10,
+        numberOfLeaves: 10
     },
     {
-        rootHash: "3",
+        root: "3",
         provider: "reddit",
         name: "GOLD",
-        size: 50
+        size: 50,
+        numberOfLeaves: 50
     }
 ];
 
@@ -150,9 +153,9 @@ describe('Test interrep synchronizer', () => {
         await synchronizer.syncCommitmentsFromInterRep();
 
         expect(getGroupsSpy).toHaveBeenCalled();
-        // expect(saveGroupSpy).not.toHaveBeenCalled();
-        // expect(updateSizeSpy).not.toHaveBeenCalled();
-        // expect(appendUsersSpy).not.toHaveBeenCalled();
+        expect(saveGroupSpy).not.toHaveBeenCalled();
+        expect(updateSizeSpy).not.toHaveBeenCalled();
+        expect(appendUsersSpy).not.toHaveBeenCalled();
     });
 
     test('test sync - partial db', async () => {
