@@ -1,7 +1,7 @@
 import { IGroup } from "../persistence/model/group/group.types";
 import UserService from "../services/user.service";
 import GroupService from "../services/group.service";
-import { IGroupMember, IInterRepGroup, IInterRepGroupV2 } from "./interfaces";
+import { IGroupMember, IInterRepGroupV2 } from "./interfaces";
 import PubSub from "../communication/pub_sub";
 import { SyncType } from "../communication/socket/config";
 import interRepFunctions from "./api";
@@ -52,7 +52,7 @@ class InterRepSynchronizer {
 
             if (groupInDb == undefined) {
                 // Group doesn't exist, load all members for that group, paginate over 100
-                const groupMembers: IGroupMember[] = await this.loadGroupMembersWithPagination(g.root, 0, g.numberOfLeaves);
+                const groupMembers: IGroupMember[] = await this.loadGroupMembersWithPagination(g.provider, g.name, 0, g.numberOfLeaves);
                 try {
                     // Add all members to the tree
                     await this.userService.appendUsers(groupMembers, g_id);
@@ -67,7 +67,7 @@ class InterRepSynchronizer {
                 // Group exists, load new members only if sizes differ (new members got added in InterRep)
                 if (g.numberOfLeaves > groupInDb.size) {
                     // Load members from groupInDb.size up to g.numberOfLeaves
-                    const groupMembers: IGroupMember[] = await this.loadGroupMembersWithPagination(g.root, groupInDb.size, g.numberOfLeaves);
+                    const groupMembers: IGroupMember[] = await this.loadGroupMembersWithPagination(g.provider, g.name, groupInDb.size, g.numberOfLeaves);
                     try {
                         // Add group members to the tree
                         await this.userService.appendUsers(groupMembers, g_id);
@@ -88,18 +88,18 @@ class InterRepSynchronizer {
         }
     }
 
-    private async loadGroupMembersWithPagination(groupId: string, offset: number, to: number): Promise<IGroupMember[]> {
+    private async loadGroupMembersWithPagination(provider: string, name: string, offset: number, to: number): Promise<IGroupMember[]> {
         let loadedMembers: IGroupMember[] = [];
 
         const limit: number = 100;
 
-        let members: IGroupMember[] = await interRepFunctions.getMembersForGroup(groupId, limit, offset);
+        let members: IGroupMember[] = await interRepFunctions.getMembersForGroup(provider, name, limit, offset);
 
         loadedMembers = loadedMembers.concat(members);
 
         while (members.length + limit <= to) {
             offset += limit;
-            members = await interRepFunctions.getMembersForGroup(groupId, limit, offset);
+            members = await interRepFunctions.getMembersForGroup(provider, name, limit, offset);
             loadedMembers = loadedMembers.concat(members);
         }
 

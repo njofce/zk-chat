@@ -62,11 +62,19 @@ describe('Test interrep sync - subgraph', () => {
 
         mockAxios.mockResolvedValue({
             data: {
-                data: testMembers_g1
+                data: {
+                    provider: "twitter",
+                    name: "not_sufficient",
+                    depth: 20,
+                    root: "3282736528510229708245753028800701559160032734733920390753117377915762630937",
+                    size: 6,
+                    numberOfLeaves: 6,
+                    members: testMembers_g1
+                }
             }
         });
 
-        const members: IGroupMember[] = await apiFunctions.getMembersForGroup("id1");
+        const members: IGroupMember[] = await apiFunctions.getMembersForGroup("twitter", "not_sufficient");
         expect(members.length).toEqual(6);
         expect(members[0]).toEqual({ index: 0, identityCommitment: 'id-0' });
         expect(members[1]).toEqual({ index: 1, identityCommitment: 'id-1' });
