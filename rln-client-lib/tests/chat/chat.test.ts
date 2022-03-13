@@ -196,20 +196,22 @@ describe('Chat test', () => {
         expect(sendMessageSpy).toHaveBeenCalledTimes(1);
         expect(sendMessageSpy).toHaveBeenCalledWith(JSON.stringify({
             "zk_proof": {
-                "proof": {
-                    "pi_a": "pi_a",
-                    "pi_b": "pi_b",
-                    "pi_c": "pi_c",
-                    "protocol": "p",
-                    "curve": "c"
-                },
-                "publicSignals": {
-                    "yShare": BigInt(123).toString(),
-                    "merkleRoot": BigInt(123).toString(),
-                    "internalNullifier": BigInt(123).toString(),
-                    "signalHash": BigInt(123).toString(),
-                    "epoch": BigInt(123).toString(),
-                    "rlnIdentifier": BigInt(123).toString()
+                "fullProof": {
+                    "proof": {
+                        "pi_a": "pi_a",
+                        "pi_b": "pi_b",
+                        "pi_c": "pi_c",
+                        "protocol": "p",
+                        "curve": "c"
+                    },
+                    "publicSignals": {
+                        "yShare": BigInt(123).toString(),
+                        "merkleRoot": BigInt(123).toString(),
+                        "internalNullifier": BigInt(123).toString(),
+                        "signalHash": BigInt(123).toString(),
+                        "epoch": BigInt(123).toString(),
+                        "rlnIdentifier": BigInt(123).toString()
+                    }
                 }
             },
             "x_share": "111",
