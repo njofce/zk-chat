@@ -1,3 +1,4 @@
+import { ITrustedContactsMap } from './../../src/profile/interfaces';
 import { IProfile } from '../../src/profile/interfaces';
 import { StorageProvider } from '../../src/storage/interfaces';
 import { jest, test, expect, describe, beforeAll, beforeEach } from '@jest/globals'
@@ -79,7 +80,8 @@ describe('Test profile', () => {
             public: [],
             private: [],
             direct: []
-        }
+        },
+        contacts: {}
     }
 
     let crypto: ICryptography;
@@ -156,6 +158,7 @@ describe('Test profile', () => {
                     "private": [],
                     "direct": []
                 },
+                "contacts": {}
             });
         expect(formatValid).toBeTruthy();
 
@@ -651,6 +654,58 @@ describe('Test profile', () => {
         } catch(e) {
             expect(true).toBeTruthy();
         }
+    })
+
+    test('get contacts - empty', async() => {
+        await profileManager.recoverProfile(deepClone(testProfile));
+        const contacts: ITrustedContactsMap = profileManager.getTrustedContacts();
+        expect(Object.keys(contacts).length).toEqual(0);
+    })
+
+    test('get contacts - not empty', async () => {
+        await profileManager.recoverProfile(deepClone(testProfile));
+        await profileManager.insertTrustedContact("test", "test key");
+        
+        const contacts: ITrustedContactsMap = await profileManager.getTrustedContacts();
+        expect(Object.keys(contacts).length).toEqual(1);
+    })
+
+    test('insert contact - doesnt exist', async () => {
+        await profileManager.recoverProfile(deepClone(testProfile));
+        await profileManager.insertTrustedContact("test", "test key");
+
+        const contact = profileManager.getTrustedContact("test");
+        expect(contact.name).toEqual("test");
+        expect(contact.publicKey).toEqual("test key");
+    })
+
+    test('insert contact - exists', async () => {
+        await profileManager.recoverProfile(deepClone(testProfile));
+        await profileManager.insertTrustedContact("test", "test key");
+
+        try {
+            await profileManager.insertTrustedContact("test", "test key");
+            expect(true).toBeFalsy();
+        } catch(e) {
+            expect(true).toBeTruthy();
+        }
+    })
+
+    test('get contact - doesnt exist', async () => {
+        await profileManager.recoverProfile(deepClone(testProfile));
+        try {
+            profileManager.getTrustedContact("non existent contact");
+            expect(true).toBeFalsy();
+        } catch (e) {
+            expect(true).toBeTruthy();
+        }
+    })
+
+    test('get contact - exists', async () => {
+        await profileManager.recoverProfile(deepClone(testProfile));
+        await profileManager.insertTrustedContact("test", "test key");
+        const contact = profileManager.getTrustedContact("test");
+        expect(contact).not.toBeNull();
     })
 
 });

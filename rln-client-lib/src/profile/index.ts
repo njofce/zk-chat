@@ -2,7 +2,7 @@ import { ICryptography, IKeyPair } from '../crypto/interfaces';
 import { IPublicRoom, IDirectRoom, IPrivateRoom } from '../room/interfaces';
 import { deepClone } from '../util';
 import { StorageProvider } from '../storage/interfaces';
-import { IProfile, IRooms } from './interfaces';
+import { IProfile, IRooms, ITrustedContact, ITrustedContactsMap } from './interfaces';
 
 /**
  * Manages the local profile of the current user. The profile is kept in-memory, and continuously synced with the profile stored in the selected
@@ -68,7 +68,8 @@ class ProfileManager {
                 public: [],
                 private: [],
                 direct: []
-            }
+            },
+            contacts: {}
         }
         this.inMemoryProfile = profile;
         await this.persistProfile();
@@ -81,11 +82,11 @@ class ProfileManager {
 
         const keys: string[] = Object.keys(parsed_profile_data);
 
-        if (keys.length != 6)
+        if (keys.length != 7)
             return false;
 
         const interfaceKeys: string[] = [
-            "rln_identity_commitment", "root_hash", "leaves", "user_private_key", "user_public_key", "rooms"
+            "rln_identity_commitment", "root_hash", "leaves", "user_private_key", "user_public_key", "rooms", "contacts"
         ];
 
         for (let iK of interfaceKeys) {
@@ -193,6 +194,48 @@ class ProfileManager {
     public getLeaves(): string[] {
         if (this.inMemoryProfile != null) {
             return this.inMemoryProfile.leaves;
+        }
+        throw "Profile doesn't exist";
+    }
+
+    /**
+     * Returns all trusted contacts registered in the user's profile
+     */
+    public getTrustedContacts(): ITrustedContactsMap {
+        if (this.inMemoryProfile != null) {
+            return this.inMemoryProfile.contacts;
+        }
+        throw "Profile doesn't exist";
+    }
+
+    /**
+     * Returns the trusted contact with the given name, if exists
+     */
+    public getTrustedContact(name: string): ITrustedContact {
+        if (this.inMemoryProfile != null) {
+            if (Object.keys(this.inMemoryProfile.contacts).indexOf(name) != -1) {
+                return this.inMemoryProfile.contacts[name];
+            }
+            throw "Contact doesn't exist";
+        }
+        throw "Profile doesn't exist";
+    }
+
+    /**
+     * Saves the trusted contact with the given name and public key. 
+     * Throws an exception if a contact with the same name already exists.
+     */
+    public async insertTrustedContact(name: string, publicKey: string) {
+        if (this.inMemoryProfile != null) {
+            if (Object.keys(this.inMemoryProfile.contacts).indexOf(name) != -1) {
+                throw "A contact with the same name already exists";
+            }
+
+            this.inMemoryProfile.contacts[name] = {
+                name: name,
+                publicKey: publicKey
+            };
+            return await this.persistProfile();
         }
         throw "Profile doesn't exist";
     }

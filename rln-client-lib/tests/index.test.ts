@@ -20,7 +20,10 @@ import {
     get_chat_history,
     get_public_key,
     export_profile,
-    recover_profile
+    recover_profile,
+    get_contacts,
+    get_contact,
+    insert_contact
 } from '../src/index';
 
 import ProfileManager from '../src/profile';
@@ -639,6 +642,96 @@ describe('Test main', () => {
         jest.spyOn(ProfileManager.prototype, "getPublicKey").mockResolvedValue("test key");
 
         expect(await get_public_key()).toEqual("test key");
+    });
+
+    test('get contacts', async () => {
+        // No profile
+        try {
+            await get_contacts();
+            expect(true).toBeFalsy();
+        } catch (e) {
+            expect(true).toBeTruthy();
+        }
+
+        // With profile
+        await init_new_profile();
+
+        jest.spyOn(ProfileManager.prototype, "getTrustedContacts").mockReturnValue({
+            "test": {
+                name: "test",
+                publicKey: "test key"
+            }
+        });
+
+        expect(await get_contacts()).toEqual({
+            "test": {
+                name: "test",
+                publicKey: "test key"
+            }
+        });
+    });
+
+    test('get contact', async () => {
+        // No profile
+        try {
+            await get_contact("test");
+            expect(true).toBeFalsy();
+        } catch (e) {
+            expect(true).toBeTruthy();
+        }
+
+        // With profile, doesnt exist
+        await init_new_profile();
+
+        jest.spyOn(ProfileManager.prototype, "getTrustedContact").mockImplementation((name) => {
+            throw "doesn't exist"
+        });
+
+        try {
+            await get_contact("sm");
+            expect(true).toBeFalsy();
+        } catch(e) {
+            expect(true).toBeTruthy();
+        }
+
+        // With profile, exists
+        jest.spyOn(ProfileManager.prototype, "getTrustedContact").mockImplementation((name) => {
+            return {
+                name: "test",
+                publicKey: "test key"
+            }
+        });
+        const contact = await get_contact("test");
+        expect(contact.name).toEqual('test');
+        expect(contact.publicKey).toEqual('test key');
+    });
+
+    test('insert contact', async () => {
+        // No profile
+        try {
+            await insert_contact("test", "test");
+            expect(true).toBeFalsy();
+        } catch (e) {
+            expect(true).toBeTruthy();
+        }
+
+        // With profile, already exists
+        await init_new_profile();
+
+        jest.spyOn(ProfileManager.prototype, "insertTrustedContact").mockImplementation((name, key) => {
+            throw "Contact already exists";
+        });
+
+        try {
+            await insert_contact("test", "test");
+            expect(true).toBeFalsy();
+        } catch (e) {
+            expect(true).toBeTruthy();
+        }
+
+        // With profile, doesn't exist
+        jest.spyOn(ProfileManager.prototype, "insertTrustedContact").mockResolvedValue();
+        await insert_contact("test", "test");
     });
 
     test('export profile', async () => {
