@@ -23,7 +23,9 @@ import {
     recover_profile,
     get_contacts,
     get_contact,
-    insert_contact
+    insert_contact,
+    delete_contact,
+    update_contact
 } from '../src/index';
 
 import ProfileManager from '../src/profile';
@@ -732,6 +734,62 @@ describe('Test main', () => {
         // With profile, doesn't exist
         jest.spyOn(ProfileManager.prototype, "insertTrustedContact").mockResolvedValue();
         await insert_contact("test", "test");
+    });
+
+    test('delete contact', async () => {
+        // No profile
+        try {
+            await delete_contact("test");
+            expect(true).toBeFalsy();
+        } catch (e) {
+            expect(true).toBeTruthy();
+        }
+
+        // With profile, doesnt exist
+        await init_new_profile();
+
+        jest.spyOn(ProfileManager.prototype, "deleteTrustedContact").mockImplementation((name) => {
+            throw "Doesnt exist";
+        });
+
+        try {
+            await delete_contact("test");
+            expect(true).toBeFalsy();
+        } catch (e) {
+            expect(true).toBeTruthy();
+        }
+
+        // With profile, exists
+        jest.spyOn(ProfileManager.prototype, "deleteTrustedContact").mockResolvedValue();
+        await delete_contact("test");
+    });
+
+    test('update contact', async () => {
+        // No profile
+        try {
+            await update_contact("old", "new", "pub key");
+            expect(true).toBeFalsy();
+        } catch (e) {
+            expect(true).toBeTruthy();
+        }
+
+        // With profile, doesnt exist
+        await init_new_profile();
+
+        jest.spyOn(ProfileManager.prototype, "updateTrustedContact").mockImplementation((old_name, new_name, pub_key) => {
+            throw "Doesnt exist";
+        });
+
+        try {
+            await update_contact("test", "test2", "pub key");
+            expect(true).toBeFalsy();
+        } catch (e) {
+            expect(true).toBeTruthy();
+        }
+
+        // With profile, exists
+        jest.spyOn(ProfileManager.prototype, "updateTrustedContact").mockResolvedValue();
+        await update_contact("test", "test2", "pub key");
     });
 
     test('export profile', async () => {

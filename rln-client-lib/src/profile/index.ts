@@ -47,6 +47,11 @@ class ProfileManager {
                 return false;
 
             this.inMemoryProfile = JSON.parse(loadedProfile);
+
+            if (this.inMemoryProfile != null && this.inMemoryProfile.contacts==null) {
+                this.inMemoryProfile.contacts = {};
+            }
+
             return true;
         } catch(e) {
             return false;
@@ -235,6 +240,46 @@ class ProfileManager {
                 name: name,
                 publicKey: publicKey
             };
+            return await this.persistProfile();
+        }
+        throw "Profile doesn't exist";
+    }
+
+    /**
+     * Updates the trusted contact with the given name and public key. 
+     * Throws an exception if a contact with the new name already exists.
+     */
+    public async updateTrustedContact(old_name: string, new_name: string, publicKey: string) {
+        if (this.inMemoryProfile != null) {
+            if (Object.keys(this.inMemoryProfile.contacts).indexOf(old_name) == -1) {
+                throw "The contact doesnt exist";
+            }
+
+            if (Object.keys(this.inMemoryProfile.contacts).indexOf(new_name) != -1) {
+                throw "A contact with the same name already exists";
+            }
+
+            delete this.inMemoryProfile.contacts[old_name];
+            this.inMemoryProfile.contacts[new_name] = {
+                name: new_name,
+                publicKey: publicKey
+            };
+            return await this.persistProfile();
+        }
+        throw "Profile doesn't exist";
+    }
+
+    /**
+     * Deletes a trusted contact with the specified name, if it exists.
+     */
+    public async deleteTrustedContact(name: string) {
+        if (this.inMemoryProfile != null) {
+            if (Object.keys(this.inMemoryProfile.contacts).indexOf(name) == -1) {
+                throw "The specified contact doesn't exist";
+            }
+
+            delete this.inMemoryProfile.contacts[name];
+
             return await this.persistProfile();
         }
         throw "Profile doesn't exist";

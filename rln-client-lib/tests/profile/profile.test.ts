@@ -708,4 +708,70 @@ describe('Test profile', () => {
         expect(contact).not.toBeNull();
     })
 
+    test('delete contact - exists', async () => {
+        await profileManager.recoverProfile(deepClone(testProfile));
+        await profileManager.insertTrustedContact("test", "test key");
+        const contact = profileManager.getTrustedContact("test");
+        expect(contact).not.toBeNull();
+
+        await profileManager.deleteTrustedContact("test");
+        try {
+            profileManager.getTrustedContact("test");
+            expect(true).toBeFalsy();
+        } catch (e) {
+            expect(true).toBeTruthy();
+        }
+    })
+
+    test('delete contact - doesnt exist', async () => {
+        await profileManager.recoverProfile(deepClone(testProfile));
+        
+        try {
+            await profileManager.deleteTrustedContact("test");
+            expect(true).toBeFalsy();
+        } catch (e) {
+            expect(true).toBeTruthy();
+        }
+    })
+
+    test('update contact - doesnt exist', async () => {
+        await profileManager.recoverProfile(deepClone(testProfile));
+
+        try {
+            await profileManager.updateTrustedContact("old", "new", "test");
+            expect(true).toBeFalsy();
+        } catch (e) {
+            expect(true).toBeTruthy();
+        }
+    })
+
+    test('update contact - exists', async () => {
+        await profileManager.recoverProfile(deepClone(testProfile));
+        await profileManager.insertTrustedContact("test", "test key");
+
+        await profileManager.updateTrustedContact("test", "new", "test");
+
+        const contact = profileManager.getTrustedContact("new");
+        expect(contact).not.toBeNull();
+        expect(contact.name).toEqual('new');
+        expect(contact.publicKey).toEqual('test');
+
+        const allContacts = profileManager.getTrustedContacts();
+        expect(Object.keys(allContacts).length).toEqual(1);
+    })
+
+    test('update contact - new name already exists', async () => {
+        await profileManager.recoverProfile(deepClone(testProfile));
+        await profileManager.insertTrustedContact("test", "test key");
+
+        await profileManager.insertTrustedContact("new", "new key");
+
+        try {
+            await profileManager.updateTrustedContact("test", "new", "test");
+            expect(false).toBeTruthy();
+        } catch(e) {
+            expect(true).toBeTruthy();
+        }
+    })
+
 });
