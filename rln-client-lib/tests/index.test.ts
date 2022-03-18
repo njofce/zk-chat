@@ -14,8 +14,6 @@ import {
     create_private_room,
     invite_private_room,
     join_private_room,
-    generate_encrypted_invite_direct_room,
-    update_direct_room_key,
     create_direct_room,
     get_chat_history,
     get_public_key,
@@ -32,6 +30,7 @@ import ProfileManager from '../src/profile';
 import { ICryptography, IKeyPair } from '../src/crypto/interfaces';
 import ChatManager from '../src/chat';
 import WebCryptography from '../src/crypto/web_cryptography';
+import KeyExchangeManager from '../src/key-exchange';
 
 
 /**
@@ -121,6 +120,14 @@ class LocalTestCryptography implements ICryptography {
         return (this.seed * 1111).toString();
     };
 
+    generateECDHKeyPair = async(): Promise<IKeyPair> => {
+        return this.generateKeyPair()
+    }
+
+    deriveSharedSecretKey = async(sourcePrivateKey: string, targetPublicKey: string): Promise<string> => {
+        return "derived-" + sourcePrivateKey + targetPublicKey;
+    }
+
     generateKeyPair = async (): Promise<IKeyPair> => {
         const privateKey = this.seed * 1111;
         const publicKey = (this.seed * 12345) ^ privateKey;
@@ -146,13 +153,35 @@ class LocalTestCryptography implements ICryptography {
     decryptMessageAsymmetric = async (cyphertext: string, privateKey: string): Promise<string> => {
         return cyphertext.substr(0, cyphertext.indexOf('||'));
     }
+
+    hash = (data: string): string => {
+        return "hash-" + data;
+    }
 }
 
 
 describe('Test main', () => {
 
     const proof_generator_callback = async (nullifier: string, signal: string, storage_artifacts: any, rln_identitifer: any): Promise<any> => {
-        return "proof";
+        return JSON.stringify({
+            fullProof: {
+                proof: {
+                    pi_a: "pi_a",
+                    pi_b: "pi_b",
+                    pi_c: "pi_c",
+                    protocol: "p",
+                    curve: "c"
+                },
+                publicSignals: {
+                    yShare: BigInt(123).toString(),
+                    merkleRoot: BigInt(123).toString(),
+                    internalNullifier: BigInt(123).toString(),
+                    signalHash: BigInt(123).toString(),
+                    epoch: BigInt(123).toString(),
+                    rlnIdentifier: BigInt(123).toString()
+                }
+            }
+        });
     }
 
     beforeEach(async () => {
@@ -173,7 +202,8 @@ describe('Test main', () => {
             await init({
                 serverUrl: "test1",
                 socketUrl: "ws://test2"
-            });
+            }, 
+            proof_generator_callback);
             expect(true).toBeFalsy();
         } catch(e) {
             expect(true).toBeTruthy();
@@ -191,7 +221,8 @@ describe('Test main', () => {
         await init({
             serverUrl: "test1",
             socketUrl: "ws://test2"
-        });
+        }, 
+        proof_generator_callback);
         expect(true).toBeTruthy();
     });
 
@@ -215,6 +246,7 @@ describe('Test main', () => {
                 serverUrl: "test1",
                 socketUrl: "ws://test2"
             }, 
+            proof_generator_callback,
             "test_id_commitment", 
             new TestStorageProvider(), 
             new LocalTestCryptography(1000));
@@ -244,7 +276,7 @@ describe('Test main', () => {
     test('send message', async () => {
         // No profile
         try {
-            await send_message("test-room-1", "message", proof_generator_callback);
+            await send_message("test-room-1", "message");
             expect(true).toBeFalsy();
         } catch (e) {
             expect(true).toBeTruthy();
@@ -253,7 +285,7 @@ describe('Test main', () => {
         // With profile
         await init_new_profile();
         const chatSpy = jest.spyOn(ChatManager.prototype, "sendMessage").mockResolvedValue();
-        await send_message("test-room-1", "message", proof_generator_callback);
+        await send_message("test-room-1", "message");
         expect(chatSpy).toHaveBeenCalled();
     });
 
@@ -489,41 +521,10 @@ describe('Test main', () => {
         expect(addPrivateRoomSpy).toHaveBeenCalled();
     });
 
-    test('generate encrypted invite for direct room', async () => {
-        // No profile
-        try {
-            await generate_encrypted_invite_direct_room("id-1");
-            expect(true).toBeFalsy();
-        } catch (e) {
-            expect(true).toBeTruthy();
-        }
-
-        // With profile
-        await init_new_profile();
-        jest.spyOn(ProfileManager.prototype, "generateEncryptedInviteDirectRoom").mockResolvedValue("encrypted invite");
-
-        const encInvite = await generate_encrypted_invite_direct_room("id-1");
-        expect(encInvite).toEqual("encrypted invite");
-    });
-
-    test('update direct room key', async () => {
-        // No profile
-        try {
-            await update_direct_room_key("id-1", "enc-key");
-            expect(true).toBeFalsy();
-        } catch (e) {
-            expect(true).toBeTruthy();
-        }
-
-        // With profile
-        await init_new_profile();
-        const updateSpy = jest.spyOn(ProfileManager.prototype, "updateDirectRoomKey").mockImplementation(async (roomId, key) => {});
-        
-        await update_direct_room_key("id-1", "enc-key");
-        expect(updateSpy).toHaveBeenCalled();
-    });
-
     test('create direct room', async () => {
+        jest.spyOn(KeyExchangeManager.prototype, "init").mockImplementation(() => {});
+        const bundleSaveSpy = jest.spyOn(KeyExchangeManager.prototype, "saveKeyExchangeBundle").mockImplementation(async(dhPublicKey: string, receiverPublicKey: string) => {});
+
         // No profile
         try {
             await create_direct_room("test-room", "public key");
@@ -546,7 +547,10 @@ describe('Test main', () => {
         }
 
         // Room exists
-        jest.spyOn(WebCryptography.prototype, "generateSymmetricKey").mockResolvedValue("test symm key");
+        jest.spyOn(WebCryptography.prototype, "generateECDHKeyPair").mockResolvedValue({
+            publicKey: "public",
+            privateKey: "private"
+        });
         jest.spyOn(ProfileManager.prototype, "addDirectRoom").mockImplementation(async (room) => {
             throw "Room already exists"
         })
@@ -559,13 +563,15 @@ describe('Test main', () => {
         }
 
         // Success
-        jest.spyOn(WebCryptography.prototype, "generateSymmetricKey").mockResolvedValue("test symm key");
-        const addRoomSpy = jest.spyOn(ProfileManager.prototype, "addDirectRoom").mockImplementation(async (room) => {
-
-        })
+        jest.spyOn(WebCryptography.prototype, "generateECDHKeyPair").mockResolvedValue({
+            publicKey: "public",
+            privateKey: "private"
+        });
+        const addRoomSpy = jest.spyOn(ProfileManager.prototype, "addDirectRoom").mockImplementation(async (room) => {})
 
         await create_direct_room("test-room", "public key")
         expect(addRoomSpy).toHaveBeenCalled();
+        expect(bundleSaveSpy).toHaveBeenCalled();
     });
 
     test('get chat history', async () => {
@@ -858,7 +864,9 @@ describe('Test main', () => {
         await init({
             serverUrl: "test1",
             socketUrl: "ws://test2"
-        }, "test_id_commitment");
+        }, 
+        proof_generator_callback, 
+        "test_id_commitment");
 
         return initProfileSpy;
     }

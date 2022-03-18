@@ -53,7 +53,7 @@ jest.mock("../../src/hasher", () => {
     });
 })
 
-class TestStorageProvider implements StorageProvider {
+export class TestStorageProvider implements StorageProvider {
 
     private data = {}
 
@@ -76,7 +76,7 @@ class TestStorageProvider implements StorageProvider {
 
 }
 
-class LocalTestCryptography implements ICryptography {
+export class LocalTestCryptography implements ICryptography {
 
     private seed: number;
 
@@ -86,6 +86,14 @@ class LocalTestCryptography implements ICryptography {
 
     generateSymmetricKey = async (): Promise<string> => {
         return (this.seed * 10000).toString();
+    };
+
+    generateECDHKeyPair = async (): Promise<IKeyPair> => {
+        return this.generateKeyPair()
+    };
+
+    deriveSharedSecretKey = async (sourcePrivateKey: string, targetPublicKey: string): Promise<string> => {
+        return "derived-" + sourcePrivateKey + targetPublicKey;
     };
 
     generateKeyPair = async (): Promise<IKeyPair> => {
@@ -100,11 +108,11 @@ class LocalTestCryptography implements ICryptography {
 
     encryptMessageSymmetric = async (message: string, symmetricKey: string): Promise<string> => {
         return message + "___" + symmetricKey;
-    }
+    };
 
     decryptMessageSymmetric = async (cyphertext: string, symmetricKey: string): Promise<string> => {
         return cyphertext.substr(0, cyphertext.indexOf('___'));
-    }
+    };
 
     encryptMessageAsymmetric = async (message: string, publicKey: string): Promise<string> => {
         return message + "___" + publicKey;
@@ -112,7 +120,12 @@ class LocalTestCryptography implements ICryptography {
 
     decryptMessageAsymmetric = async (cyphertext: string, privateKey: string): Promise<string> => {
         return cyphertext.substr(0, cyphertext.indexOf('___'));
+    };
+
+    hash = (data: string): string => {
+        return "hash-" + data;
     }
+
 }
 
 
@@ -245,7 +258,9 @@ describe('Chat test', () => {
                 "id": "test-1",
                 "type": "DIRECT",
                 "symmetric_key": "test_symm_key",
-                "recipient_public_key": "test_public_key"
+                "recipient_public_key": "test_public_key",
+                "dh_public_key": "dh_key_public",
+                "dh_private_key": "dh_key_private"
             }
         ]);
 
@@ -311,7 +326,9 @@ describe('Chat test', () => {
                 "id": "test-1",
                 "type": "DIRECT",
                 "symmetric_key": "test_symm_key",
-                "recipient_public_key": "test_public_key"
+                "recipient_public_key": "test_public_key",
+                "dh_public_key": "dh_key_public",
+                "dh_private_key": "dh_key_private"
             }
         ]);
 

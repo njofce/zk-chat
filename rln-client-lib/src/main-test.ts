@@ -50,6 +50,14 @@ class LocalTestCryptography implements ICryptography {
         }
     };
 
+    generateECDHKeyPair = async() : Promise<IKeyPair> => {
+        return this.generateKeyPair();
+    }
+
+    deriveSharedSecretKey = async(sourcePrivateKey: string, targetPublicKey: string): Promise<string> => {
+        return "shared-secret-" + sourcePrivateKey + targetPublicKey;
+    }
+
     encryptMessageSymmetric = async (message: string, symmetricKey: string): Promise<string> => {
         return message;
     }
@@ -64,6 +72,10 @@ class LocalTestCryptography implements ICryptography {
 
     decryptMessageAsymmetric = async (cyphertext: string, privateKey: string): Promise<string> => {
         return cyphertext;
+    }
+
+    hash = (text: string) => {
+        return "hash+" + text;
     }
 }
 
@@ -98,7 +110,9 @@ const main = async () => {
         name: "direct room 1",
         type: "PUBLIC",
         symmetric_key: "some other key",
-        recipient_public_key: "some key"
+        recipient_public_key: "some key",
+        dh_public_key: "test 1",
+        dh_private_key: "test 2"
     })
 
     await chat.sendMessage("test-1", "This is a raw test message", async (nullifier: string, signal: string, storage_artifacts: any, rln_identitifer: any) => {

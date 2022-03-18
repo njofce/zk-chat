@@ -16,6 +16,7 @@ import { roomTypes, serverUrl, socketUrl } from "../../constants/constants";
 import { ToastContainer } from 'react-toastify';
 
 import 'react-toastify/dist/ReactToastify.css';
+import { generateProof } from "../../util/util";
 
 const AppWrapper = () => {
   const navigate = useNavigate();
@@ -32,7 +33,8 @@ const AppWrapper = () => {
       await init({
         serverUrl: serverUrl,
         socketUrl: socketUrl
-      })
+      }, 
+      generateProof)
         .then(() => {
           if (!location.pathname.includes(roomTypes.public))
             navigate("/dashboard");

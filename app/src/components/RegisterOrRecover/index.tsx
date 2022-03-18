@@ -10,6 +10,7 @@ import {
   serverUrl,
   socketUrl
 } from "../../constants/constants";
+import { generateProof } from "../../util/util";
 
 const StyledRegisterWrapper = styled.div`
   background: ${Colors.ANATRACITE};
@@ -57,6 +58,7 @@ const RegisterOrRecover = () => {
           serverUrl,
           socketUrl
         },
+        generateProof,
         identityCommitment
       ).then(() => {
         navigate("/dashboard");

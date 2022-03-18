@@ -7,6 +7,7 @@ import styled from "styled-components";
 import * as Colors from "../../constants/colors";
 import { serverUrl, socketUrl } from "../../constants/constants";
 import { addMessageToRoomAction, getChatHistoryAction, getRoomsAction } from "../../redux/actions/actionCreator";
+import { generateProof } from "../../util/util";
 
 const StyledButton = styled.button`
   background: ${Colors.ANATRACITE};
@@ -54,7 +55,8 @@ const RecoverModal = ({
       await init({
         serverUrl: serverUrl,
         socketUrl: socketUrl
-      })
+      }, 
+      generateProof)
         .then(() => {
           navigate("/dashboard");
           dispatch(getRoomsAction());

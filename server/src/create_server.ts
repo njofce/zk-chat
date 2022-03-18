@@ -1,5 +1,5 @@
 import express from "express";
-import { chatRouter, roomRouter, userRouter } from "./controllers";
+import { chatRouter, roomRouter, userRouter, keyExchangeRouter } from "./controllers";
 
 var cors = require("cors");
 
@@ -18,6 +18,7 @@ const createServer = () => {
     app.use("/api/v1/chat", chatRouter);
     app.use("/api/v1/user", userRouter);
     app.use("/api/v1/public_room", roomRouter);
+    app.use("/api/v1/key_exchange", keyExchangeRouter);
 
 
     return app;

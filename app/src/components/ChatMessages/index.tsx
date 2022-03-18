@@ -9,7 +9,6 @@ import { addActiveChatRoom } from "../../redux/actions/actionCreator";
 import InviteModal from "../Modals/inviteModal";
 import { useAppSelector } from "../../redux/hooks/useAppSelector";
 import Input from "../Input";
-import ExcangeKeysModal from "../Modals/exchangeKeysModal";
 import ReactTooltip from "react-tooltip";
 
 const StyledChatContainer = styled.div`
@@ -173,10 +172,6 @@ const ChatMessages = ({ currentActiveRoom }: ChatMessagesProps) => {
       <InviteModal
         toggleInviteModal={toggleInviteModal}
         setToggleInviteModal={setToggleInviteModal}
-      />
-      <ExcangeKeysModal
-        toggleExchangeKeysModal={toggleExchangeKeysModal}
-        setToggleExchangeKeysModal={setToggleExchangeKeysModal}
       />
     </StyledChatContainer>
   );

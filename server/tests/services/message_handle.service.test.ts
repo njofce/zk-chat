@@ -82,7 +82,6 @@ describe('Test message handle service', () => {
                 chat_type: "PUBLIC",
                 message_content: "encrypted message content",
             };
-            console.log("Object timestamp", object.epoch);
             await messageHandlerService.handleChatMessage(JSON.stringify(object));
             expect(false).toBeTruthy();
         } catch (e) {

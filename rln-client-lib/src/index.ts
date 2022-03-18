@@ -1,7 +1,7 @@
 import { SocketClient } from './communication/interfaces';
 import { LocalStorageProvider } from './storage/local_storage';
 import { ServerCommunication } from "./communication";
-import { ICryptography } from "./crypto/interfaces"
+import { ICryptography, IKeyPair } from "./crypto/interfaces"
 import ProfileManager from "./profile"
 import { StorageProvider } from "./storage/interfaces"
 import WebCryptography from './crypto/web_cryptography';
@@ -14,15 +14,20 @@ import RLNServerApi from './communication/api';
 import { IPrivateRoom, IDirectRoom } from './room/interfaces';
 import WebsocketClient from './communication/websocket';
 import WsSocketClient from './communication/ws-socket';
+import KeyExchangeManager from './key-exchange';
 
 let communication: ServerCommunication | null = null;
 let generated_storage_provider: StorageProvider | null = null;
 let generated_cryptography: ICryptography | null = null;
 let profile_manager: ProfileManager | null = null;
+let key_exchange_manager: KeyExchangeManager | null = null;
 let chat_manager: ChatManager;
+
+let get_proof_callback: (nullifier: string, signal: string, storage_artifacts: any, rln_identitifer: any) => Promise <any>;
 
 const init = async (
     server_config: IServerConfig,
+    proof_generator_callback: (nullifier: string, signal: string, storage_artifacts: any, rln_identitifer: any) => Promise < any >,
     identitiy_commitment?: string, 
     storage_provider?: StorageProvider, 
     cryptography?: ICryptography) => {
@@ -69,6 +74,13 @@ const init = async (
         await profile_manager.updateLeaves(leaves);
     }
 
+    get_proof_callback = proof_generator_callback;
+
+    if (key_exchange_manager == null) {
+        key_exchange_manager = new KeyExchangeManager(communication, generated_cryptography, chat_manager, profile_manager, get_proof_callback);
+        key_exchange_manager.init();
+    }
+
     // listen to events
     await communication.receiveEvent(syncRlnData);
 }
@@ -80,10 +92,10 @@ const get_rooms = async (): Promise<IRooms> => {
     return await profile_manager.getRooms();
 }
 
-const send_message = async (chat_room_id: string, raw_message: string, proof_generator_callback: (nullifier: string, signal: string, storage_artifacts: any, rln_identitifer: any) => Promise<any>) => {
+const send_message = async (chat_room_id: string, raw_message: string) => {
     if (communication == null)
         throw "init() not called";
-    await chat_manager.sendMessage(chat_room_id, raw_message, proof_generator_callback);
+    await chat_manager.sendMessage(chat_room_id, raw_message, get_proof_callback);
 }
 
 const receive_message = async(receive_msg_callback: (message: any, chat_room_id: string) => void) => {
@@ -195,19 +207,17 @@ const join_private_room = async (encrypted_invite: string) => {
     return room;
 }
 
+/**
+ * @deprecated since automated key exchange
+ */
 const generate_encrypted_invite_direct_room = async(room_id: string) => {
-    if (generated_cryptography == null || communication == null || profile_manager == null)
-        throw "init() not called";
-
-    return await profile_manager.generateEncryptedInviteDirectRoom(room_id);
+   return "";
 }
 
-const update_direct_room_key = async (room_id: string, encrypted_symmetric_key: string) => {
-    if (generated_cryptography == null || communication == null || profile_manager == null)
-        throw "init() not called";
-
-    await profile_manager.updateDirectRoomKey(room_id, encrypted_symmetric_key);
-}
+/**
+ * @deprecated since automated key exchange
+ */
+const update_direct_room_key = async (room_id: string, encrypted_symmetric_key: string) => {}
 
 const create_direct_room = async (name: string, receiver_public_key: string) => {
     if (generated_cryptography == null || communication == null || profile_manager == null)
@@ -217,17 +227,23 @@ const create_direct_room = async (name: string, receiver_public_key: string) => 
         throw "Room name cannot have more than " + ProfileManager.ROOM_NAME_MAX_LENGTH + " characters";
 
     const room_id = uuidv4();
-    const symmetric_key: string = await generated_cryptography.generateSymmetricKey();
+    
+    const dh_keypair: IKeyPair = await generated_cryptography.generateECDHKeyPair()
 
     const room: IDirectRoom = {
         id: room_id,
         name: name,
         type: "DIRECT",
-        symmetric_key: symmetric_key,
-        recipient_public_key: receiver_public_key
+        symmetric_key: "",
+        recipient_public_key: receiver_public_key,
+        dh_public_key: dh_keypair.publicKey,
+        dh_private_key: dh_keypair.privateKey
     };
 
     await profile_manager.addDirectRoom(room);
+
+    await key_exchange_manager?.saveKeyExchangeBundle(dh_keypair.publicKey, receiver_public_key);
+    
     return room;
 }
 

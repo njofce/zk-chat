@@ -1,3 +1,4 @@
+import { RLNFullProof } from '@zk-kit/protocols';
 import RLNServerApi from './api';
 import { SocketClient } from './interfaces';
 
@@ -56,6 +57,18 @@ export class ServerCommunication {
 
     public async getBannedUsers() {
         return await this.rln_server.getBannedUsers();
+    }
+
+    public async getKeyExchangeBundles(receiver_public_key: string) {
+        return await this.rln_server.getKeyExchangeBundles(receiver_public_key);
+    }
+
+    public async saveKeyExchangeBundle(zk_proof: RLNFullProof, epoch: string, x_share: string, encrypted_content: string, content_hash: string, encrypted_key: string, receiver_public_key: string) {
+        return await this.rln_server.saveKeyExchangeBundle(zk_proof, epoch, x_share, encrypted_content, content_hash, encrypted_key, receiver_public_key);
+    }
+
+    public async deleteKeyExchangeBundles(zk_proof: RLNFullProof, epoch: string, x_share: string, bundles: any[]) {
+        return await this.rln_server.deleteKeyExchangeBundles(zk_proof, epoch, x_share, bundles);
     }
 }
 

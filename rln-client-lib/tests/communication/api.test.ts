@@ -12,7 +12,25 @@ const mockAxios = axios as AxiosMock
 
 describe('Test api', () => {
 
-    let rlnServerApi;
+    const proof = JSON.parse(JSON.stringify({
+        "proof": {
+            "pi_a": "pi_a",
+            "pi_b": "pi_b",
+            "pi_c": "pi_c",
+            "protocol": "p",
+            "curve": "c"
+        },
+        "publicSignals": {
+            "yShare": BigInt(123).toString(),
+            "merkleRoot": BigInt(123).toString(),
+            "internalNullifier": BigInt(123).toString(),
+            "signalHash": BigInt(123).toString(),
+            "epoch": BigInt(123).toString(),
+            "rlnIdentifier": BigInt(123).toString()
+        }
+    }));
+
+    let rlnServerApi: RLNServerApi;
 
     beforeAll(async() => {
         rlnServerApi = new RLNServerApi("");
@@ -108,7 +126,7 @@ describe('Test api', () => {
             data: messages
         });
 
-        const history: any = await rlnServerApi.getChatHistory(["1", "2"]);
+        const history: any = await rlnServerApi.getChatHistory();
         expect(history.length).toEqual(3);
     });
 
@@ -155,6 +173,53 @@ describe('Test api', () => {
 
         const banned: any[] = await rlnServerApi.getBannedUsers();
         expect(banned.length).toEqual(3);
+    });
+
+    test('save key exchange bundle', async () => {
+        const dataToReturn = {
+            encrypted_content: "enc_content",
+            encrypted_key: "key",
+            receiver_public_key: "key"
+        }
+        mockAxios.mockResolvedValue({
+            data: dataToReturn
+        });
+        const saved = await rlnServerApi.saveKeyExchangeBundle(proof, "123", "x_share", "enc_content", "hash", "key", "key");
+        expect(saved).toEqual(dataToReturn)
+    });
+
+    test('get key exchange bundles', async () => {
+        const dataToReturn = [
+            {
+                encrypted_content: "enc_content 1",
+                encrypted_key: "key 1",
+                receiver_public_key: "key 1"
+            },
+            {
+                encrypted_content: "enc_content 2",
+                encrypted_key: "key 2",
+                receiver_public_key: "key 1"
+            },
+        ]
+
+        mockAxios.mockResolvedValue({
+            data: dataToReturn
+        });
+
+        const res = await rlnServerApi.getKeyExchangeBundles("key 1");
+        expect(res).toEqual(dataToReturn);
+    });
+
+    test('delete key exchange bundles', async () => {
+        const dataToReturn = {
+            deletedItemCount: 2
+        };
+        mockAxios.mockResolvedValue({
+            data: dataToReturn
+        });
+
+        const res = await rlnServerApi.deleteKeyExchangeBundles(proof, "test", "test", ["1", "2"]);
+        expect(res).toEqual(dataToReturn)
     });
 
 });

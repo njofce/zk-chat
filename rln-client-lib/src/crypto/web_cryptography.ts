@@ -1,4 +1,5 @@
 import { ICryptography, IKeyPair } from './interfaces'
+import CryptoJS from 'crypto-js'
 
 /**
  * Provides basic cryptographical primitives using the Web Crypto API.
@@ -11,6 +12,11 @@ class WebCryptography implements ICryptography {
      * THe maximum length of content that can be encrypted with RSA-OAEP used will be (4096/8) - 42 bytes.
      */
     public static RSA_MODULUS_LENGTH: number = 4096;
+
+    /**
+     * The chosen curve for the diffie-hellman key exchange.
+     */
+    public static ECDH_CURVE: string = "P-521";
 
     constructor() {
         if (!window)
@@ -70,6 +76,72 @@ class WebCryptography implements ICryptography {
     }
 
     /**
+     * Generate an ECDH key pair used for deriving a shared secret.
+     */
+    public async generateECDHKeyPair(): Promise<IKeyPair> {
+        let keyPair = await window.crypto.subtle.generateKey(
+            {
+                name: "ECDH",
+                namedCurve: WebCryptography.ECDH_CURVE
+            },
+            true,
+            ["deriveKey"]
+        );
+
+        if (keyPair.publicKey && keyPair.privateKey) {
+            const exportedPublicKey: ArrayBuffer = await window.crypto.subtle.exportKey("spki", keyPair.publicKey);
+            const exportedPrivateKey: ArrayBuffer = await window.crypto.subtle.exportKey("pkcs8", keyPair.privateKey);
+
+            return {
+                publicKey: btoa(this.ab2str(exportedPublicKey)),
+                privateKey: btoa(this.ab2str(exportedPrivateKey))
+            }
+        }
+        throw "Could not generate key pairs";
+    }
+
+    /**
+     * Using the DH algorithm, this method derives a shared secret from the provided source private key and the target 
+     * user's public key. 
+     * The shared secret will be used to encrypt & decrypt the data.
+     */
+    public async deriveSharedSecretKey(sourcePrivateKey: string, targetPublicKey: string): Promise<string> {
+        const importedPublicKey = await window.crypto.subtle.importKey(
+            "spki",
+            this.str2ab(atob(targetPublicKey)),
+            { name: "ECDH", namedCurve: WebCryptography.ECDH_CURVE },
+            true,
+            []);
+
+        const importedPrivateKey = await window.crypto.subtle.importKey(
+            "pkcs8",
+            this.str2ab(atob(sourcePrivateKey)),
+            { name: "ECDH", namedCurve: WebCryptography.ECDH_CURVE },
+            true,
+            ['deriveKey']);
+
+        const derivedKey: CryptoKey = await window.crypto.subtle.deriveKey(
+            {
+                name: "ECDH",
+                public: importedPublicKey
+            },
+            importedPrivateKey,
+            {
+                name: "AES-GCM",
+                length: 256
+            },
+            true,
+            ["encrypt", "decrypt"]
+        );
+
+        const raw: JsonWebKey = await crypto.subtle.exportKey(
+            "jwk",
+            derivedKey,
+        );
+        return JSON.stringify(raw);
+    }
+
+    /**
      * Encrypts a message using a provided symmetric key.
      * Throws an exception if the key is invalid
      */
@@ -92,7 +164,7 @@ class WebCryptography implements ICryptography {
             importedSymmetricKey, 
             this.str2ab(message));
 
-        return this.ab2str(encrypted);
+        return btoa(this.ab2str(encrypted));
     }
 
     /**
@@ -115,7 +187,7 @@ class WebCryptography implements ICryptography {
                 iv: this.str2ab(iv_substring)
             },
             importedSymmetricKey,
-            this.str2ab(cyphertext));
+            this.str2ab(atob(cyphertext)));
 
         return this.ab2str(decrypted);
     }
@@ -165,6 +237,14 @@ class WebCryptography implements ICryptography {
         );
 
         return this.ab2str(decryptedBytes);
+    }
+
+    /**
+     * Returns the SHA-256 hash of the provided text.
+     */
+    public hash(plaintext: string): string {
+        const hash = CryptoJS.SHA256(plaintext);
+        return hash.toString(CryptoJS.enc.Base64);
     }
 
     /**
