@@ -232,9 +232,8 @@ class ProfileManager {
      */
     public async insertTrustedContact(name: string, publicKey: string) {
         if (this.inMemoryProfile != null) {
-            if (Object.keys(this.inMemoryProfile.contacts).indexOf(name) != -1) {
-                throw "A contact with the same name already exists";
-            }
+            this.validateContactWithSameNameDoesntExist(this.inMemoryProfile, name);
+            this.validateContactWithSamePublicKeyDoesntExist(this.inMemoryProfile, publicKey);
 
             this.inMemoryProfile.contacts[name] = {
                 name: name,
@@ -251,13 +250,9 @@ class ProfileManager {
      */
     public async updateTrustedContact(old_name: string, new_name: string, publicKey: string) {
         if (this.inMemoryProfile != null) {
-            if (Object.keys(this.inMemoryProfile.contacts).indexOf(old_name) == -1) {
-                throw "The contact doesnt exist";
-            }
-
-            if (Object.keys(this.inMemoryProfile.contacts).indexOf(new_name) != -1) {
-                throw "A contact with the same name already exists";
-            }
+            this.validateContactExists(this.inMemoryProfile, old_name);
+            this.validateContactWithSameNameDoesntExist(this.inMemoryProfile, new_name);
+            this.validateContactWithSamePublicKeyDoesntExist(this.inMemoryProfile, publicKey, [old_name]);
 
             delete this.inMemoryProfile.contacts[old_name];
             this.inMemoryProfile.contacts[new_name] = {
@@ -274,15 +269,39 @@ class ProfileManager {
      */
     public async deleteTrustedContact(name: string) {
         if (this.inMemoryProfile != null) {
-            if (Object.keys(this.inMemoryProfile.contacts).indexOf(name) == -1) {
-                throw "The specified contact doesn't exist";
-            }
+            this.validateContactExists(this.inMemoryProfile, name);
 
             delete this.inMemoryProfile.contacts[name];
 
             return await this.persistProfile();
         }
         throw "Profile doesn't exist";
+    }
+
+    private validateContactExists(profile: IProfile, name: string) {
+        if (Object.keys(profile.contacts).indexOf(name) == -1) {
+            throw "The specified contact doesn't exist";
+        }
+    }
+
+    private validateContactWithSameNameDoesntExist(profile: IProfile, name: string) {
+        if (Object.keys(profile.contacts).indexOf(name) != -1) {
+            throw "A contact with the same name already exists";
+        }
+    }
+
+    /**
+     * If a contact with the given public key exists, that is returned, otherwise null is returned.
+     */
+    private validateContactWithSamePublicKeyDoesntExist(profile: IProfile, publicKey: string, ignoredKeys: string[] = []) {
+        for (let c of Object.keys(profile.contacts)) {
+            if (ignoredKeys.indexOf(c) != -1)
+                continue;
+
+            if (profile.contacts[c].publicKey == publicKey) {
+                throw "A contact with the same public key already exists";
+            }
+        }
     }
 
     /**

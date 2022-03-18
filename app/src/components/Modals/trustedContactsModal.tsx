@@ -14,6 +14,7 @@ import {
 import { useAppDispatch } from "../../redux/hooks/useAppDispatch";
 import { getTrustedContacts } from "../../redux/actions/actionCreator";
 import { useAppSelector } from "../../redux/hooks/useAppSelector";
+import { toast } from 'react-toastify';
 
 const StyledTextarea = styled.textarea`
   border: 1px solid #f0f2f5;
@@ -117,11 +118,9 @@ const TrustedContactsModal = ({
 
     const handleContactDeleting = (name: string) => {
         if (name) {
-            try {
-                delete_contact(name).then(() => dispatch(getTrustedContacts()));
-            } catch (error) {
-                console.log(error);
-            }
+            delete_contact(name)
+                .then(() => dispatch(getTrustedContacts()))
+                .catch(err => toast.error(err));
         }
     };
 
@@ -218,44 +217,37 @@ const AddEditContactModal = ({
 
     useEffect(() => {
         if (name) {
-            try {
-                get_contact(name).then(contactDetails => {
+            get_contact(name)
+                .then(contactDetails => {
                     setContactName(contactDetails.name);
                     setPublicKey(contactDetails.publicKey);
-                    console.log(contactDetails);
-                });
-            } catch (error) {
-                console.log(error);
-            }
+                })
+                .catch(err => toast.error(err));
         }
     }, [toggleAddEditModal]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleContactSaving = () => {
         if (contactName && publicKey) {
             if (name) {
-                try {
-                    update_contact(name, contactName, publicKey).then(() => {
+                update_contact(name, contactName, publicKey)
+                    .then(() => {
                         dispatch(getTrustedContacts());
                         setPublicKey("");
                         setContactName("");
                         setEditContactName("");
                         setToggleAddEditModal(false);
-                    });
-                } catch (error) {
-                    console.log(error);
-                }
+                    })
+                    .catch(err => toast.error(err));
             } else {
-                try {
-                    insert_contact(contactName, publicKey).then(() => {
+                insert_contact(contactName, publicKey)
+                    .then(() => {
                         dispatch(getTrustedContacts());
                         setPublicKey("");
                         setContactName("");
                         setEditContactName("");
                         setToggleAddEditModal(false);
-                    });
-                } catch (error) {
-                    console.log(error);
-                }
+                    })
+                    .catch(err => toast.error(err));
             }
         }
     };

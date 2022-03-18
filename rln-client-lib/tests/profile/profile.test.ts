@@ -691,6 +691,18 @@ describe('Test profile', () => {
         }
     })
 
+    test('insert contact - contact with public key already exists', async () => {
+        await profileManager.recoverProfile(deepClone(testProfile));
+        await profileManager.insertTrustedContact("test", "test public key");
+
+        try {
+            await profileManager.insertTrustedContact("different contact", "test public key");
+            expect(true).toBeFalsy();
+        } catch (e) {
+            expect(true).toBeTruthy();
+        }
+    })
+
     test('get contact - doesnt exist', async () => {
         await profileManager.recoverProfile(deepClone(testProfile));
         try {
@@ -770,6 +782,20 @@ describe('Test profile', () => {
             await profileManager.updateTrustedContact("test", "new", "test");
             expect(false).toBeTruthy();
         } catch(e) {
+            expect(true).toBeTruthy();
+        }
+    })
+
+    test('update contact - new public key already exists', async () => {
+        await profileManager.recoverProfile(deepClone(testProfile));
+        await profileManager.insertTrustedContact("test 1", "test key 1");
+
+        await profileManager.insertTrustedContact("test 2", "test key 2");
+
+        try {
+            await profileManager.updateTrustedContact("test 1", "updated test 1", "test key 2");
+            expect(false).toBeTruthy();
+        } catch (e) {
             expect(true).toBeTruthy();
         }
     })
