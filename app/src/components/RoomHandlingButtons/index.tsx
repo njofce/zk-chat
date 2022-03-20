@@ -3,14 +3,16 @@ import styled from "styled-components";
 import { faFileExport } from "@fortawesome/free-solid-svg-icons";
 import { faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import { faKey } from "@fortawesome/free-solid-svg-icons";
-import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
+import { faPlusCircle, faUserLock } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import RoomOptionsModal from "../Modals";
 import ReactTooltip from "react-tooltip";
 import { saveAs } from "file-saver";
 
+
 import * as Colors from "../../constants/colors";
 import JoinPrivateRoomModal from "../Modals/privateRoomModal";
+import TrustedContactsModal from "../Modals/trustedContactsModal";
 import GeneratePublicKeyModal from "../Modals/generatePublicKey";
 import { export_profile } from "rln-client-lib";
 
@@ -32,6 +34,7 @@ const RoomHandlingButtons = () => {
   const [toggleModal, setToggleModal] = useState(false);
   const [toggleJoinPrivateRoom, setToggleJoinPrivateRoom] = useState(false);
   const [toggleGeneratePublicKey, setToggleGeneratePublicKey] = useState(false);
+  const [toggleTrustedContacts, setToggleTrustedContacts] = useState(false);
 
   const handleExportProfileClick = async () => {
     try {
@@ -48,6 +51,20 @@ const RoomHandlingButtons = () => {
 
   return (
     <StyledButtonsWrapper>
+      <FontAwesomeIcon
+        icon={faUserLock}
+        onClick={() => setToggleTrustedContacts(true)}
+        data-tip
+        data-for="TrustedContacts"
+      />
+      <ReactTooltip
+        event="mouseenter"
+        eventOff="click mouseleave"
+        id="TrustedContacts"
+        backgroundColor={Colors.BERRY_PINK}
+      >
+        Trusted Contacts
+      </ReactTooltip>
       <FontAwesomeIcon
         icon={faPlusCircle}
         onClick={() => setToggleModal(true)}
@@ -115,6 +132,10 @@ const RoomHandlingButtons = () => {
       <GeneratePublicKeyModal
         toggleGeneratePublicKey={toggleGeneratePublicKey}
         setToggleGeneratePublicKey={setToggleGeneratePublicKey}
+      />
+      <TrustedContactsModal
+        toggleTrustedContacts={toggleTrustedContacts}
+        setToggleTrustedContacts={setToggleTrustedContacts}
       />
     </StyledButtonsWrapper>
   );

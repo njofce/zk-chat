@@ -8,7 +8,8 @@ import {
   CREATE_DIRECT_ROOM,
   Room,
   ADD_MESSAGE_TO_ROOM,
-  GET_CHAT_HISTORY
+  GET_CHAT_HISTORY,
+  GET_TRUSTED_CONTACTS
 } from "../actions/actionCreator";
 import { IRooms } from "rln-client-lib/dist/src/profile/interfaces";
 
@@ -16,6 +17,7 @@ interface RoomsState {
   rooms: IRooms;
   currentActiveRoom: Room | undefined;
   chatHistory: Messages;
+  trustedContacts: string[];
 }
 
 export type Messages = {
@@ -25,7 +27,8 @@ export type Messages = {
 const defaultState: RoomsState = {
   rooms: { public: [], private: [], direct: [] },
   currentActiveRoom: undefined,
-  chatHistory: {}
+  chatHistory: {},
+  trustedContacts: []
 };
 
 const ChatReducer = (state = defaultState, action: AnyAction): RoomsState => {
@@ -109,6 +112,17 @@ const ChatReducer = (state = defaultState, action: AnyAction): RoomsState => {
         success: prevState => ({
           ...prevState,
           chatHistory: payload
+        }),
+        finish: prevState => ({ ...prevState })
+      });
+    }
+
+    case GET_TRUSTED_CONTACTS: {
+      return handle(state, action, {
+        start: prevState => ({ ...prevState }),
+        success: prevState => ({
+          ...prevState,
+          trustedContacts: Object.keys(payload)
         }),
         finish: prevState => ({ ...prevState })
       });

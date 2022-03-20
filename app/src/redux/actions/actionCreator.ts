@@ -4,7 +4,8 @@ import {
   create_public_room,
   get_chat_history,
   get_rooms,
-  join_private_room
+  join_private_room,
+  get_contacts
 } from "rln-client-lib";
 import {
   IDirectRoom,
@@ -62,4 +63,10 @@ export const GET_CHAT_HISTORY = "GET_CHAT_HISTORY";
 export const getChatHistoryAction = () => ({
   type: GET_CHAT_HISTORY,
   promise: get_chat_history()
+});
+
+export const GET_TRUSTED_CONTACTS = "GET_TRUSTED_CONTACTS";
+export const getTrustedContacts = () => ({
+  type: GET_TRUSTED_CONTACTS,
+  promise: get_contacts()
 });

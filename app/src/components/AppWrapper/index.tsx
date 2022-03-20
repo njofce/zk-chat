@@ -13,6 +13,9 @@ import {
 } from "../../redux/actions/actionCreator";
 import PublicRoomInvitedScreen from "../PublicRoomInvitedScreen";
 import { roomTypes, serverUrl, socketUrl } from "../../constants/constants";
+import { ToastContainer } from 'react-toastify';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 const AppWrapper = () => {
   const navigate = useNavigate();
@@ -56,6 +59,7 @@ const AppWrapper = () => {
         <Route path="/public/:roomId" element={<PublicRoomInvitedScreen />} />
         <Route path="/" element={<Navigate replace to="/r-procedure" />} />
       </Routes>
+      <ToastContainer />
     </div>
   );
 };

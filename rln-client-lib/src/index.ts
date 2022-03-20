@@ -5,7 +5,7 @@ import { ICryptography } from "./crypto/interfaces"
 import ProfileManager from "./profile"
 import { StorageProvider } from "./storage/interfaces"
 import WebCryptography from './crypto/web_cryptography';
-import { IRooms } from './profile/interfaces';
+import { IRooms, ITrustedContact } from './profile/interfaces';
 import { IServerConfig } from './interfaces';
 import ChatManager from './chat';
 import { v4 as uuidv4 } from 'uuid';
@@ -282,6 +282,41 @@ const recover_profile = async (profile_data: string) => {
     await chat_manager.checkRootUpToDate();
 }
 
+const get_contacts = async() => {
+    if (profile_manager == null)
+        throw "init() not called";
+
+    return await profile_manager.getTrustedContacts();
+}
+
+const get_contact = async (name: string): Promise<ITrustedContact> => {
+    if (profile_manager == null)
+        throw "init() not called";
+
+    return profile_manager.getTrustedContact(name);
+}
+
+const insert_contact = async (name: string, public_key: string) => {
+    if (profile_manager == null)
+        throw "init() not called";
+
+    await profile_manager.insertTrustedContact(name, public_key);
+}
+
+const delete_contact = async(name: string) => {
+    if (profile_manager == null)
+        throw "init() not called";
+
+    await profile_manager.deleteTrustedContact(name);
+}
+
+const update_contact = async (old_name: string, new_name: string, public_key: string) => {
+    if (profile_manager == null)
+        throw "init() not called";
+
+    await profile_manager.updateTrustedContact(old_name, new_name, public_key);
+}
+
 const syncRlnData = (event: string) => {
     console.log("Received event: ", event);
     if (chat_manager != null) {
@@ -305,5 +340,10 @@ export {
     get_chat_history, 
     get_public_key,
     export_profile,
-    recover_profile
+    recover_profile,
+    get_contacts,
+    get_contact,
+    insert_contact,
+    delete_contact,
+    update_contact
 }

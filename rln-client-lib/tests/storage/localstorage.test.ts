@@ -15,7 +15,8 @@ describe('Test storage', () => {
             public: [],
             private: [],
             direct: []
-        }
+        },
+        contacts: {}
     }
 
     let storage: StorageProvider;
