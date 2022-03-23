@@ -26,20 +26,6 @@ const StyledButton = styled.button`
   width: 200px;
 `;
 
-const StyledTextarea = styled.textarea`
-  border: 1px solid #f0f2f5;
-  border-radius: 20px;
-  width: 100%;
-  position: relative;
-  margin-bottom: 10px;
-  padding: 8px 12px;
-  min-height: 40px;
-  &:focus,
-  &:active {
-    outline: none;
-  }
-`;
-
 const StyledInviteCodeOuterWrapper = styled.div`
   color: ${Colors.ANATRACITE};
   margin: 8px;

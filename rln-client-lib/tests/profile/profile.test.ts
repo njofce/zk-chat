@@ -1,8 +1,5 @@
-<<<<<<< HEAD
 import { ITrustedContactsMap } from './../../src/profile/interfaces';
-=======
 import { IDirectRoom } from './../../src/room/interfaces';
->>>>>>> Automated key exchange
 import { IProfile } from '../../src/profile/interfaces';
 import { StorageProvider } from '../../src/storage/interfaces';
 import { jest, test, expect, describe, beforeAll, beforeEach } from '@jest/globals'
@@ -606,17 +603,7 @@ describe('Test profile', () => {
         const room: IDirectRoom = await profileManager.getRoomById("test-3");
         expect(room.symmetric_key).toEqual("derived-test-privtest-public-from-recepient");
     });
-
-<<<<<<< HEAD
-    test('update direct room - profile does not exist', async () => {
-        try {
-            await profileManager.updateDirectRoomKey("test-1", "encrypted invite");
-            expect(true).toBeFalsy();
-        } catch(e) {
-            expect(true).toBeTruthy();
-        }
-    })
-
+    
     test('get contacts - empty', async() => {
         await profileManager.recoverProfile(deepClone(testProfile));
         const contacts: ITrustedContactsMap = profileManager.getTrustedContacts();
@@ -761,6 +748,4 @@ describe('Test profile', () => {
         }
     })
 
-=======
->>>>>>> Automated key exchange
 });
