@@ -11,13 +11,16 @@ import {
   GET_CHAT_HISTORY,
   GET_TRUSTED_CONTACTS
 } from "../actions/actionCreator";
-import { IRooms } from "rln-client-lib/dist/src/profile/interfaces";
+import {
+  IRooms,
+  ITrustedContact
+} from "rln-client-lib/dist/src/profile/interfaces";
 
 interface RoomsState {
   rooms: IRooms;
   currentActiveRoom: Room | undefined;
   chatHistory: Messages;
-  trustedContacts: string[];
+  trustedContacts: ITrustedContact[];
 }
 
 export type Messages = {
@@ -122,7 +125,7 @@ const ChatReducer = (state = defaultState, action: AnyAction): RoomsState => {
         start: prevState => ({ ...prevState }),
         success: prevState => ({
           ...prevState,
-          trustedContacts: Object.keys(payload)
+          trustedContacts: Object.values(payload)
         }),
         finish: prevState => ({ ...prevState })
       });

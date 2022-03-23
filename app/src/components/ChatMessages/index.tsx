@@ -81,7 +81,6 @@ type ChatMessagesProps = {
 
 const ChatMessages = ({ currentActiveRoom }: ChatMessagesProps) => {
   const [toggleInviteModal, setToggleInviteModal] = useState(false);
-  const [toggleExchangeKeysModal, setToggleExchangeKeysModal] = useState(false);
   const [isPublicRoomInviteCopied, setIsPublicRoomInviteCopied] = useState(
     false
   );
@@ -127,12 +126,6 @@ const ChatMessages = ({ currentActiveRoom }: ChatMessagesProps) => {
                 Invite{" "}
               </StyledButton>
             </>
-          )}
-          {currentActiveRoom.type.toLowerCase() === roomTypes.oneOnOne && (
-            <StyledButton onClick={() => setToggleExchangeKeysModal(true)}>
-              {" "}
-              Exchange keys{" "}
-            </StyledButton>
           )}
           {currentActiveRoom.type.toLowerCase() === roomTypes.public && (
             <>

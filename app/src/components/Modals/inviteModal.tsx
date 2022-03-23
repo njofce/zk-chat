@@ -8,6 +8,7 @@ import ReactTooltip from "react-tooltip";
 import { invite_private_room } from "rln-client-lib";
 import { useAppSelector } from "../../redux/hooks/useAppSelector";
 import { Room } from "../../redux/actions/actionCreator";
+import TrustedContactsList from "./trustedContactsList";
 
 const StyledButton = styled.button`
   background: ${Colors.ANATRACITE};
@@ -96,16 +97,15 @@ const InviteModal = ({
 
   return (
     <Modal centered isOpen={toggleInviteModal}>
-      <ModalHeader toggle={() => setToggleInviteModal(false)}>
+      <ModalHeader 
+        toggle={() => {
+          setToggleInviteModal(false);
+          setKeyValue("");
+        }}>
         Invite to private room
       </ModalHeader>
       <ModalBody>
-        <StyledTextarea
-          rows={2}
-          value={keyValue}
-          onChange={e => setKeyValue(e.target.value)}
-          placeholder="Enter your recipient's public key..."
-        />
+        <TrustedContactsList handleContactClick={setKeyValue} />
         <StyledButton onClick={handleGenerateInvite}>
           Generate invite
         </StyledButton>

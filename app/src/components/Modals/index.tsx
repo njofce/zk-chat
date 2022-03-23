@@ -9,6 +9,7 @@ import {
   createPrivateRoomAction
 } from "../../redux/actions/actionCreator";
 import { useAppDispatch } from "../../redux/hooks/useAppDispatch";
+import TrustedContactsList from "./trustedContactsList";
 
 const StyledButton = styled.button`
   background: ${props => props.color};
@@ -243,11 +244,7 @@ const OneOnOneModal = ({
           value={roomName}
           onChange={e => setRoomName(e.target.value)}
         />
-        <StyledTextarea
-          placeholder={"Enter your recipient's public key..."}
-          value={publicKey}
-          onChange={e => setPublicKey(e.target.value)}
-        />
+        <TrustedContactsList handleContactClick={setPublicKey} />
       </ModalBody>
       <ModalFooter>
         <StyledButton

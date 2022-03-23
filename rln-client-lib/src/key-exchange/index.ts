@@ -91,24 +91,28 @@ class KeyExchangeManager {
             let bundlesToDeleteFromServer: any[] = []
             for (let bundleIntendedForCurrentUser of bundlesIntendedForCurrentUser) {
                 
-                const encryptedContentString = bundleIntendedForCurrentUser.encrypted_content;
-                const encryptedSymmetricKey = bundleIntendedForCurrentUser.encrypted_key;
-                const decryptedSymmetricKey = await this.cryptography.decryptMessageAsymmetric(encryptedSymmetricKey, userPrivateKey);
-                const decryptedContentString = await this.cryptography.decryptMessageSymmetric(encryptedContentString, decryptedSymmetricKey);
-                const decryptedContentObject: IKeyExchangeContent = JSON.parse(decryptedContentString);
-                const contentHash: string = this.cryptography.hash(decryptedContentString);
+                try {
+                    const encryptedContentString = bundleIntendedForCurrentUser.encrypted_content;
+                    const encryptedSymmetricKey = bundleIntendedForCurrentUser.encrypted_key;
+                    const decryptedSymmetricKey = await this.cryptography.decryptMessageAsymmetric(encryptedSymmetricKey, userPrivateKey);
+                    const decryptedContentString = await this.cryptography.decryptMessageSymmetric(encryptedContentString, decryptedSymmetricKey);
+                    const decryptedContentObject: IKeyExchangeContent = JSON.parse(decryptedContentString);
+                    const contentHash: string = this.cryptography.hash(decryptedContentString);
 
-                const room = rooms.find(r => r.recipient_public_key == decryptedContentObject.sender_public_key)
+                    const room = rooms.find(r => r.recipient_public_key == decryptedContentObject.sender_public_key)
 
-                if (room != undefined) {
-                    // Derive key
-                    this.profileManager.deriveRoomSecretKey(room, decryptedContentObject.dh_public_key);
+                    if (room != undefined) {
+                        // Derive key
+                        this.profileManager.deriveRoomSecretKey(room, decryptedContentObject.dh_public_key);
 
-                    // Mark bundle for deletion
-                    bundlesToDeleteFromServer.push({
-                        content_hash: contentHash,
-                        receiver_public_key: userPublicKey
-                    })
+                        // Mark bundle for deletion
+                        bundlesToDeleteFromServer.push({
+                            content_hash: contentHash,
+                            receiver_public_key: userPublicKey
+                        })
+                    }
+                } catch(e) {
+                    console.log("Error while handling the key exchange bundle", e);
                 }
             }
 
