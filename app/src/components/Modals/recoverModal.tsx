@@ -1,13 +1,24 @@
+import * as Colors from "../../constants/colors";
+import styled from "styled-components";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import { Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
-import { init, receive_message, recover_profile } from "rln-client-lib";
-import styled from "styled-components";
-import * as Colors from "../../constants/colors";
+import {
+  get_rooms,
+  init,
+  receive_message,
+  recover_profile
+} from "rln-client-lib";
+import { IRooms } from "rln-client-lib/dist/src/profile/interfaces";
 import { serverUrl, socketUrl } from "../../constants/constants";
-import { addMessageToRoomAction, getChatHistoryAction, getRoomsAction } from "../../redux/actions/actionCreator";
 import { generateProof } from "../../util/util";
+import {
+  addMessageToRoomAction,
+  getRoomsAction,
+  loadMessagesForRooms,
+  runSyncMessageHistory
+} from "../../redux/actions/actionCreator";
 
 const StyledButton = styled.button`
   background: ${Colors.ANATRACITE};
@@ -50,21 +61,37 @@ const RecoverModal = ({
   const dispatch = useDispatch();
   const [userData, setUserData] = useState("");
 
+  const loadMessagesFromDb = async () => {
+    const allRooms: IRooms = await get_rooms();
+    const roomIds: string[] = [
+      ...allRooms.direct.map(d => d.id),
+      ...allRooms.private.map(d => d.id),
+      ...allRooms.public.map(d => d.id)
+    ];
+
+    const nowTimestamp: number = new Date().getTime();
+    dispatch(loadMessagesForRooms(roomIds, nowTimestamp));
+
+    await receive_message(receiveMessageCallback);
+  };
+
   const initializeApp = async () => {
     try {
       await init({
         serverUrl: serverUrl,
         socketUrl: socketUrl
-      }, 
-      generateProof)
-        .then(() => {
-          navigate("/dashboard");
-          dispatch(getRoomsAction());
-          dispatch(getChatHistoryAction());
-        })
-        .then(async () => {
-          await receive_message(receiveMessageCallback);
-        });
+      }, generateProof).then(() => {
+        navigate("/dashboard");
+        dispatch(getRoomsAction());
+
+        dispatch(
+          runSyncMessageHistory({
+            onSuccess: () => {
+              loadMessagesFromDb();
+            }
+          })
+        );
+      });
     } catch (error) {
       navigate("/r-procedure");
     }
@@ -98,6 +125,7 @@ const RecoverModal = ({
       navigate("/r-procedure");
     }
   };
+
   return (
     <Modal centered isOpen={toggleRecoverModal}>
       <ModalHeader toggle={() => setToggleRecoverModal(false)}>

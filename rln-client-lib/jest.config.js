@@ -19,7 +19,10 @@ module.exports = {
         '!src/communication/websocket.ts',
         '!src/hasher.ts'
     ],
-    setupFilesAfterEnv: ['./tests/jest.setup.ts'],
+    setupFilesAfterEnv: [
+        './tests/jest.setup.ts', 
+        'fake-indexeddb/auto'
+    ],
     coverageThreshold: {
         'global': {
             "branches": 80,

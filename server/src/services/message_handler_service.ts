@@ -70,7 +70,7 @@ class MessageHandlerService {
             const user = getUserFromShares(validMessage.zk_proof, validMessage.x_share, this.hasher, requestStats);
 
             // Ban User
-            await this.userService.removeUser(user.idCommitment, user.secret);
+            await this.userService.banUser(user.idCommitment, user.secret);
 
             // Set user leaf to 0 and recalculate merkle tree
             await this.userService.updateUser(user.idCommitment);

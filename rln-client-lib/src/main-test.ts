@@ -1,5 +1,6 @@
 import { Strategy, ZkIdentity } from "@zk-kit/identity";
 import ChatManager from "./chat";
+import { IChatHistoryDB, IMessage } from "./chat/interfaces";
 import { ServerCommunication } from "./communication";
 import RLNServerApi from "./communication/api";
 import SocketClient from "./communication/ws-socket";
@@ -79,13 +80,38 @@ class LocalTestCryptography implements ICryptography {
     }
 }
 
+class LocalTestMessageDB implements IChatHistoryDB {
+
+    async saveMessage(roomId: string, message: IMessage) {
+
+    }
+    
+    async getMessagesForRoom(roomId: string, fromTimestamp: number): Promise<any> {
+        return [];
+    }
+
+    async getMessagesForRooms(roomIds: string[], fromTimestamp: number): Promise<any> {
+        return {};
+    }
+
+    async getMaxTimestampForAllMessages(): Promise<number> {
+        return 1;
+    }
+
+    async deleteAllMessagesForRoom(roomId: string) {
+
+    }
+
+}
+
 const comm_manager = new ServerCommunication(new RLNServerApi("http://localhost:8080"), new SocketClient("ws://localhost:8081"));
 
 const cryptography = new LocalTestCryptography();
 const storageProvider = new TestStorageProvider();
 const profile = new ProfileManager(storageProvider, cryptography);
+const message_db = new LocalTestMessageDB();
 
-const chat = new ChatManager(profile, comm_manager, cryptography);
+const chat = new ChatManager(profile, comm_manager, cryptography, message_db);
 
 const main = async () => {
     let zkIdentity: ZkIdentity = new ZkIdentity(Strategy.SERIALIZED ,`{

@@ -62,15 +62,7 @@ describe('Test interrep sync - subgraph', () => {
 
         mockAxios.mockResolvedValue({
             data: {
-                data: {
-                    provider: "twitter",
-                    name: "not_sufficient",
-                    depth: 20,
-                    root: "3282736528510229708245753028800701559160032734733920390753117377915762630937",
-                    size: 6,
-                    numberOfLeaves: 6,
-                    members: testMembers_g1
-                }
+                data: testMembers_g1
             }
         });
 
@@ -79,6 +71,22 @@ describe('Test interrep sync - subgraph', () => {
         expect(members[0]).toEqual({ index: 0, identityCommitment: 'id-0' });
         expect(members[1]).toEqual({ index: 1, identityCommitment: 'id-1' });
         expect(members[5]).toEqual({ index: 5, identityCommitment: 'id-5' });
+    });
+
+    test('test get deleted members of group - defaults', async () => {
+        const deletedIndexes = [0, 1, 2]
+
+        mockAxios.mockResolvedValue({
+            data: {
+                data: deletedIndexes
+            }
+        });
+
+        const removedIndexes: number[] = await apiFunctions.getRemovedMembersForGroup("twitter", "not_sufficient");
+        expect(removedIndexes.length).toEqual(3);
+        expect(removedIndexes[0]).toEqual(0);
+        expect(removedIndexes[1]).toEqual(1);
+        expect(removedIndexes[2]).toEqual(2);
     });
 
 });

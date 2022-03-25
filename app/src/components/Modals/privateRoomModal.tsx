@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
-import styled from "styled-components";
-import * as Colors from "../../constants/colors";
-import { joinPrivateRoomAction } from "../../redux/actions/actionCreator";
-import { useAppDispatch } from "../../redux/hooks/useAppDispatch";
+import { useState } from "react"
+import { Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap"
+import styled from "styled-components"
+import * as Colors from "../../constants/colors"
+import { joinPrivateRoomAction } from "../../redux/actions/actionCreator"
+import { useAppDispatch } from "../../redux/hooks/useAppDispatch"
 
 const StyledTextarea = styled.textarea`
   border: 1px solid #f0f2f5;
@@ -17,7 +17,7 @@ const StyledTextarea = styled.textarea`
   &:active {
     outline: none;
   }
-`;
+`
 
 const StyledButton = styled.button`
   background: ${Colors.ANATRACITE};
@@ -32,26 +32,26 @@ const StyledButton = styled.button`
     box-shadow: 0px 0px 15px 0px ${Colors.ANATRACITE};
   }
   width: 200px;
-`;
+`
 
 const JoinPrivateRoomModal = ({
   toggleJoinPrivateRoom,
   setToggleJoinPrivateRoom
 }: any) => {
-  const [roomInvite, setRoomInvite] = useState("");
-  const dispatch = useAppDispatch();
+  const [roomInvite, setRoomInvite] = useState("")
+  const dispatch = useAppDispatch()
 
   const handleModalClosing = () => {
-    setRoomInvite("");
-    setToggleJoinPrivateRoom(false);
-  };
+    setRoomInvite("")
+    setToggleJoinPrivateRoom(false)
+  }
 
   const handleRoomCreation = () => {
     if (roomInvite) {
-      dispatch(joinPrivateRoomAction(roomInvite));
-      handleModalClosing();
+      dispatch(joinPrivateRoomAction(roomInvite))
+      handleModalClosing()
     }
-  };
+  }
 
   return (
     <Modal isOpen={toggleJoinPrivateRoom} centered>
@@ -60,7 +60,7 @@ const JoinPrivateRoomModal = ({
         <StyledTextarea
           placeholder={"Paste your encrypted invite..."}
           value={roomInvite}
-          onChange={e => setRoomInvite(e.target.value)}
+          onChange={(e) => setRoomInvite(e.target.value)}
           rows={2}
         />
       </ModalBody>
@@ -70,7 +70,7 @@ const JoinPrivateRoomModal = ({
         </StyledButton>
       </ModalFooter>
     </Modal>
-  );
-};
+  )
+}
 
-export default JoinPrivateRoomModal;
+export default JoinPrivateRoomModal

@@ -128,6 +128,14 @@ describe('Test server communication', () => {
         expect(testSpy).toHaveBeenCalled();
     });
 
+    test('get time range chat history', async () => {
+        const testSpy = jest.spyOn(server, "getTimeRangeChatHistory");
+        testSpy.mockResolvedValue([]);
+        await communication.getTimeRangeChatHistory(1, 2);
+
+        expect(testSpy).toHaveBeenCalledWith(1, 2);
+    })
+
     test('get rln root', async () => {
         const testSpy = jest.spyOn(server, "getRlnRoot");
         testSpy.mockResolvedValue("test root");
@@ -151,6 +159,7 @@ describe('Test server communication', () => {
 
         expect(testSpy).toHaveBeenCalled();
     });
+    
 
     test('save key exchange bundle', async () => {
         const testSpy = jest.spyOn(server, "saveKeyExchangeBundle");

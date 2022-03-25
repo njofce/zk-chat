@@ -1,5 +1,5 @@
-import { handle } from "redux-pack";
-import { AnyAction } from "redux";
+import { handle } from "redux-pack"
+import { AnyAction } from "redux"
 import {
   ADD_ACTIVE_CHAT_ROOM,
   GET_ROOMS,
@@ -8,49 +8,59 @@ import {
   CREATE_DIRECT_ROOM,
   Room,
   ADD_MESSAGE_TO_ROOM,
-  GET_CHAT_HISTORY,
-  GET_TRUSTED_CONTACTS
+  GET_TRUSTED_CONTACTS,
+  DELETE_MESSAGES_FOR_ROOM,
+  LOAD_MESSAGES_FOR_ROOM,
+  LOAD_MESSAGES_FOR_ROOMS,
+  RUN_SYNC_MESSAGE_HISTORY
 } from "../actions/actionCreator";
 import {
   IRooms,
   ITrustedContact
 } from "rln-client-lib/dist/src/profile/interfaces";
+import { IMessage } from "rln-client-lib/dist/src/chat/interfaces";
 
 interface RoomsState {
   rooms: IRooms;
   currentActiveRoom: Room | undefined;
   chatHistory: Messages;
   trustedContacts: ITrustedContact[];
+  chatHistorySyncing: boolean
+  stayOnBottom: boolean
+  loading: boolean
 }
 
 export type Messages = {
-  [id: string]: any[];
-};
+  [id: string]: IMessage[]
+}
 
 const defaultState: RoomsState = {
   rooms: { public: [], private: [], direct: [] },
   currentActiveRoom: undefined,
   chatHistory: {},
-  trustedContacts: []
-};
+  trustedContacts: [],
+  chatHistorySyncing: false,
+  stayOnBottom: true,
+  loading: false
+}
 
 const ChatReducer = (state = defaultState, action: AnyAction): RoomsState => {
-  const { type, payload, meta } = action;
+  const { type, payload, meta } = action
   switch (type) {
     case GET_ROOMS: {
       return handle(state, action, {
-        start: prevState => ({ ...prevState }),
-        success: prevState => ({
+        start: (prevState) => ({ ...prevState }),
+        success: (prevState) => ({
           ...prevState,
           rooms: payload
         }),
-        finish: prevState => ({ ...prevState })
-      });
+        finish: (prevState) => ({ ...prevState })
+      })
     }
     case CREATE_PUBLIC_ROOM: {
       return handle(state, action, {
-        start: prevState => ({ ...prevState }),
-        success: prevState => ({
+        start: (prevState) => ({ ...prevState }),
+        success: (prevState) => ({
           ...prevState,
           rooms: {
             ...prevState.rooms,
@@ -58,13 +68,13 @@ const ChatReducer = (state = defaultState, action: AnyAction): RoomsState => {
           },
           currentActiveRoom: payload
         }),
-        finish: prevState => ({ ...prevState })
-      });
+        finish: (prevState) => ({ ...prevState })
+      })
     }
     case CREATE_PRIVATE_ROOM: {
       return handle(state, action, {
-        start: prevState => ({ ...prevState }),
-        success: prevState => ({
+        start: (prevState) => ({ ...prevState }),
+        success: (prevState) => ({
           ...prevState,
           rooms: {
             ...prevState.rooms,
@@ -72,13 +82,13 @@ const ChatReducer = (state = defaultState, action: AnyAction): RoomsState => {
           },
           currentActiveRoom: payload
         }),
-        finish: prevState => ({ ...prevState })
-      });
+        finish: (prevState) => ({ ...prevState })
+      })
     }
     case CREATE_DIRECT_ROOM: {
       return handle(state, action, {
-        start: prevState => ({ ...prevState }),
-        success: prevState => ({
+        start: (prevState) => ({ ...prevState }),
+        success: (prevState) => ({
           ...prevState,
           rooms: {
             ...prevState.rooms,
@@ -86,15 +96,15 @@ const ChatReducer = (state = defaultState, action: AnyAction): RoomsState => {
           },
           currentActiveRoom: payload
         }),
-        finish: prevState => ({ ...prevState })
-      });
+        finish: (prevState) => ({ ...prevState })
+      })
     }
 
     case ADD_ACTIVE_CHAT_ROOM: {
       return {
         ...state,
         currentActiveRoom: meta
-      };
+      }
     }
 
     case ADD_MESSAGE_TO_ROOM: {
@@ -105,35 +115,81 @@ const ChatReducer = (state = defaultState, action: AnyAction): RoomsState => {
           [meta.roomId]: state.chatHistory[meta.roomId]
             ? [...state.chatHistory[meta.roomId], meta.message]
             : [meta.message]
-        }
-      };
+        },
+        stayOnBottom: true
+      }
     }
 
-    case GET_CHAT_HISTORY: {
+    case RUN_SYNC_MESSAGE_HISTORY: {
       return handle(state, action, {
-        start: prevState => ({ ...prevState }),
-        success: prevState => ({
+        start: (prevState) => ({
           ...prevState,
-          chatHistory: payload
+          chatHistorySyncing: true
         }),
-        finish: prevState => ({ ...prevState })
-      });
+        success: (prevState) => ({ ...prevState }),
+        finish: (prevState) => ({
+          ...prevState,
+          chatHistorySyncing: false
+        })
+      })
+    }
+
+    case LOAD_MESSAGES_FOR_ROOM: {
+      return handle(state, action, {
+        start: (prevState) => ({ ...prevState, loading: true }),
+        success: (prevState) => ({
+          ...prevState,
+          chatHistory: {
+            ...prevState.chatHistory,
+            [meta.roomId]: meta.shouldReset
+              ? [...payload]
+              : [...payload, ...prevState.chatHistory[meta.roomId]]
+          },
+          stayOnBottom: false
+        }),
+        finish: (prevState) => ({ ...prevState, loading: false })
+      })
+    }
+
+    case LOAD_MESSAGES_FOR_ROOMS: {
+      return handle(state, action, {
+        start: (prevState) => ({ ...prevState }),
+        success: (prevState) => ({
+          ...prevState,
+          chatHistory: {
+            ...prevState.chatHistory,
+            ...payload
+          }
+        }),
+        finish: (prevState) => ({ ...prevState })
+      })
+    }
+
+    case DELETE_MESSAGES_FOR_ROOM: {
+      return handle(state, action, {
+        start: (prevState) => ({ ...prevState }),
+        success: (prevState) => ({
+          ...prevState,
+          [meta.roomId]: []
+        }),
+        finish: (prevState) => ({ ...prevState })
+      })
     }
 
     case GET_TRUSTED_CONTACTS: {
       return handle(state, action, {
-        start: prevState => ({ ...prevState }),
-        success: prevState => ({
+        start: (prevState) => ({ ...prevState }),
+        success: (prevState) => ({
           ...prevState,
           trustedContacts: Object.values(payload)
         }),
-        finish: prevState => ({ ...prevState })
-      });
+        finish: (prevState) => ({ ...prevState })
+      })
     }
 
     default:
-      return state;
+      return state
   }
-};
+}
 
-export default ChatReducer;
+export default ChatReducer

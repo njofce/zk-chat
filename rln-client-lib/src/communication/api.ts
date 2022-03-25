@@ -81,6 +81,26 @@ class RLNServerApi {
         }
     };
 
+    public getTimeRangeChatHistory = async (fromTimestamp: number, toTimestamp: number): Promise<any | null> => {
+        try {
+            const res = await axios({
+                method: 'POST',
+                url: this.server_url + "/api/v1/chat/time_range_chat_history",
+                data: {
+                    from: fromTimestamp,
+                    to: toTimestamp
+                },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                }
+            });
+            return res.data;
+        } catch (e) {
+            return null;
+        }
+    };
+
     public getRlnRoot = async (): Promise<any | null> => {
         try {
             const res = await axios({

@@ -1,5 +1,5 @@
 import { Model, Document } from "mongoose";
-import { getDailyMessages } from "./message.statics";
+import { getDailyMessages, getMessagesInTimeRange } from "./message.statics";
 
 export interface IMessage {
     uuid: string;
@@ -11,4 +11,5 @@ export interface IMessage {
 export interface IMessageDocument extends IMessage, Document {}
 export interface IMessageModel extends Model<IMessageDocument> {
     getDailyMessages: typeof getDailyMessages;
+    getMessagesInTimeRange: typeof getMessagesInTimeRange;
 }

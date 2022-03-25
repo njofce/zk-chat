@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
-import styled from "styled-components";
-import * as Colors from "../../constants/colors";
-import { roomTypes } from "../../constants/constants";
+import { useState } from "react"
+import { Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap"
+import styled from "styled-components"
+import * as Colors from "../../constants/colors"
+import { roomTypes } from "../../constants/constants"
 import {
   createDirectRoomAction,
   createPublicRoomAction,
@@ -12,7 +12,7 @@ import { useAppDispatch } from "../../redux/hooks/useAppDispatch";
 import TrustedContactsList from "./trustedContactsList";
 
 const StyledButton = styled.button`
-  background: ${props => props.color};
+  background: ${(props) => props.color};
   border-radius: 8px;
   border: none;
   outline: none;
@@ -21,10 +21,10 @@ const StyledButton = styled.button`
   color: white;
   &:hover {
     transition: 0.15s;
-    box-shadow: 0px 0px 15px 0px ${props => props.color};
+    box-shadow: 0px 0px 15px 0px ${(props) => props.color};
   }
   width: 200px;
-`;
+`
 
 const StyledInput = styled.input`
   border: 1px solid #f0f2f5;
@@ -37,53 +37,53 @@ const StyledInput = styled.input`
   &:active {
     outline: none;
   }
-`;
+`
 
 const StyledButtonsWrapper = styled.div`
   display: flex;
-`;
+`
 
 type RoomOptionsModalProps = {
-  setToggleModal: (shouldToggle: boolean) => void;
-  toggleModal: boolean;
-};
+  setToggleModal: (shouldToggle: boolean) => void
+  toggleModal: boolean
+}
 
 type RoomsOptionsModalProps = {
-  setToggleModal: (shouldToggle: boolean) => void;
-  toggleModal: boolean;
-  setModalContent: (modalContent: string) => void;
-};
+  setToggleModal: (shouldToggle: boolean) => void
+  toggleModal: boolean
+  setModalContent: (modalContent: string) => void
+}
 
 const RoomOptionsModal = ({
   toggleModal,
   setToggleModal
 }: RoomOptionsModalProps) => {
-  const [modalContent, setModalContent] = useState("");
-  const dispatch = useAppDispatch();
+  const [modalContent, setModalContent] = useState("")
+  const dispatch = useAppDispatch()
 
   const handleRoomCreation = (roomType: string, data: any) => {
     if (data.name) {
       switch (roomType) {
         case roomTypes.public:
-          dispatch(createPublicRoomAction(data.name));
-          break;
+          dispatch(createPublicRoomAction(data.name))
+          break
         case roomTypes.private:
-          dispatch(createPrivateRoomAction(data.name));
-          break;
+          dispatch(createPrivateRoomAction(data.name))
+          break
         case roomTypes.oneOnOne:
-          dispatch(createDirectRoomAction(data.name, data.publicKey));
-          break;
+          dispatch(createDirectRoomAction(data.name, data.publicKey))
+          break
         default:
-          return handleModalClosing();
+          return handleModalClosing()
       }
     }
-    handleModalClosing();
-  };
+    handleModalClosing()
+  }
 
   const handleModalClosing = () => {
-    setModalContent("");
-    setToggleModal(false);
-  };
+    setModalContent("")
+    setToggleModal(false)
+  }
 
   const getModalContent = () => {
     switch (modalContent) {
@@ -95,7 +95,7 @@ const RoomOptionsModal = ({
             modalContent={modalContent}
             handleModalClosing={handleModalClosing}
           />
-        );
+        )
 
       case roomTypes.private:
         return (
@@ -105,7 +105,7 @@ const RoomOptionsModal = ({
             modalContent={modalContent}
             handleModalClosing={handleModalClosing}
           />
-        );
+        )
 
       case roomTypes.oneOnOne:
         return (
@@ -115,7 +115,7 @@ const RoomOptionsModal = ({
             modalContent={modalContent}
             handleModalClosing={handleModalClosing}
           />
-        );
+        )
       default:
         return (
           <RoomTypeOptions
@@ -123,11 +123,11 @@ const RoomOptionsModal = ({
             setModalContent={setModalContent}
             setToggleModal={setToggleModal}
           />
-        );
+        )
     }
-  };
-  return getModalContent();
-};
+  }
+  return getModalContent()
+}
 
 const RoomTypeOptions = ({
   toggleModal,
@@ -163,15 +163,15 @@ const RoomTypeOptions = ({
         </StyledButtonsWrapper>
       </ModalBody>{" "}
     </Modal>
-  );
-};
+  )
+}
 
 type RoomNameInputProps = {
-  toggleModal: boolean;
-  handleRoomCreation: (roomType: string, data: any) => void;
-  modalContent: string;
-  handleModalClosing: () => void;
-};
+  toggleModal: boolean
+  handleRoomCreation: (roomType: string, data: any) => void
+  modalContent: string
+  handleModalClosing: () => void
+}
 
 const RoomNameInput = ({
   toggleModal,
@@ -179,7 +179,7 @@ const RoomNameInput = ({
   modalContent,
   handleModalClosing
 }: RoomNameInputProps) => {
-  const [roomName, setRoomName] = useState("");
+  const [roomName, setRoomName] = useState("")
 
   return (
     <Modal isOpen={toggleModal} centered>
@@ -188,7 +188,7 @@ const RoomNameInput = ({
         <StyledInput
           placeholder={"Write down your room's name..."}
           value={roomName}
-          onChange={e => setRoomName(e.target.value)}
+          onChange={(e) => setRoomName(e.target.value)}
         />
       </ModalBody>
       <ModalFooter>
@@ -200,25 +200,25 @@ const RoomNameInput = ({
         </StyledButton>
       </ModalFooter>
     </Modal>
-  );
-};
+  )
+}
 
 const OneOnOneModal = ({
   toggleModal,
   handleRoomCreation,
   handleModalClosing
 }: RoomNameInputProps) => {
-  const [roomName, setRoomName] = useState("");
-  const [publicKey, setPublicKey] = useState("");
+  const [roomName, setRoomName] = useState("")
+  const [publicKey, setPublicKey] = useState("")
 
   const handleDirectRoomCreation = () => {
     if (publicKey && roomName) {
       handleRoomCreation(roomTypes.oneOnOne, {
         name: roomName,
         publicKey
-      });
+      })
     }
-  };
+  }
   return (
     <Modal isOpen={toggleModal} centered>
       <ModalHeader toggle={handleModalClosing}>
@@ -228,7 +228,7 @@ const OneOnOneModal = ({
         <StyledInput
           placeholder={"Write down your room's name..."}
           value={roomName}
-          onChange={e => setRoomName(e.target.value)}
+          onChange={(e) => setRoomName(e.target.value)}
         />
         <TrustedContactsList handleContactClick={setPublicKey} />
       </ModalBody>
@@ -241,6 +241,6 @@ const OneOnOneModal = ({
         </StyledButton>
       </ModalFooter>
     </Modal>
-  );
-};
-export default RoomOptionsModal;
+  )
+}
+export default RoomOptionsModal

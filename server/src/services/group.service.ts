@@ -10,18 +10,23 @@ class GroupService {
         return await Group.getAllGroups();
     }
 
-    public async saveGroup(group_id: string, provider: string, name: string, size: number): Promise<IGroup> {
+    public async saveGroup(group_id: string, provider: string, name: string, size: number, number_of_leaves: number): Promise<IGroup> {
         const group = await Group.create({
             group_id: group_id,
             provider: provider,
             name: name,
-            size: size
+            size: size,
+            number_of_leaves: number_of_leaves
         })
         return await group.save();
     }
 
     public async updateSize(group_id: string, new_size: number): Promise<IGroup | null> {
         return await Group.updateGroupSize(group_id, new_size);
+    }
+
+    public async updateNumberOfLeaves(group_id: string, new_number_of_leaves: number): Promise<IGroup | null> {
+        return await Group.updateGroupLeafCount(group_id, new_number_of_leaves);
     }
 
     public async containsGroup(group_id: string): Promise<boolean> {

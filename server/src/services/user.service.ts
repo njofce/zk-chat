@@ -157,6 +157,31 @@ class UserService {
         return "Done";
     }
 
+    public async removeUsersByIndexes(indexes: number[], groupId: string): Promise<string> {
+        if (indexes.length == 0)
+            return "";
+
+        // Get the zero hashes.
+        const zeros = await MerkleTreeZero.findZeros();
+
+        if (!zeros || zeros.length === 0) {
+            throw `The zero hashes have not yet been created`;
+        }
+
+        for (let index of indexes) {
+
+            let node = await MerkleTreeNode.findLeafByGroupIdAndIndexInGroup(groupId, index)
+
+            if (!node) {
+                throw new Error(`The node with the given index does not exist`)
+            }
+
+            await this.updateUser(node.hash);
+        }
+
+        return "Done";
+    }
+
     public async updateUser(leafHash: string, newValue: string = config.ZERO_VALUE.toString()) {
         let node = await MerkleTreeNode.findLeafByHash(leafHash);
 
@@ -183,7 +208,10 @@ class UserService {
 
     }
 
-    public async removeUser(idCommitment: string, secret: bigint): Promise<string> {
+    /**
+     * Bans a user with the given identity commitment.
+     */
+    public async banUser(idCommitment: string, secret: bigint): Promise<string> {
         const treeNode = await MerkleTreeNode.findLeafByHash(idCommitment);
 
         if (!treeNode) {
@@ -198,6 +226,7 @@ class UserService {
         await bannedUser.save();
         return idCommitment
     }
+
 }
 
 export default UserService
