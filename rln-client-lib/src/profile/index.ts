@@ -1,3 +1,4 @@
+import { IKeyExchangeEnabledRoom } from './../room/interfaces';
 import { ICryptography, IKeyPair } from '../crypto/interfaces';
 import { IPublicRoom, IDirectRoom, IPrivateRoom } from '../room/interfaces';
 import { deepClone } from '../util';
@@ -474,37 +475,28 @@ class ProfileManager {
     }
 
     /**
-     * Encrypts the direct room's symmetric key with the recepient public key.
-     */
-    public async generateEncryptedInviteDirectRoom(room_id: string): Promise<string> {
+    * Derives the direct room's symmetric key, using the receiver's public key
+    */
+    public async deriveRoomSecretKey(keyExchangeEnabledRoom: IKeyExchangeEnabledRoom, dh_public_key: string): Promise<void> {
         if (this.inMemoryProfile == null)
             throw "Profile doesn't exist";
 
-        const directIndex = this.inMemoryProfile.rooms.direct.findIndex(r => r.id == room_id);
-        if (directIndex == -1)
-            throw "Room doesn't exist";
-        const room: IDirectRoom = this.inMemoryProfile.rooms.direct[directIndex];
+        const derived_secret_key: string = await this.cryptography.deriveSharedSecretKey(keyExchangeEnabledRoom.dh_private_key, dh_public_key);
 
-        return this.cryptography.encryptMessageAsymmetric(room.symmetric_key, room.recipient_public_key);
+        keyExchangeEnabledRoom.symmetric_key = derived_secret_key;
+        await this.persistProfile();
     }
 
     /**
-     * Updates the direct room's symmetric key, by decrypting an invite with the user's private key.
+     * Returns only the direct rooms, which support DH key exchange.
      */
-    public async updateDirectRoomKey(room_id: string, encrypted_symmetric_key: string): Promise<void> {
+    public getAllRoomsAvailableForKeyExchange(): IKeyExchangeEnabledRoom[] {
         if (this.inMemoryProfile == null)
             throw "Profile doesn't exist";
 
-        const directIndex = this.inMemoryProfile.rooms.direct.findIndex(r => r.id == room_id);
-        if (directIndex == -1)
-            throw "Room doesn't exist";
-
-        const room: IDirectRoom = this.inMemoryProfile.rooms.direct[directIndex];
-
-        const decrypted_symm_key = await this.cryptography.decryptMessageAsymmetric(encrypted_symmetric_key, this.inMemoryProfile.user_private_key);
-
-        room.symmetric_key = decrypted_symm_key;
-        await this.persistProfile();
+        if (this.inMemoryProfile.rooms.direct.length == 0)
+            return [];
+        return this.inMemoryProfile.rooms.direct.filter(room => room.symmetric_key == "");
     }
 
 }

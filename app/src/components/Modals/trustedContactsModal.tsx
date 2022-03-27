@@ -14,7 +14,7 @@ import {
 import { useAppDispatch } from "../../redux/hooks/useAppDispatch";
 import { getTrustedContacts } from "../../redux/actions/actionCreator";
 import { useAppSelector } from "../../redux/hooks/useAppSelector";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 
 const StyledTextarea = styled.textarea`
   border: 1px solid #f0f2f5;
@@ -123,7 +123,7 @@ const TrustedContactsModal = ({
                 .catch(err => toast.error(err));
         }
     };
-
+    
     return (
         <Modal centered isOpen={toggleTrustedContacts}>
             <ModalHeader
@@ -139,13 +139,13 @@ const TrustedContactsModal = ({
                         return (
                             <StyledContactWrapper>
                                 {" "}
-                                <StyledContactName>{contact}</StyledContactName>
+                                <StyledContactName>{contact.name}</StyledContactName>
                                 <div>
                                     <FontAwesomeIcon
                                         icon={faPen}
                                         onClick={() => {
                                             setToggleAddEditModal(true);
-                                            setEditContactName(contact);
+                                            setEditContactName(contact.name);
                                         }}
                                         data-tip
                                         data-for="EditContact"
@@ -161,7 +161,7 @@ const TrustedContactsModal = ({
                                     <FontAwesomeIcon
                                         icon={faTrash}
                                         onClick={() => {
-                                            handleContactDeleting(contact);
+                                            handleContactDeleting(contact.name);
                                         }}
                                         data-tip
                                         data-for="DeleteContact"

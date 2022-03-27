@@ -9,7 +9,6 @@ import RoomOptionsModal from "../Modals";
 import ReactTooltip from "react-tooltip";
 import { saveAs } from "file-saver";
 
-
 import * as Colors from "../../constants/colors";
 import JoinPrivateRoomModal from "../Modals/privateRoomModal";
 import TrustedContactsModal from "../Modals/trustedContactsModal";
@@ -52,20 +51,6 @@ const RoomHandlingButtons = () => {
   return (
     <StyledButtonsWrapper>
       <FontAwesomeIcon
-        icon={faUserLock}
-        onClick={() => setToggleTrustedContacts(true)}
-        data-tip
-        data-for="TrustedContacts"
-      />
-      <ReactTooltip
-        event="mouseenter"
-        eventOff="click mouseleave"
-        id="TrustedContacts"
-        backgroundColor={Colors.BERRY_PINK}
-      >
-        Trusted Contacts
-      </ReactTooltip>
-      <FontAwesomeIcon
         icon={faPlusCircle}
         onClick={() => setToggleModal(true)}
         data-tip
@@ -97,12 +82,12 @@ const RoomHandlingButtons = () => {
         icon={faUserPlus}
         onClick={() => setToggleJoinPrivateRoom(true)}
         data-tip
-        data-for="Join"
+        data-for="JoinPrivateRoom"
       />
       <ReactTooltip
         event="mouseenter"
         eventOff="click mouseleave"
-        id="Join"
+        id="JoinPrivateRoom"
         backgroundColor={Colors.BERRY_PINK}
       >
         Join private room
@@ -120,6 +105,20 @@ const RoomHandlingButtons = () => {
         backgroundColor={Colors.BERRY_PINK}
       >
         Generate public key
+      </ReactTooltip>
+      <FontAwesomeIcon
+        icon={faUserLock}
+        onClick={() => setToggleTrustedContacts(true)}
+        data-tip
+        data-for="TrustedContacts"
+      />
+      <ReactTooltip
+        event="mouseenter"
+        eventOff="click mouseleave"
+        id="TrustedContacts"
+        backgroundColor={Colors.BERRY_PINK}
+      >
+        Trusted Contacts
       </ReactTooltip>
       <RoomOptionsModal
         toggleModal={toggleModal}

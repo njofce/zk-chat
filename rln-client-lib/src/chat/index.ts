@@ -44,13 +44,11 @@ class ChatManager {
         return !this.root_up_to_date;
     }
 
-    public async sendMessage(chat_room_id: string, raw_message: string, proof_generator_callback: (nullifier: string, signal: string, storage_artifacts: any, rln_identitifer: any) => Promise<any>) {
-        await this.checkRootUpToDate();
-        // Generate proof
+    public async generateProof(proof_generator_callback: (nullifier: string, signal: string, storage_artifacts: any, rln_identitifer: any) => Promise<any>): Promise<IProofData> {
         let epoch: string = this.getEpoch();
 
         let externalNullifier: string = this.hasher.genExternalNullifier((epoch));
-        
+
         const signal: string = this.generateRandomSignal();
 
         const storageArtifacts = {
@@ -63,15 +61,27 @@ class ChatManager {
         const fullProof: RLNFullProof = JSON.parse(proof);
         const xShare: bigint = this.hasher.genSignalHash(signal);
 
+        return {
+            fullProof: fullProof,
+            xShare: xShare.toString(),
+            epoch: epoch
+        }
+    }
+
+    public async sendMessage(chat_room_id: string, raw_message: string, proof_generator_callback: (nullifier: string, signal: string, storage_artifacts: any, rln_identitifer: any) => Promise<any>) {
+        await this.checkRootUpToDate();
+        // Generate proof
+        const proofData: IProofData = await this.generateProof(proof_generator_callback);
+
         // Encrypt with room's key
         const roomData: any = await this.profile_manager.getRoomById(chat_room_id);
         const encryptedMessage: string = await this.profile_manager.encryptMessageForRoom(chat_room_id, raw_message);
 
         // Send message
         const message = {
-            zk_proof: fullProof,
-            x_share: xShare.toString(),
-            epoch: epoch,
+            zk_proof: proofData.fullProof,
+            x_share: proofData.xShare,
+            epoch: proofData.epoch,
             chat_type: roomData.type,
             message_content: encryptedMessage
         }
@@ -149,6 +159,12 @@ class ChatManager {
     private generateRandomSignal = () => {
         return Math.random().toString();
     }
+}
+
+export interface IProofData {
+    fullProof: RLNFullProof;
+    xShare: string;
+    epoch: string;
 }
 
 export default ChatManager

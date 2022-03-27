@@ -9,6 +9,7 @@
         "@zk-kit/identity": "^1.4.1",
         "@zk-kit/protocols": "^1.8.2",
         "axios": "^0.24.0",
+        "crypto-js": "^4.1.1",
         "dotenv": "^10.0.0",
         "uuid": "^8.3.2",
         "ws": "^8.3.0"
@@ -18,7 +19,6 @@
         "@babel/preset-env": "^7.16.4",
         "@babel/preset-typescript": "^7.16.0",
         "@peculiar/webcrypto": "^1.2.3",
-        "@types/crypto-js": "^4.0.2",
         "@types/jest": "^27.0.3",
         "@types/node": "^16.11.12",
         "@types/uuid": "^8.3.3",

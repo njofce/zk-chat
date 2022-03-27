@@ -1,3 +1,4 @@
+import { IKeyPair } from './../../src/crypto/interfaces';
 import { jest, test, expect, describe, beforeAll, beforeEach } from '@jest/globals'
 import WebCryptography from '../../src/crypto/web_cryptography';
 import { v4 as uuidv4 } from 'uuid';
@@ -108,6 +109,34 @@ describe('Test crypto', () => {
         } catch(e) {
             expect(true).toBeTruthy();
         }
+    });
+
+    test('derive ECDH shared secret', async () => {
+        const keyPair1: IKeyPair = await crypto.generateECDHKeyPair();
+        const keyPair2: IKeyPair = await crypto.generateECDHKeyPair();
+
+        const derived1 = await crypto.deriveSharedSecretKey(keyPair1.privateKey, keyPair2.publicKey);
+        const derived2 = await crypto.deriveSharedSecretKey(keyPair2.privateKey, keyPair1.publicKey);
+
+        expect(derived1).not.toBeNull();
+        expect(derived2).not.toBeNull();
+        expect(derived1).toEqual(derived2);
+
+        const plaintext = "some text";
+        const encryptedWithSharedSecret = await crypto.encryptMessageSymmetric(plaintext, derived1);
+        const decryptedWithSharedSecret = await crypto.decryptMessageSymmetric(encryptedWithSharedSecret, derived2);
+
+        expect(decryptedWithSharedSecret).toEqual(plaintext);
+    });
+
+    test('hash', async() => {
+        const content = "some random data";
+        const hash1 = crypto.hash(content);
+        const hash2 = crypto.hash(content);
+
+        expect(hash1).toEqual(hash2);
+        expect(hash1.length).not.toEqual(0);
+        expect(hash2.length).not.toEqual(0);
     });
 
 });

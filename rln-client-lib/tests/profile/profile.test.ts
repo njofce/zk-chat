@@ -1,4 +1,5 @@
 import { ITrustedContactsMap } from './../../src/profile/interfaces';
+import { IDirectRoom } from './../../src/room/interfaces';
 import { IProfile } from '../../src/profile/interfaces';
 import { StorageProvider } from '../../src/storage/interfaces';
 import { jest, test, expect, describe, beforeAll, beforeEach } from '@jest/globals'
@@ -41,6 +42,14 @@ class LocalTestCryptography implements ICryptography {
         return (this.seed * 10000).toString();
     };
 
+    generateECDHKeyPair = async (): Promise<IKeyPair> => {
+        return this.generateKeyPair()
+    }
+
+    deriveSharedSecretKey = async (sourcePrivateKey: string, targetPublicKey: string): Promise<string> => {
+        return "derived-" + sourcePrivateKey + targetPublicKey;
+    }
+
     generateKeyPair = async (): Promise<IKeyPair> => {
         const privateKey = this.seed * 10000;
         const publicKey = (this.seed * 12345) ^ privateKey;
@@ -65,6 +74,10 @@ class LocalTestCryptography implements ICryptography {
 
     decryptMessageAsymmetric = async (cyphertext: string, privateKey: string): Promise<string> => {
         return cyphertext.substr(0, cyphertext.indexOf('___'));
+    }
+    
+    hash = (data: string): string => {
+        return "hash-" + data;
     }
 }
 
@@ -115,7 +128,6 @@ describe('Test profile', () => {
 
     test('init profile', async () => {
         await profileManager.initProfile("id1", "root1", ["sha-1", "sha-2"]);
-
         expect(await profileManager.profileExists()).toBeTruthy();
     });
 
@@ -338,12 +350,14 @@ describe('Test profile', () => {
     test('add direct room', async () => {
         await profileManager.recoverProfile(testProfile);
 
-        const room = {
+        const room: IDirectRoom = {
             name: "test",
             id: "test-1",
             type: "PRIVATE",
             symmetric_key: "test key",
-            recipient_public_key: "test key"
+            recipient_public_key: "test key",
+            dh_public_key: "test-pub",
+            dh_private_key: "test-pub"
         };
 
         await profileManager.addDirectRoom(room);
@@ -356,12 +370,14 @@ describe('Test profile', () => {
     test('add direct room - already exists', async () => {
         await profileManager.recoverProfile(testProfile);
 
-        const room = {
+        const room: IDirectRoom = {
             name: "test",
             id: "test-1",
             type: "PRIVATE",
             symmetric_key: "test key",
-            recipient_public_key: "test key"
+            recipient_public_key: "test key",
+            dh_public_key: "test-pub",
+            dh_private_key: "test-pub"
         };
 
         await profileManager.addDirectRoom(room);
@@ -384,12 +400,14 @@ describe('Test profile', () => {
     test('get rooms', async () => {
         await profileManager.recoverProfile(deepClone(testProfile));
 
-        const room = {
+        const room: IDirectRoom= {
             name: "test",
             id: "test-1",
             type: "PRIVATE",
             symmetric_key: "test key",
-            recipient_public_key: "test key"
+            recipient_public_key: "test key",
+            dh_public_key: "test-pub",
+            dh_private_key: "test-pub"
         };
 
         await profileManager.addDirectRoom(room);
@@ -410,12 +428,14 @@ describe('Test profile', () => {
     test('get room ids', async () => {
         await profileManager.recoverProfile(deepClone(testProfile));
 
-        const room = {
+        const room: IDirectRoom = {
             name: "test",
             id: "test-1",
             type: "PRIVATE",
             symmetric_key: "test key",
-            recipient_public_key: "test key"
+            recipient_public_key: "test key",
+            dh_public_key: "test-pub",
+            dh_private_key: "test-pub"
         };
 
         await profileManager.addDirectRoom(room);
@@ -427,12 +447,14 @@ describe('Test profile', () => {
     test('get room by id - direct', async () => {
         await profileManager.recoverProfile(deepClone(testProfile));
 
-        const room = {
+        const room: IDirectRoom = {
             name: "test",
             id: "test-1",
             type: "PRIVATE",
             symmetric_key: "test key",
-            recipient_public_key: "test key"
+            recipient_public_key: "test key",
+            dh_public_key: "test-pub",
+            dh_private_key: "test-pub"
         };
 
         await profileManager.addDirectRoom(room);
@@ -501,12 +523,14 @@ describe('Test profile', () => {
             symmetric_key: "test key 2"
         };
 
-        const room3 = {
+        const room3: IDirectRoom = {
             name: "test",
             id: "test-3",
             type: "DIRECT",
             symmetric_key: "test key 3",
-            recipient_public_key: "test key 3"
+            recipient_public_key: "test key 3",
+            dh_public_key: "test-pub",
+            dh_private_key: "test-pub"
         };
 
         await profileManager.addPublicRoom(room1);
@@ -539,12 +563,14 @@ describe('Test profile', () => {
             symmetric_key: "test key 2"
         };
 
-        const room3 = {
+        const room3: IDirectRoom = {
             name: "test",
             id: "test-3",
             type: "DIRECT",
             symmetric_key: "test key 3",
-            recipient_public_key: "test key 3"
+            recipient_public_key: "test key 3",
+            dh_public_key: "test-pub",
+            dh_private_key: "test-pub"
         };
 
         await profileManager.addPublicRoom(room1);
@@ -557,105 +583,27 @@ describe('Test profile', () => {
         expect(await (await profileManager.getUserRoomsForChatType("XX")).length).toEqual(0);
     });
 
-    test('generate encrypted invite direct room - room not exists', async () => {
-        
+    test('derive key for direct room', async () => {
         await profileManager.recoverProfile(deepClone(testProfile));
 
-        const room1 = {
-            name: "test",
-            id: "test-1",
-            type: "DIRECT",
-            symmetric_key: "test key 1",
-            recipient_public_key: "test key 1"
-        };
-
-        const room2 = {
-            name: "test",
-            id: "test-2",
-            type: "DIRECT",
-            symmetric_key: "test key 2",
-            recipient_public_key: "test key 2"
-        };
-
-        const room3 = {
+        const room1: IDirectRoom = {
             name: "test",
             id: "test-3",
             type: "DIRECT",
-            symmetric_key: "test key 3",
-            recipient_public_key: "test key 3"
-        };
-
-        await profileManager.addDirectRoom(room1);
-        await profileManager.addDirectRoom(room2);
-        await profileManager.addDirectRoom(room3);
-
-        try {
-            await profileManager.generateEncryptedInviteDirectRoom("non-existed-id");
-            expect(true).toBeFalsy();
-        } catch(e) {
-            expect(true).toBeTruthy();
-        }
-    })
-
-    test('generate encrypted invite direct room - room exists', async () => {
-        await profileManager.recoverProfile(deepClone(testProfile));
-
-        const room1 = {
-            name: "test",
-            id: "test-1",
-            type: "DIRECT",
-            symmetric_key: "test key 1",
-            recipient_public_key: "test key 1"
-        };
-
-        await profileManager.addDirectRoom(room1);
-        
-        jest.spyOn(crypto, "encryptMessageAsymmetric").mockResolvedValue("encrypted invite direct room");
-        
-        const encrypted_invite: string = await profileManager.generateEncryptedInviteDirectRoom("test-1");
-        expect(encrypted_invite).toEqual("encrypted invite direct room");
-    })
-
-    test('update direct room - room not exists', async () => {
-        await profileManager.recoverProfile(deepClone(testProfile));
-        
-        try {
-            await profileManager.updateDirectRoomKey("non-existent-id", "encrypted-invite");
-            expect(true).toBeFalsy();
-        } catch(e) {
-            expect(true).toBeTruthy();
-        }
-    })
-
-    test('update direct room - room exists', async () => {
-        await profileManager.recoverProfile(deepClone(testProfile));
-        const room1 = {
-            name: "test",
-            id: "test-1",
-            type: "DIRECT",
-            symmetric_key: "test key 1",
-            recipient_public_key: "test key 1"
+            symmetric_key: "",
+            recipient_public_key: "test key 3",
+            dh_public_key: "test-pub",
+            dh_private_key: "test-priv"
         };
 
         await profileManager.addDirectRoom(room1);
 
-        jest.spyOn(crypto, "decryptMessageAsymmetric").mockResolvedValue("decrypted symmetric key");
+        await profileManager.deriveRoomSecretKey(room1, "test-public-from-recepient");
 
-        await profileManager.updateDirectRoomKey("test-1", "encrypted invite")
-
-        const room = await profileManager.getRoomById("test-1");
-        expect(room.symmetric_key).toEqual("decrypted symmetric key");
+        const room: IDirectRoom = await profileManager.getRoomById("test-3");
+        expect(room.symmetric_key).toEqual("derived-test-privtest-public-from-recepient");
     });
-
-    test('update direct room - profile does not exist', async () => {
-        try {
-            await profileManager.updateDirectRoomKey("test-1", "encrypted invite");
-            expect(true).toBeFalsy();
-        } catch(e) {
-            expect(true).toBeTruthy();
-        }
-    })
-
+    
     test('get contacts - empty', async() => {
         await profileManager.recoverProfile(deepClone(testProfile));
         const contacts: ITrustedContactsMap = profileManager.getTrustedContacts();

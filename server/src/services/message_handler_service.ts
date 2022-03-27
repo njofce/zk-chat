@@ -13,6 +13,7 @@ import config from "../config";
 import { randomUUID } from "crypto";
 import Hasher from "../util/hasher";
 import { constructRLNMessage, RLNMessage } from "../util/types";
+import { getUserFromShares, isZkProofValid, verifyEpoch } from '../util/proof_utils';
 
 /**
  * The core service that handles every message coming from the websocket channel. The message format is deserialized and validated properly.
@@ -45,7 +46,7 @@ class MessageHandlerService {
             throw "Message format invalid";
 
         // Validate epoch
-        if (!this.verifyEpoch(validMessage))
+        if (!verifyEpoch(validMessage.epoch))
             throw "Epoch invalid";
 
         // Check if message is duplicate
@@ -54,7 +55,7 @@ class MessageHandlerService {
 
         // Check valid proof
         const merkleRoot: string = await this.userService.getRoot();
-        const validZkProof = await this.isZkProofValid(validMessage.zk_proof, merkleRoot);
+        const validZkProof = await isZkProofValid(this.hasher, this.verifierKey, validMessage.zk_proof, merkleRoot);
 
         if (!validZkProof) {
             throw "ZK Proof is invalid, ignoring message";
@@ -66,19 +67,13 @@ class MessageHandlerService {
         if (spamRulesViolated) {
             const requestStats = await this.requestStatsService.getRequestStats(validMessage);
 
-            const sharesX = requestStats.map((stats) => BigInt(stats.xShare));
-            const sharesY = requestStats.map((stats) => BigInt(stats.yShare));
-
-            sharesX.push(BigInt(validMessage.x_share));
-            sharesY.push(BigInt(getYShareFromFullProof(validMessage.zk_proof)));
-            const secret: bigint = this.hasher.retrieveSecret(sharesX, sharesY);
-            const idCommitment = this.hasher.poseidonHash([secret]).toString();
+            const user = getUserFromShares(validMessage.zk_proof, validMessage.x_share, this.hasher, requestStats);
 
             // Ban User
-            await this.userService.removeUser(idCommitment, secret);
+            await this.userService.removeUser(user.idCommitment, user.secret);
 
             // Set user leaf to 0 and recalculate merkle tree
-            await this.userService.updateUser(idCommitment);
+            await this.userService.updateUser(user.idCommitment);
 
             // Broadcast tree updated event
             const treeUpdated: ISyncMessage = {
@@ -110,36 +105,6 @@ class MessageHandlerService {
         } catch(e) {
             return null;
         }
-    }
-
-    private verifyEpoch = (message: RLNMessage): boolean => {
-        const serverTimestamp = new Date();
-        
-        serverTimestamp.setSeconds(Math.floor(serverTimestamp.getSeconds() / 10) * 10);
-        serverTimestamp.setMilliseconds(0);
-        const messageTimestamp = new Date(parseInt(message.epoch));
-
-        // Tolerate a difference of TIMESTAMP_TOLERATED_DIFFERENCE_SECONDS seconds between client and server timestamp
-        const difference_in_seconds = Math.abs(serverTimestamp.getTime() - messageTimestamp.getTime()) / 1000;
-        if (difference_in_seconds >= config.EPOCH_ALLOWED_DELAY_THRESHOLD)
-            return false;
-
-        return true;
-    }
-
-    private isZkProofValid = async (proof: RLNFullProof, root: string): Promise<boolean> => {
-
-        return await this.hasher.verifyProof(this.verifierKey, {
-            proof: proof.proof,
-            publicSignals: {
-                yShare: proof.publicSignals.yShare,
-                merkleRoot: root,
-                internalNullifier: proof.publicSignals.internalNullifier,
-                signalHash: proof.publicSignals.signalHash,
-                epoch: proof.publicSignals.epoch,
-                rlnIdentifier: proof.publicSignals.rlnIdentifier,
-            }
-        });
     }
 
     private areSpamRulesViolated = async (message: RLNMessage): Promise<boolean> => {

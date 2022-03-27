@@ -30,6 +30,24 @@ jest.mock("ws", () => {
 
 describe('Test server communication', () => {
 
+    const proof = JSON.parse(JSON.stringify({
+        "proof": {
+            "pi_a": "pi_a",
+            "pi_b": "pi_b",
+            "pi_c": "pi_c",
+            "protocol": "p",
+            "curve": "c"
+        },
+        "publicSignals": {
+            "yShare": BigInt(123).toString(),
+            "merkleRoot": BigInt(123).toString(),
+            "internalNullifier": BigInt(123).toString(),
+            "signalHash": BigInt(123).toString(),
+            "epoch": BigInt(123).toString(),
+            "rlnIdentifier": BigInt(123).toString()
+        }
+    }));
+
     let communication: ServerCommunication;
     let server: RLNServerApi;
     let socketClient: WsSocketClient;
@@ -130,6 +148,40 @@ describe('Test server communication', () => {
         const testSpy = jest.spyOn(server, "getBannedUsers");
         testSpy.mockResolvedValue([]);
         await communication.getBannedUsers();
+
+        expect(testSpy).toHaveBeenCalled();
+    });
+
+    test('save key exchange bundle', async () => {
+        const testSpy = jest.spyOn(server, "saveKeyExchangeBundle");
+        testSpy.mockResolvedValue({
+            encrypted_content: "enc_content",
+            encrypted_key: "key",
+            receiver_public_key: "key"
+        });
+        await communication.saveKeyExchangeBundle(proof, "test", "test", "test", "test", "test", "test");
+
+        expect(testSpy).toHaveBeenCalled();
+    });
+
+    test('get key exchange bundles', async () => {
+        const testSpy = jest.spyOn(server, "getKeyExchangeBundles");
+        testSpy.mockResolvedValue([{
+            encrypted_content: "enc_content",
+            encrypted_key: "key",
+            receiver_public_key: "key"
+        }]);
+        await communication.getKeyExchangeBundles("test");
+
+        expect(testSpy).toHaveBeenCalled();
+    });
+
+    test('delete key exchange bundles', async () => {
+        const testSpy = jest.spyOn(server, "deleteKeyExchangeBundles");
+        testSpy.mockResolvedValue({
+            deletedItemCount: 2
+        });
+        await communication.deleteKeyExchangeBundles(proof, "test", "test", ["1"]);
 
         expect(testSpy).toHaveBeenCalled();
     });

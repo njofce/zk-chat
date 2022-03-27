@@ -5,6 +5,10 @@ export interface ICryptography {
 
     generateKeyPair: () => Promise<IKeyPair>;
 
+    generateECDHKeyPair: () => Promise<IKeyPair>;
+
+    deriveSharedSecretKey: (sourcePrivateKey: string, targetPublicKey: string) => Promise<string>;
+
     encryptMessageSymmetric: (message: string, symmetricKey: string) => Promise<string>;
 
     decryptMessageSymmetric: (cyphertext: string, symmetricKey: string) => Promise<string>;
@@ -12,6 +16,8 @@ export interface ICryptography {
     encryptMessageAsymmetric: (message: string, publicKey: string) => Promise<string>;
 
     decryptMessageAsymmetric: (cyphertext: string, privateKey: string) => Promise<string>;
+
+    hash: (data: string) => string;
 
 }
 

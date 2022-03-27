@@ -9,7 +9,6 @@ import { addActiveChatRoom } from "../../redux/actions/actionCreator";
 import InviteModal from "../Modals/inviteModal";
 import { useAppSelector } from "../../redux/hooks/useAppSelector";
 import Input from "../Input";
-import ExcangeKeysModal from "../Modals/exchangeKeysModal";
 import ReactTooltip from "react-tooltip";
 
 const StyledChatContainer = styled.div`
@@ -82,7 +81,6 @@ type ChatMessagesProps = {
 
 const ChatMessages = ({ currentActiveRoom }: ChatMessagesProps) => {
   const [toggleInviteModal, setToggleInviteModal] = useState(false);
-  const [toggleExchangeKeysModal, setToggleExchangeKeysModal] = useState(false);
   const [isPublicRoomInviteCopied, setIsPublicRoomInviteCopied] = useState(
     false
   );
@@ -129,12 +127,6 @@ const ChatMessages = ({ currentActiveRoom }: ChatMessagesProps) => {
               </StyledButton>
             </>
           )}
-          {currentActiveRoom.type.toLowerCase() === roomTypes.oneOnOne && (
-            <StyledButton onClick={() => setToggleExchangeKeysModal(true)}>
-              {" "}
-              Exchange keys{" "}
-            </StyledButton>
-          )}
           {currentActiveRoom.type.toLowerCase() === roomTypes.public && (
             <>
               <StyledButton
@@ -173,10 +165,6 @@ const ChatMessages = ({ currentActiveRoom }: ChatMessagesProps) => {
       <InviteModal
         toggleInviteModal={toggleInviteModal}
         setToggleInviteModal={setToggleInviteModal}
-      />
-      <ExcangeKeysModal
-        toggleExchangeKeysModal={toggleExchangeKeysModal}
-        setToggleExchangeKeysModal={setToggleExchangeKeysModal}
       />
     </StyledChatContainer>
   );
