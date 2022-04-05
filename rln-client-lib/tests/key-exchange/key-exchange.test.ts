@@ -9,6 +9,8 @@ import ProfileManager from '../../src/profile';
 import "../../src/hasher";
 import { ICryptography, IKeyPair } from '../../src/crypto/interfaces';
 import { StorageProvider } from '../../src/storage/interfaces';
+import { IChatHistoryDB, IMessage } from '../../src/chat/interfaces';
+import { deepClone } from '../../src/util';
 
 const ws = require("ws");
 
@@ -128,6 +130,31 @@ export class LocalTestCryptography implements ICryptography {
 
 }
 
+class LocalTestMessageDB implements IChatHistoryDB {
+
+    private messages = {};
+
+    async saveMessage(roomId: string, message: IMessage) {
+        
+    }
+
+    async getMessagesForRoom(roomId: string, fromTimestamp: number): Promise<any> {
+        return this.messages[roomId];
+    }
+
+    async getMessagesForRooms(roomIdS: string[], fromTimestamp: number): Promise<any> {
+        return {}
+    }
+
+    async getMaxTimestampForAllMessages(): Promise<number> {
+        return 0;
+    }
+
+    async deleteAllMessagesForRoom(roomId: string) {
+        this.messages[roomId] = [];
+    }
+
+}
 
 describe('Key exchange test', () => {
 
@@ -141,6 +168,7 @@ describe('Key exchange test', () => {
     let profileManager: ProfileManager;
     let storageProvider: TestStorageProvider;
     let cryptography: LocalTestCryptography;
+    let chatDB: IChatHistoryDB;
     let chatManager: ChatManager;
 
     beforeEach(() => {
@@ -151,7 +179,8 @@ describe('Key exchange test', () => {
         server = new RLNServerApi("");
         socketClient = new WsSocketClient("");
         communication = new ServerCommunication(server, socketClient);
-        chatManager = new ChatManager(profileManager, communication, cryptography);
+        chatDB = new LocalTestMessageDB();
+        chatManager = new ChatManager(profileManager, communication, cryptography, chatDB);
 
         keyExchangeManager = new KeyExchangeManager(communication, cryptography, chatManager, profileManager, proofGeneratorCallback);
     })
