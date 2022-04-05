@@ -5,7 +5,6 @@ import * as Colors from "../../constants/colors"
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons"
 import { Room } from "../../redux/actions/actionCreator"
 import { send_message } from "rln-client-lib"
-import { clientUrl } from "../../constants/constants"
 import { toast } from "react-toastify"
 
 const StyledInput = styled.input`
@@ -65,7 +64,7 @@ class Input extends React.Component<InputProps, InputState> {
     const { currentActiveRoom } = this.props
     if (inputValue) {
       try {
-        await send_message(currentActiveRoom.id, inputValue, this.generateProof)
+        await send_message(currentActiveRoom.id, inputValue)
         this.setState({ inputValue: "" })
       } catch (error) {
         console.log(error)
@@ -74,24 +73,6 @@ class Input extends React.Component<InputProps, InputState> {
         )
       }
     }
-  }
-
-  generateProof = async (
-    nullifier: string,
-    signal: string,
-    storage_artifacts: any,
-    rln_identitifer: string
-  ): Promise<any> => {
-    const { injected } = window as any
-    const client = await injected.connect()
-    return await client.rlnProof(
-      nullifier,
-      signal,
-      `${clientUrl}/circuitFiles/rln/rln.wasm`,
-      `${clientUrl}/circuitFiles/rln/rln_final.zkey`,
-      storage_artifacts,
-      rln_identitifer
-    )
   }
 
   render() {

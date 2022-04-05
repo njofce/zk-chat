@@ -1,36 +1,18 @@
-<<<<<<< HEAD
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import * as Colors from "../../constants/colors";
-import { faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faTimes, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { clientUrl, roomTypes } from "../../constants/constants";
 import { useAppDispatch } from "../../redux/hooks/useAppDispatch";
-import { addActiveChatRoom } from "../../redux/actions/actionCreator";
+import { addActiveChatRoom, deleteMessagesForRoom } from "../../redux/actions/actionCreator";
 import InviteModal from "../Modals/inviteModal";
 import { useAppSelector } from "../../redux/hooks/useAppSelector";
 import Input from "../Input";
 import ReactTooltip from "react-tooltip";
-=======
-import React, { useEffect, useRef, useState } from "react"
-import styled from "styled-components"
-import * as Colors from "../../constants/colors"
-import { faTimes, faTrash } from "@fortawesome/free-solid-svg-icons"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { clientUrl, roomTypes } from "../../constants/constants"
-import { useAppDispatch } from "../../redux/hooks/useAppDispatch"
-import {
-  addActiveChatRoom,
-  deleteMessagesForRoom
-} from "../../redux/actions/actionCreator"
-import InviteModal from "../Modals/inviteModal"
-import { useAppSelector } from "../../redux/hooks/useAppSelector"
-import Input from "../Input"
-import ExcangeKeysModal from "../Modals/exchangeKeysModal"
-import ReactTooltip from "react-tooltip"
-import { delete_messages_for_room } from "rln-client-lib"
 import ChatMessagesWrapper from "./ChatMessagesWrapper"
->>>>>>> Message flow with local persistance. Sync deleted nodes from interep
+import { delete_messages_for_room } from "rln-client-lib";
+
 
 const StyledChatContainer = styled.div`
   background: white;
@@ -84,17 +66,10 @@ type ChatMessagesProps = {
 }
 
 const ChatMessages = ({ currentActiveRoom }: ChatMessagesProps) => {
-<<<<<<< HEAD
   const [toggleInviteModal, setToggleInviteModal] = useState(false);
   const [isPublicRoomInviteCopied, setIsPublicRoomInviteCopied] = useState(
     false
   );
-=======
-  const [toggleInviteModal, setToggleInviteModal] = useState(false)
-  const [toggleExchangeKeysModal, setToggleExchangeKeysModal] = useState(false)
-  const [isPublicRoomInviteCopied, setIsPublicRoomInviteCopied] =
-    useState(false)
->>>>>>> Message flow with local persistance. Sync deleted nodes from interep
   //@ts-ignore
   const chatHistoryByRoom: any[] = useAppSelector(
     (state) => state.ChatReducer.chatHistory[currentActiveRoom.id]
