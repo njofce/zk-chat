@@ -1,5 +1,5 @@
 import { clearDatabase } from '../jest.setup';
-import { test, expect, describe, afterEach } from '@jest/globals'
+import { test, expect, describe, afterEach, beforeEach } from '@jest/globals'
 import Message from '../../src/persistence/model/message/message.model';
 import { IMessage } from '../../src/persistence/model/message/message.types';
 import ChatService, { ITimeRangeMessages } from '../../src/services/chat.service'
@@ -11,6 +11,10 @@ describe('Test chat service', () => {
     const timestampTodayMs = 1637837920000;
     
     const msecondsPerDay = 86400000;
+
+    beforeEach(async() => {
+        jest.setTimeout(60000);
+    })
 
     afterEach(async () => {
         MockDate.reset();

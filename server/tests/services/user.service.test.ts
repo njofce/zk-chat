@@ -1,11 +1,11 @@
 import { clearDatabase } from '../jest.setup';
 import { test, expect, describe, afterEach } from '@jest/globals'
-import BannedUser from "../../src/persistence/model/banned_user/banned_user.model";
 import { IBannedUser } from "../../src/persistence/model/banned_user/banned_user.types";
-import UserService from '../../src/services/user.service';
-import config from "../../src/config"
 import { MerkleTreeNode, MerkleTreeZero } from '../../src/persistence/model/merkle_tree/merkle_tree.model';
 import Hasher from '../../src/util/hasher';
+import UserService from '../../src/services/user.service';
+import config from "../../src/config"
+import BannedUser from "../../src/persistence/model/banned_user/banned_user.model";
 
 describe('Test user service', () => {
 
@@ -276,9 +276,7 @@ describe('Test user service', () => {
 
         let deletedUser = await MerkleTreeNode.findByLevelAndIndex(0, 1);
         expect(deletedUser).not.toBeNull();
-
-        console.log(deletedUser);
-        // expect(deletedUser.hash).toEqual("0");
+        expect(deletedUser!.hash).not.toEqual(hash1);
     });
 
 });
