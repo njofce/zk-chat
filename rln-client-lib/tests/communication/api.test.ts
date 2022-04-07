@@ -1,3 +1,4 @@
+import { ITimeRangeMessages } from './../../../server/src/services/chat.service';
 import axios, { AxiosStatic } from 'axios'
 import { jest, test, expect, describe, beforeAll } from '@jest/globals'
 import RLNServerApi from '../../src/communication/api';
@@ -221,5 +222,53 @@ describe('Test api', () => {
         const res = await rlnServerApi.deleteKeyExchangeBundles(proof, "test", "test", ["1", "2"]);
         expect(res).toEqual(dataToReturn)
     });
+    test('get time range message history', async() => {
+        const history: ITimeRangeMessages = {
+            requestedFromTimestamp: 0,
+            requestedToTimestamp: 10000,
+            returnedFromTimestamp: 0,
+            returnedToTimestamp: 999,
+            messages: [
+                {
+                    uuid: "1",
+                    epoch: 100,
+                    chat_type: "PUBLIC",
+                    message_content: "content 1"
+                },
+                {
+                    uuid: "2",
+                    epoch: 400,
+                    chat_type: "PUBLIC",
+                    message_content: "content 2"
+                },
+                {
+                    uuid: "3",
+                    epoch: 500,
+                    chat_type: "PUBLIC",
+                    message_content: "content 3"
+                },
+                {
+                    uuid: "4",
+                    epoch: 800,
+                    chat_type: "PUBLIC",
+                    message_content: "content 4"
+                },
+                {
+                    uuid: "5",
+                    epoch: 999,
+                    chat_type: "PUBLIC",
+                    message_content: "content 5"
+                }
+            ],
+            limit: 5
+        };
+
+        mockAxios.mockResolvedValue({
+            data: history
+        });
+
+        const historyFromServer = await rlnServerApi.getTimeRangeChatHistory(1, 2);
+        expect(history).toEqual(historyFromServer);
+    })
 
 });

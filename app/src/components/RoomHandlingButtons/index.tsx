@@ -1,19 +1,19 @@
-import React, { useState } from "react";
-import styled from "styled-components";
-import { faFileExport } from "@fortawesome/free-solid-svg-icons";
-import { faUserPlus } from "@fortawesome/free-solid-svg-icons";
-import { faKey } from "@fortawesome/free-solid-svg-icons";
-import { faPlusCircle, faUserLock } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import RoomOptionsModal from "../Modals";
-import ReactTooltip from "react-tooltip";
-import { saveAs } from "file-saver";
+import React, { useState } from "react"
+import styled from "styled-components"
+import { faFileExport } from "@fortawesome/free-solid-svg-icons"
+import { faUserPlus } from "@fortawesome/free-solid-svg-icons"
+import { faKey } from "@fortawesome/free-solid-svg-icons"
+import { faPlusCircle, faUserLock } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import RoomOptionsModal from "../Modals"
+import ReactTooltip from "react-tooltip"
+import { saveAs } from "file-saver"
 
-import * as Colors from "../../constants/colors";
-import JoinPrivateRoomModal from "../Modals/privateRoomModal";
-import TrustedContactsModal from "../Modals/trustedContactsModal";
-import GeneratePublicKeyModal from "../Modals/generatePublicKey";
-import { export_profile } from "rln-client-lib";
+import * as Colors from "../../constants/colors"
+import JoinPrivateRoomModal from "../Modals/privateRoomModal"
+import TrustedContactsModal from "../Modals/trustedContactsModal"
+import GeneratePublicKeyModal from "../Modals/generatePublicKey"
+import { export_profile } from "rln-client-lib"
 
 const StyledButtonsWrapper = styled.div`
   display: flex;
@@ -27,26 +27,26 @@ const StyledButtonsWrapper = styled.div`
       fill: ${Colors.BERRY_PINK};
     }
   }
-`;
+`
 
 const RoomHandlingButtons = () => {
-  const [toggleModal, setToggleModal] = useState(false);
-  const [toggleJoinPrivateRoom, setToggleJoinPrivateRoom] = useState(false);
-  const [toggleGeneratePublicKey, setToggleGeneratePublicKey] = useState(false);
-  const [toggleTrustedContacts, setToggleTrustedContacts] = useState(false);
+  const [toggleModal, setToggleModal] = useState(false)
+  const [toggleJoinPrivateRoom, setToggleJoinPrivateRoom] = useState(false)
+  const [toggleGeneratePublicKey, setToggleGeneratePublicKey] = useState(false)
+  const [toggleTrustedContacts, setToggleTrustedContacts] = useState(false)
 
   const handleExportProfileClick = async () => {
     try {
-      export_profile().then(json => {
+      export_profile().then((json) => {
         var fileToSave = new Blob([json], {
           type: "application/json"
-        });
-        return saveAs(fileToSave, "Profile.json");
-      });
+        })
+        return saveAs(fileToSave, "Profile.json")
+      })
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
-  };
+  }
 
   return (
     <StyledButtonsWrapper>
@@ -137,7 +137,7 @@ const RoomHandlingButtons = () => {
         setToggleTrustedContacts={setToggleTrustedContacts}
       />
     </StyledButtonsWrapper>
-  );
-};
+  )
+}
 
-export default RoomHandlingButtons;
+export default RoomHandlingButtons

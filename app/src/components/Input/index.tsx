@@ -1,11 +1,11 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React from "react";
-import styled from "styled-components";
-import * as Colors from "../../constants/colors";
-import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
-import { Room } from "../../redux/actions/actionCreator";
-import { send_message } from "rln-client-lib";
-import { toast } from 'react-toastify';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import React from "react"
+import styled from "styled-components"
+import * as Colors from "../../constants/colors"
+import { faPaperPlane } from "@fortawesome/free-solid-svg-icons"
+import { Room } from "../../redux/actions/actionCreator"
+import { send_message } from "rln-client-lib"
+import { toast } from "react-toastify"
 
 const StyledInput = styled.input`
   border: 1px solid #f0f2f5;
@@ -17,7 +17,7 @@ const StyledInput = styled.input`
   &:active {
     outline: none;
   }
-`;
+`
 
 const StyledChatFooterWrapper = styled.div`
   display: flex;
@@ -30,60 +30,60 @@ const StyledChatFooterWrapper = styled.div`
       fill: ${Colors.ANATRACITE};
     }
   }
-`;
+`
 
 type InputProps = {
-  currentActiveRoom: Room;
-};
+  currentActiveRoom: Room
+}
 
 type InputState = {
-  inputValue: string;
-};
+  inputValue: string
+}
 
 class Input extends React.Component<InputProps, InputState> {
   constructor(props: InputProps) {
-    super(props);
+    super(props)
     this.state = {
       inputValue: ""
-    };
+    }
   }
 
   componentDidMount() {
-    window.addEventListener("keydown", this.handleKeyDown);
+    window.addEventListener("keydown", this.handleKeyDown)
   }
   componentWillUnmount() {
-    window.removeEventListener("keydown", this.handleKeyDown);
+    window.removeEventListener("keydown", this.handleKeyDown)
   }
 
-  handleKeyDown = async(event: KeyboardEvent) => {
-    if (event.code === "Enter") 
-      await this.handleMessageSubmit();
-  };
+  handleKeyDown = async (event: KeyboardEvent) => {
+    if (event.code === "Enter") await this.handleMessageSubmit()
+  }
 
-  handleMessageSubmit = async() => {
-    const { inputValue } = this.state;
-    const { currentActiveRoom } = this.props;
+  handleMessageSubmit = async () => {
+    const { inputValue } = this.state
+    const { currentActiveRoom } = this.props
     if (inputValue) {
       try {
-        await send_message(currentActiveRoom.id, inputValue);
+        await send_message(currentActiveRoom.id, inputValue)
         this.setState({ inputValue: "" })
       } catch (error) {
-        toast.error("Error while sending the message. You are either banned from the chat or deleted from InteRep");
+        console.log(error)
+        toast.error(
+          "Error while sending the message. You are either banned from the chat or deleted from InteRep"
+        )
       }
     }
-  };
-
-
+  }
 
   render() {
-    const { inputValue } = this.state;
+    const { inputValue } = this.state
 
     return (
       <StyledChatFooterWrapper>
         <StyledInput
           placeholder={"Write down your message..."}
           value={inputValue}
-          onChange={e => this.setState({ inputValue: e.target.value })}
+          onChange={(e) => this.setState({ inputValue: e.target.value })}
         />{" "}
         <div>
           {" "}
@@ -92,10 +92,9 @@ class Input extends React.Component<InputProps, InputState> {
             onClick={this.handleMessageSubmit}
           />{" "}
         </div>
-
       </StyledChatFooterWrapper>
-    );
+    )
   }
 }
 
-export default Input;
+export default Input

@@ -1,6 +1,6 @@
 import { IMessage, IMessageDocument, IMessageModel } from './message.types';
 import { Schema } from "mongoose";
-import { getDailyMessages } from './message.statics';
+import { getDailyMessages, getMessagesInTimeRange } from './message.statics';
 
 const MessageSchemaFields: Record<keyof IMessage, any> = {
     uuid: { type: String, required: true, unique: true },
@@ -14,5 +14,6 @@ const MessageSchema = new Schema<IMessageDocument, IMessageModel>(
 );
 
 MessageSchema.statics.getDailyMessages = getDailyMessages;
+MessageSchema.statics.getMessagesInTimeRange = getMessagesInTimeRange;
 
 export default MessageSchema;

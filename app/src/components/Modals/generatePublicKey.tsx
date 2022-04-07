@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
-import { Modal, ModalBody, ModalHeader } from "reactstrap";
-import styled from "styled-components";
-import * as Colors from "../../constants/colors";
-import { faCopy } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import ReactTooltip from "react-tooltip";
-import { get_public_key } from "rln-client-lib";
+import { useEffect, useState } from "react"
+import { Modal, ModalBody, ModalHeader } from "reactstrap"
+import styled from "styled-components"
+import * as Colors from "../../constants/colors"
+import { faCopy } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import ReactTooltip from "react-tooltip"
+import { get_public_key } from "rln-client-lib"
 
 const StyledTextarea = styled.textarea`
   border: 1px solid #f0f2f5;
@@ -19,7 +19,7 @@ const StyledTextarea = styled.textarea`
   &:active {
     outline: none;
   }
-`;
+`
 const StyledInviteCodeOuterWrapper = styled.div`
   color: ${Colors.ANATRACITE};
   margin: 8px;
@@ -31,47 +31,47 @@ const StyledInviteCodeOuterWrapper = styled.div`
     position: relative;
     left: 10px;
   }
-`;
+`
 
 type InviteModalProps = {
-  setToggleGeneratePublicKey: (shouldToggle: boolean) => void;
-  toggleGeneratePublicKey: boolean;
-};
+  setToggleGeneratePublicKey: (shouldToggle: boolean) => void
+  toggleGeneratePublicKey: boolean
+}
 
 const GeneratePublicKeyModal = ({
   setToggleGeneratePublicKey,
   toggleGeneratePublicKey
 }: InviteModalProps) => {
-  const [generatedInvite, setDisplayGeneratedInvite] = useState("");
-  const [isInviteCopied, setIsInviteCopied] = useState(false);
+  const [generatedInvite, setDisplayGeneratedInvite] = useState("")
+  const [isInviteCopied, setIsInviteCopied] = useState(false)
 
   useEffect(() => {
-    if (toggleGeneratePublicKey) generatePublicKey();
-  }, [toggleGeneratePublicKey]);
+    if (toggleGeneratePublicKey) generatePublicKey()
+  }, [toggleGeneratePublicKey])
 
   const handleInviteCopying = () => {
     navigator.clipboard.writeText(generatedInvite).then(() => {
-      setIsInviteCopied(true);
-      setTimeout(() => setIsInviteCopied(false), 4000);
-    });
-  };
+      setIsInviteCopied(true)
+      setTimeout(() => setIsInviteCopied(false), 4000)
+    })
+  }
 
   const generatePublicKey = async () => {
     try {
-      get_public_key().then(key => {
-        return setDisplayGeneratedInvite(key);
-      });
+      get_public_key().then((key) => {
+        return setDisplayGeneratedInvite(key)
+      })
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
-  };
+  }
 
   return (
     <Modal centered isOpen={toggleGeneratePublicKey}>
       <ModalHeader
         toggle={() => {
-          setDisplayGeneratedInvite("");
-          setToggleGeneratePublicKey(false);
+          setDisplayGeneratedInvite("")
+          setToggleGeneratePublicKey(false)
         }}
       >
         Generate Public Key
@@ -99,7 +99,7 @@ const GeneratePublicKeyModal = ({
         </StyledInviteCodeOuterWrapper>
       </ModalBody>
     </Modal>
-  );
-};
+  )
+}
 
-export default GeneratePublicKeyModal;
+export default GeneratePublicKeyModal

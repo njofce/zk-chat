@@ -1,15 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import * as Colors from "../../constants/colors";
-import { faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faTimes, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { clientUrl, roomTypes } from "../../constants/constants";
 import { useAppDispatch } from "../../redux/hooks/useAppDispatch";
-import { addActiveChatRoom } from "../../redux/actions/actionCreator";
+import { addActiveChatRoom, deleteMessagesForRoom } from "../../redux/actions/actionCreator";
 import InviteModal from "../Modals/inviteModal";
 import { useAppSelector } from "../../redux/hooks/useAppSelector";
 import Input from "../Input";
 import ReactTooltip from "react-tooltip";
+import ChatMessagesWrapper from "./ChatMessagesWrapper"
+import { delete_messages_for_room } from "rln-client-lib";
+
 
 const StyledChatContainer = styled.div`
   background: white;
@@ -17,32 +20,7 @@ const StyledChatContainer = styled.div`
   border-radius: 18px;
   box-shadow: 0px 8px 14px 0px #a0a0a0;
   padding: 20px 40px;
-`;
-const StyledSingleMessage = styled.div`
-  font-size: 16px;
-  color: black;
-  border-radius: 10px;
-  padding: 8px 12px;
-  margin-bottom: 16px;
-  width: fit-content;
-  text-align: left;
-`;
-const StyledMessagesWrapper = styled.div`
-  overflow-y: scroll;
-  padding: 20px 40px;
-  scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-  height: 85%;
-  div:nth-child(odd) {
-    background: ${Colors.ANATRACITE};
-    color: white;
-  }
-  div:nth-child(even) {
-    background: #f0f2f5;
-  }
-`;
+`
 
 const StyledChatDetailsWrapper = styled.div`
   display: flex;
@@ -53,12 +31,12 @@ const StyledChatDetailsWrapper = styled.div`
       fill: ${Colors.ANATRACITE};
     }
   }
-`;
+`
 const StyledChatRoomsTitle = styled.p`
   color: ${Colors.ANATRACITE};
   font-weight: 600;
   font-size: 24px;
-`;
+`
 
 const StyledButton = styled.button`
   background: ${Colors.BERRY_PINK};
@@ -73,11 +51,19 @@ const StyledButton = styled.button`
     box-shadow: 0px 0px 15px 0px ${Colors.BERRY_PINK};
   }
   width: 180px;
-`;
+`
+
+const StyledIconWrapper = styled.div`
+  margin: 0 30px;
+`
+const StyledChatCommandsWrapper = styled.div`
+  display: flex;
+  align-items: center;
+`
 
 type ChatMessagesProps = {
-  currentActiveRoom: any;
-};
+  currentActiveRoom: any
+}
 
 const ChatMessages = ({ currentActiveRoom }: ChatMessagesProps) => {
   const [toggleInviteModal, setToggleInviteModal] = useState(false);
@@ -86,39 +72,48 @@ const ChatMessages = ({ currentActiveRoom }: ChatMessagesProps) => {
   );
   //@ts-ignore
   const chatHistoryByRoom: any[] = useAppSelector(
-    state => state.ChatReducer.chatHistory[currentActiveRoom.id]
-  );
-  const chatRef = useRef<HTMLDivElement>(null);
-  const dispatch = useAppDispatch();
+    (state) => state.ChatReducer.chatHistory[currentActiveRoom.id]
+  )
+  const stayOnBottom: boolean = useAppSelector(
+    (state) => state.ChatReducer.stayOnBottom
+  )
+  const chatRef = useRef<HTMLDivElement>(null)
+  const dispatch = useAppDispatch()
 
   const scrollToBottom = () => {
     if (chatRef.current) {
       //Scroll to bottom
-      chatRef.current.scrollTop = chatRef.current.scrollHeight;
+      chatRef.current.scrollTop = chatRef.current.scrollHeight
     }
-  };
+  }
 
   useEffect(() => {
-    scrollToBottom();
-  }, [chatHistoryByRoom]);
+    if (stayOnBottom) scrollToBottom()
+  }, [chatHistoryByRoom, stayOnBottom])
 
   const handleActiveChatClosing = () => {
-    dispatch(addActiveChatRoom(undefined));
-  };
+    dispatch(addActiveChatRoom(undefined))
+  }
 
   const handleGenerateInvitePublicRoomLink = () => {
-    const publicRoomInviteLink = `${clientUrl}/public/${currentActiveRoom.id}`;    
+    const publicRoomInviteLink = `${clientUrl}/public/${currentActiveRoom.id}`
     navigator.clipboard.writeText(publicRoomInviteLink).then(() => {
       setIsPublicRoomInviteCopied(true)
-      setTimeout(() => setIsPublicRoomInviteCopied(false), 4000);
-    });
-  };
+      setTimeout(() => setIsPublicRoomInviteCopied(false), 4000)
+    })
+  }
+
+  const handleMessagesDeleting = () => {
+    delete_messages_for_room(currentActiveRoom.id).then(() =>
+      dispatch(deleteMessagesForRoom(currentActiveRoom.id))
+    )
+  }
 
   return (
     <StyledChatContainer className="col">
       <StyledChatDetailsWrapper>
         <StyledChatRoomsTitle>{currentActiveRoom.name}</StyledChatRoomsTitle>
-        <div>
+        <StyledChatCommandsWrapper>
           {currentActiveRoom.type.toLowerCase() === roomTypes.private && (
             <>
               <StyledButton onClick={() => setToggleInviteModal(true)}>
@@ -150,24 +145,37 @@ const ChatMessages = ({ currentActiveRoom }: ChatMessagesProps) => {
               </ReactTooltip>
             </>
           )}
+          <StyledIconWrapper>
+            <FontAwesomeIcon
+              icon={faTrash}
+              onClick={handleMessagesDeleting}
+              data-tip
+              data-for="DeleteContact"
+            />
+            <ReactTooltip
+              event="mouseenter"
+              eventOff="click mouseleave"
+              id="DeleteContact"
+              backgroundColor={Colors.ANATRACITE}
+            >
+              Delete Message History
+            </ReactTooltip>
+          </StyledIconWrapper>
           <FontAwesomeIcon icon={faTimes} onClick={handleActiveChatClosing} />
-        </div>
+        </StyledChatCommandsWrapper>
       </StyledChatDetailsWrapper>{" "}
-      <StyledMessagesWrapper ref={chatRef}>
-        {chatHistoryByRoom?.length > 0 &&
-          chatHistoryByRoom.map(messageObj => (
-            <StyledSingleMessage key={messageObj.uuid}>
-              {messageObj.message_content}
-            </StyledSingleMessage>
-          ))}
-      </StyledMessagesWrapper>
+      <ChatMessagesWrapper
+        chatHistory={chatHistoryByRoom}
+        chatRef={chatRef}
+        currentActiveRoom={currentActiveRoom}
+      />
       <Input currentActiveRoom={currentActiveRoom} />
       <InviteModal
         toggleInviteModal={toggleInviteModal}
         setToggleInviteModal={setToggleInviteModal}
       />
     </StyledChatContainer>
-  );
-};
+  )
+}
 
-export default ChatMessages;
+export default ChatMessages

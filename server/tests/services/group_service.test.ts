@@ -12,7 +12,7 @@ describe('Test group service', () => {
     test('create group', async () => {
         const groupService = new GroupService();
 
-        await groupService.saveGroup('id-1', 'github', 'test_1', 10);
+        await groupService.saveGroup('id-1', 'github', 'test_1', 1, 10);
 
         const allGroups = await Group.find({});
         expect(allGroups.length).toEqual(1);
@@ -21,19 +21,33 @@ describe('Test group service', () => {
     test('update size', async () => {
         const groupService = new GroupService();
 
-        await groupService.saveGroup('id-1', 'github', 'test_1', 10);
+        await groupService.saveGroup('id-1', 'github', 'test_1', 10, 10);
 
         await groupService.updateSize('id-1', 15);
 
         const allGroups = await Group.find({});
         expect(allGroups.length).toEqual(1);
         expect(allGroups[0].size).toEqual(15);
+        expect(allGroups[0].number_of_leaves).toEqual(10);
+    });
+
+    test('update leaf count', async () => {
+        const groupService = new GroupService();
+
+        await groupService.saveGroup('id-1', 'github', 'test_1', 10, 10);
+
+        await groupService.updateNumberOfLeaves('id-1', 15);
+
+        const allGroups = await Group.find({});
+        expect(allGroups.length).toEqual(1);
+        expect(allGroups[0].size).toEqual(10);
+        expect(allGroups[0].number_of_leaves).toEqual(15);
     });
 
     test('contains group', async () => {
         const groupService = new GroupService();
 
-        await groupService.saveGroup('id-1', 'github', 'test_1', 10);
+        await groupService.saveGroup('id-1', 'github', 'test_1', 1, 10);
 
         const containsGroup1 = await groupService.containsGroup("id-1");
         expect(containsGroup1).toBeTruthy();
@@ -48,8 +62,8 @@ describe('Test group service', () => {
         const groups = await groupService.getGroups();
         expect(groups.length).toEqual(0);
 
-        await groupService.saveGroup('id-1', 'github', 'test_1', 10);
-        await groupService.saveGroup('id-2', 'github', 'test_2', 10);
+        await groupService.saveGroup('id-1', 'github', 'test_1',1,  10);
+        await groupService.saveGroup('id-2', 'github', 'test_2', 1, 10);
 
         const groups2 = await groupService.getGroups();
         expect(groups2.length).toEqual(2);

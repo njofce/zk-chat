@@ -24,21 +24,21 @@ const StyledButton = styled.button`
     box-shadow: 0px 0px 15px 0px ${Colors.ANATRACITE};
   }
   width: 200px;
-`;
+`
 
 const StyledInviteCodeOuterWrapper = styled.div`
   color: ${Colors.ANATRACITE};
   margin: 8px;
   display: flex;
   align-items: center;
-  
+
   svg {
     font-size: 30px;
     cursor: pointer;
     position: relative;
     left: 10px;
   }
-`;
+`
 const StyledInviteCodeInnerWrapper = styled.div`
   border: 1px solid #f0f2f5;
   border-radius: 20px;
@@ -47,39 +47,40 @@ const StyledInviteCodeInnerWrapper = styled.div`
   padding: 8px 12px;
   margin: 10px 0;
   word-break: break-all;
-`;
- 
+`
+
 type InviteModalProps = {
-  setToggleInviteModal: (shouldToggle: boolean) => void;
-  toggleInviteModal: boolean;
-};
+  setToggleInviteModal: (shouldToggle: boolean) => void
+  toggleInviteModal: boolean
+}
 
 const InviteModal = ({
   setToggleInviteModal,
   toggleInviteModal
 }: InviteModalProps) => {
-  const [keyValue, setKeyValue] = useState("");
-  const [generatedInvite, setDisplayGeneratedInvite] = useState("");
-  const [isInviteCopied, setIsInviteCopied] = useState(false);
+  const [keyValue, setKeyValue] = useState("")
+  const [generatedInvite, setDisplayGeneratedInvite] = useState("")
+  const [isInviteCopied, setIsInviteCopied] = useState(false)
   //@ts-ignore
-  const currentActiveRoom: Room   = useAppSelector(
-    state => state.ChatReducer.currentActiveRoom
-  );
+  const currentActiveRoom: Room = useAppSelector(
+    (state) => state.ChatReducer.currentActiveRoom
+  )
   const handleInviteCopying = () => {
-    setIsInviteCopied(true);
+    setIsInviteCopied(true)
     navigator.clipboard.writeText(generatedInvite).then(() => {
-      setTimeout(() => setIsInviteCopied(false), 4000);
-    });
-  };
+      setTimeout(() => setIsInviteCopied(false), 4000)
+    })
+  }
 
-  const handleGenerateInvite = async () => {     
+  const handleGenerateInvite = async () => {
     try {
-      await invite_private_room(currentActiveRoom?.id, keyValue).then(invite => setDisplayGeneratedInvite(invite)
-    );
+      await invite_private_room(currentActiveRoom?.id, keyValue).then(
+        (invite) => setDisplayGeneratedInvite(invite)
+      )
     } catch (error) {
       console.log(error)
     }
-  }; 
+  }
 
   return (
     <Modal centered isOpen={toggleInviteModal}>
@@ -121,7 +122,7 @@ const InviteModal = ({
         )}
       </ModalBody>
     </Modal>
-  );
-};
+  )
+}
 
-export default InviteModal;
+export default InviteModal

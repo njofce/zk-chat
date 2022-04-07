@@ -1,14 +1,15 @@
 import { clearDatabase } from '../jest.setup';
-import { test, expect, describe, afterEach } from '@jest/globals'
+import { test, expect, describe, afterEach, beforeEach } from '@jest/globals'
 import Message from '../../src/persistence/model/message/message.model';
 import { IMessage } from '../../src/persistence/model/message/message.types';
-import ChatService from '../../src/services/chat.service'
+import ChatService, { ITimeRangeMessages } from '../../src/services/chat.service'
 
 import MockDate from 'mockdate';
 
 describe('Test chat service', () => {
 
     const timestampTodayMs = 1637837920000;
+    
     const msecondsPerDay = 86400000;
 
     afterEach(async () => {
@@ -47,6 +48,128 @@ describe('Test chat service', () => {
         const data: IMessage[] = await chatService.getDailyMessages();
         expect(data.length).toEqual(1);
     });
+
+    test('get messages in time range - invalid range', async () => {
+        jest.setTimeout(30000);
+        const chatService = new ChatService();
+
+        try {
+            await chatService.getMessagesInTimeRange(new Date(timestampTodayMs), new Date(timestampTodayMs - 10));
+            expect(false).toBeTruthy();
+        } catch (e: any) {
+            expect(true).toBeTruthy();
+            expect(e.message).toEqual("Please select valid date range");
+        }
+    })
+
+    test('get messages in time range - 1', async () => {
+        jest.setTimeout(30000);
+        const chatService = new ChatService();
+
+        for (let i = 0; i < 100; i++) {
+            const timestamp = timestampTodayMs + 60000 * i; // 1 minute apart
+            await insertMessage(i, timestamp);
+        }
+
+        const lastItemTimestamp = timestampTodayMs + 9 * 60000
+        const messageData: ITimeRangeMessages = await chatService.getMessagesInTimeRange(
+            new Date(timestampTodayMs), 
+            new Date(lastItemTimestamp + 100));
+
+        expect(messageData.messages.length).toEqual(10);
+        expect(messageData.returnedFromTimestamp).toEqual(timestampTodayMs);
+        expect(messageData.returnedToTimestamp).toEqual(lastItemTimestamp);
+    })
+
+    test('get messages in time range - 2', async () => {
+        jest.setTimeout(30000);
+        const chatService = new ChatService();
+
+        for (let i = 0; i < 100; i++) {
+            const timestamp = timestampTodayMs + 60000 * i; // 1 minute apart
+            await insertMessage(i, timestamp);
+        }
+
+        const lastItemTimestamp = timestampTodayMs + 9 * 60000
+        const messageData: ITimeRangeMessages = await chatService.getMessagesInTimeRange(
+            new Date(timestampTodayMs + 100),
+            new Date(lastItemTimestamp + 100));
+
+        expect(messageData.messages.length).toEqual(10 - 1); // the first one is not returned
+        expect(messageData.returnedFromTimestamp).toEqual((timestampTodayMs + 60000));
+        expect(messageData.returnedToTimestamp).toEqual(lastItemTimestamp);
+    })
+
+    test('get messages in time range - pagination single page', async () => {
+        jest.setTimeout(30000);
+        const chatService = new ChatService();
+
+        for (let i = 0; i < ChatService.MESSAGE_COUNT_LIMIT + 100; i++) {
+            const timestamp = timestampTodayMs + 60000 * i; // 1 minute apart
+            await insertMessage(i, timestamp);
+        }
+
+        const numberOfMessagesMoreThanLimit = 10;
+        const lastItemTimestamp = timestampTodayMs + (ChatService.MESSAGE_COUNT_LIMIT + numberOfMessagesMoreThanLimit) * 60000
+        const messageData: ITimeRangeMessages = await chatService.getMessagesInTimeRange(
+            new Date(timestampTodayMs),
+            new Date(lastItemTimestamp + 100));
+
+        expect(messageData.messages.length).toEqual(ChatService.MESSAGE_COUNT_LIMIT); // no more than limit gets returned
+        
+        expect(messageData.returnedFromTimestamp).toEqual(timestampTodayMs);
+        
+        expect(messageData.returnedToTimestamp).toEqual((lastItemTimestamp - (numberOfMessagesMoreThanLimit + 1) * 60000));
+    })
+
+    test('get messages in time range - pagination single page no items', async () => {
+        jest.setTimeout(30000);
+        const chatService = new ChatService();
+
+        const numberOfMessagesMoreThanLimit = 10;
+        const lastItemTimestamp = timestampTodayMs + (ChatService.MESSAGE_COUNT_LIMIT + numberOfMessagesMoreThanLimit) * 60000
+        const messageData: ITimeRangeMessages = await chatService.getMessagesInTimeRange(
+            new Date(timestampTodayMs),
+            new Date(lastItemTimestamp + 100));
+
+        expect(messageData.messages.length).toEqual(0);
+
+        expect(messageData.returnedFromTimestamp).toEqual(timestampTodayMs);
+        expect(messageData.returnedToTimestamp).toEqual(lastItemTimestamp + 100);
+    })
+
+    test('get messages in time range - pagination all pages', async () => {
+        jest.setTimeout(30000);
+        const chatService = new ChatService();
+
+        for (let i = 0; i < ChatService.MESSAGE_COUNT_LIMIT + 100; i++) {
+            const timestamp = timestampTodayMs + 60000 * i; // 1 minute apart
+            await insertMessage(i, timestamp);
+        }
+
+        let messages: IMessage[] = [];
+        const numberOfMessagesMoreThanLimit = 10;
+        const lastItemTimestamp = timestampTodayMs + (ChatService.MESSAGE_COUNT_LIMIT + numberOfMessagesMoreThanLimit) * 60000;
+
+        // Pagination needs to load all until now.
+        const toTimestamp = new Date();
+        let fromTimestamp = new Date(timestampTodayMs);
+        let messageData: ITimeRangeMessages = await chatService.getMessagesInTimeRange(fromTimestamp, toTimestamp);
+        messages = messages.concat(messageData.messages);
+
+        while(1) {
+            if (messageData.messages.length == messageData.limit) {
+                fromTimestamp = new Date(messageData.returnedToTimestamp + 1)
+                messageData = await chatService.getMessagesInTimeRange(fromTimestamp, toTimestamp);
+                messages = messages.concat(messageData.messages);
+            } else {
+                break;
+            }
+        }
+
+        expect(messages.length).toEqual(ChatService.MESSAGE_COUNT_LIMIT + 100);
+    })
+
 
 });
 

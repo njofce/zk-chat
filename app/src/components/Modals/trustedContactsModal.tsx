@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
-import { Modal, ModalBody, ModalHeader } from "reactstrap";
-import styled from "styled-components";
-import * as Colors from "../../constants/colors";
-import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import ReactTooltip from "react-tooltip";
+import { useEffect, useState } from "react"
+import { Modal, ModalBody, ModalHeader } from "reactstrap"
+import styled from "styled-components"
+import * as Colors from "../../constants/colors"
+import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import ReactTooltip from "react-tooltip"
 import {
     delete_contact,
     get_contact,
@@ -28,7 +28,7 @@ const StyledTextarea = styled.textarea`
   &:active {
     outline: none;
   }
-`;
+`
 
 const StyledInput = styled.input`
   border: 1px solid #f0f2f5;
@@ -40,7 +40,7 @@ const StyledInput = styled.input`
   &:active {
     outline: none;
   }
-`;
+`
 
 const StyledButton = styled.button`
   background: ${Colors.ANATRACITE};
@@ -55,7 +55,7 @@ const StyledButton = styled.button`
     box-shadow: 0px 0px 15px 0px ${Colors.ANATRACITE};
   }
   width: 200px;
-`;
+`
 
 const StyledContactWrapper = styled.div`
   display: flex;
@@ -69,7 +69,7 @@ const StyledContactWrapper = styled.div`
       fill: ${Colors.ANATRACITE};
     }
   }
-`;
+`
 
 const StyledContactName = styled.div`
   background: ${Colors.BERRY_PINK};
@@ -81,40 +81,40 @@ const StyledContactName = styled.div`
   color: white;
   min-width: 300px;
   text-align: center;
-`;
+`
 
 const StyledButtonWrapper = styled.div`
   display: flex;
   justify-content: center;
   margin-top: 20px;
-`;
+`
 
 const StyledInputLabel = styled.div`
   font-size: 12px;
   padding: 0 10px;
   color: ${Colors.ANATRACITE};
   margin-top: 25px;
-`;
+`
 
 type TrustedContactsProps = {
-    setToggleTrustedContacts: (shouldToggle: boolean) => void;
-    toggleTrustedContacts: boolean;
-};
+  setToggleTrustedContacts: (shouldToggle: boolean) => void
+  toggleTrustedContacts: boolean
+}
 
 const TrustedContactsModal = ({
-    setToggleTrustedContacts,
-    toggleTrustedContacts
+  setToggleTrustedContacts,
+  toggleTrustedContacts
 }: TrustedContactsProps) => {
-    const [toggleAddEditModal, setToggleAddEditModal] = useState(false);
-    const [editContactName, setEditContactName] = useState("");
-    const trustedContacts = useAppSelector(
-        state => state.ChatReducer.trustedContacts
-    );
-    const dispatch = useAppDispatch();
+  const [toggleAddEditModal, setToggleAddEditModal] = useState(false)
+  const [editContactName, setEditContactName] = useState("")
+  const trustedContacts = useAppSelector(
+    (state) => state.ChatReducer.trustedContacts
+  )
+  const dispatch = useAppDispatch()
 
-    useEffect(() => {
-        dispatch(getTrustedContacts());
-    }, [toggleTrustedContacts]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    dispatch(getTrustedContacts())
+  }, [toggleTrustedContacts]) // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleContactDeleting = (name: string) => {
         if (name) {
@@ -187,106 +187,106 @@ const TrustedContactsModal = ({
                     </StyledButton>
                 </StyledButtonWrapper>
 
-                <AddEditContactModal
-                    name={editContactName}
-                    setToggleAddEditModal={setToggleAddEditModal}
-                    toggleAddEditModal={toggleAddEditModal}
-                    setEditContactName={setEditContactName}
-                />
-            </ModalBody>
-        </Modal>
-    );
-};
+        <AddEditContactModal
+          name={editContactName}
+          setToggleAddEditModal={setToggleAddEditModal}
+          toggleAddEditModal={toggleAddEditModal}
+          setEditContactName={setEditContactName}
+        />
+      </ModalBody>
+    </Modal>
+  )
+}
 
 type AddEditModalProps = {
-    name?: string;
-    setToggleAddEditModal: (shouldToggle: boolean) => void;
-    toggleAddEditModal: boolean;
-    setEditContactName: (name: string) => void;
-};
+  name?: string
+  setToggleAddEditModal: (shouldToggle: boolean) => void
+  toggleAddEditModal: boolean
+  setEditContactName: (name: string) => void
+}
 
 const AddEditContactModal = ({
-    name,
-    setToggleAddEditModal,
-    toggleAddEditModal,
-    setEditContactName
+  name,
+  setToggleAddEditModal,
+  toggleAddEditModal,
+  setEditContactName
 }: AddEditModalProps) => {
-    const [contactName, setContactName] = useState("");
-    const [publicKey, setPublicKey] = useState("");
-    const dispatch = useAppDispatch();
+  const [contactName, setContactName] = useState("")
+  const [publicKey, setPublicKey] = useState("")
+  const dispatch = useAppDispatch()
 
-    useEffect(() => {
-        if (name) {
-            get_contact(name)
-                .then(contactDetails => {
-                    setContactName(contactDetails.name);
-                    setPublicKey(contactDetails.publicKey);
-                })
-                .catch(err => toast.error(err));
-        }
-    }, [toggleAddEditModal]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (name) {
+      get_contact(name)
+        .then((contactDetails) => {
+          setContactName(contactDetails.name)
+          setPublicKey(contactDetails.publicKey)
+        })
+        .catch((err) => toast.error(err))
+    }
+  }, [toggleAddEditModal]) // eslint-disable-line react-hooks/exhaustive-deps
 
-    const handleContactSaving = () => {
-        if (contactName && publicKey) {
-            if (name) {
-                update_contact(name, contactName, publicKey)
-                    .then(() => {
-                        dispatch(getTrustedContacts());
-                        setPublicKey("");
-                        setContactName("");
-                        setEditContactName("");
-                        setToggleAddEditModal(false);
-                    })
-                    .catch(err => toast.error(err));
-            } else {
-                insert_contact(contactName, publicKey)
-                    .then(() => {
-                        dispatch(getTrustedContacts());
-                        setPublicKey("");
-                        setContactName("");
-                        setEditContactName("");
-                        setToggleAddEditModal(false);
-                    })
-                    .catch(err => toast.error(err));
-            }
-        }
-    };
+  const handleContactSaving = () => {
+    if (contactName && publicKey) {
+      if (name) {
+        update_contact(name, contactName, publicKey)
+          .then(() => {
+            dispatch(getTrustedContacts())
+            setPublicKey("")
+            setContactName("")
+            setEditContactName("")
+            setToggleAddEditModal(false)
+          })
+          .catch((err) => toast.error(err))
+      } else {
+        insert_contact(contactName, publicKey)
+          .then(() => {
+            dispatch(getTrustedContacts())
+            setPublicKey("")
+            setContactName("")
+            setEditContactName("")
+            setToggleAddEditModal(false)
+          })
+          .catch((err) => toast.error(err))
+      }
+    }
+  }
 
-    return (
-        <Modal centered isOpen={toggleAddEditModal}>
-            <ModalHeader
-                toggle={() => {
-                    setContactName("");
-                    setPublicKey("");
-                    setEditContactName("");
-                    setToggleAddEditModal(false);
-                }}
-            >
-                {name ? "Edit Contact" : "Create Trusted Contact"}
-            </ModalHeader>
-            <ModalBody>
-                <StyledInputLabel>Name </StyledInputLabel>
-                <StyledInput
-                    value={contactName}
-                    placeholder="Write down your trusted contact's name"
-                    onChange={e => setContactName(e.target.value)}
-                />
+  return (
+    <Modal centered isOpen={toggleAddEditModal}>
+      <ModalHeader
+        toggle={() => {
+          setContactName("")
+          setPublicKey("")
+          setEditContactName("")
+          setToggleAddEditModal(false)
+        }}
+      >
+        {name ? "Edit Contact" : "Create Trusted Contact"}
+      </ModalHeader>
+      <ModalBody>
+        <StyledInputLabel>Name </StyledInputLabel>
+        <StyledInput
+          value={contactName}
+          placeholder="Write down your trusted contact's name"
+          onChange={(e) => setContactName(e.target.value)}
+        />
 
-                <StyledInputLabel> Public Key </StyledInputLabel>
-                <StyledTextarea
-                    value={publicKey}
-                    rows={10}
-                    placeholder="Enter public key"
-                    onChange={e => setPublicKey(e.target.value)}
-                />
-                <StyledButtonWrapper>
-                    <StyledButton onClick={handleContactSaving}>
-                        {name ? "Update" : "Create"}
-                    </StyledButton>
-                </StyledButtonWrapper>
-            </ModalBody>
-        </Modal>
-    );
-};
+        <StyledInputLabel> Public Key </StyledInputLabel>
+        <StyledTextarea
+          value={publicKey}
+          rows={10}
+          placeholder="Enter public key"
+          onChange={(e) => setPublicKey(e.target.value)}
+        />
+        <StyledButtonWrapper>
+          <StyledButton onClick={handleContactSaving}>
+            {name ? "Update" : "Create"}
+          </StyledButton>
+        </StyledButtonWrapper>
+      </ModalBody>
+    </Modal>
+  )
+}
 
-export default TrustedContactsModal;
+export default TrustedContactsModal

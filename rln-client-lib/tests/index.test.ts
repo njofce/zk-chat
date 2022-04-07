@@ -16,6 +16,9 @@ import {
     join_private_room,
     create_direct_room,
     get_chat_history,
+    sync_message_history,
+    delete_messages_for_room,
+    get_messages_for_room,
     get_public_key,
     export_profile,
     recover_profile,
@@ -159,7 +162,6 @@ class LocalTestCryptography implements ICryptography {
     }
 }
 
-
 describe('Test main', () => {
 
     const proof_generator_callback = async (nullifier: string, signal: string, storage_artifacts: any, rln_identitifer: any): Promise<any> => {
@@ -209,7 +211,6 @@ describe('Test main', () => {
             expect(true).toBeTruthy();
         }
     });
-
 
     test('init - default params, profile exists', async () => {
         jest.spyOn(ServerCommunication.prototype, "init").mockImplementation(() => {
@@ -577,7 +578,7 @@ describe('Test main', () => {
     test('get chat history', async () => {
         // No profile
         try {
-            await get_public_key();
+            await get_chat_history();
             expect(true).toBeFalsy();
         } catch (e) {
             expect(true).toBeTruthy();
@@ -608,32 +609,107 @@ describe('Test main', () => {
             if (message.uuid == 'id-1') {
                 return [{
                     uuid: "id-1",
-                    message: "Decrypted 1",
+                    chat_type: "PUBLIC",
+                    message_content: "Decrypted 1",
                     epoch: 1
                 }, 'room-1'];
             }
             if (message.uuid == 'id-2') {
                 return [{
                     uuid: "id-2",
-                    message: "Decrypted 2",
+                    chat_type: "PUBLIC",
+                    message_content: "Decrypted 2",
                     epoch: 2
                 }, 'room-1'];
             }
             if (message.uuid == 'id-3') {
                 return [{
                     uuid: "id-3",
-                    message: "Decrypted 3",
+                    chat_type: "PUBLIC",
+                    message_content: "Decrypted 3",
                     epoch: 3
                 }, 'room-2'];
             }
+
+            return [null, null];
         })
-        
 
         const chatHistory = await get_chat_history();
         expect(Object.keys(chatHistory)).toEqual(['room-1', 'room-2']);
         expect(chatHistory['room-1'].length).toEqual(2);
         expect(chatHistory['room-2'].length).toEqual(1);
     });
+
+    test('sync message history', async() => {
+        // No profile
+        try {
+            await sync_message_history();
+            expect(true).toBeFalsy();
+        } catch (e) {
+            expect(true).toBeTruthy();
+        }
+
+        // With profile
+        await init_new_profile();
+
+        const spy = jest.spyOn(ChatManager.prototype, "syncMessagesForAllRooms").mockResolvedValue();
+
+        await sync_message_history();
+
+        expect(spy).toHaveBeenCalled();
+    })
+
+    test('delete messages for room', async () => {
+        // No profile
+        try {
+            await delete_messages_for_room("id-1");
+            expect(true).toBeFalsy();
+        } catch (e) {
+            expect(true).toBeTruthy();
+        }
+
+        // With profile
+        await init_new_profile();
+
+        const spy = jest.spyOn(ChatManager.prototype, "deleteMessageHistoryForRoom").mockResolvedValue();
+
+        await delete_messages_for_room("id-1");
+
+        expect(spy).toHaveBeenCalled();
+    })
+
+    test('get messages for room', async () => {
+        // No profile
+        try {
+            await get_messages_for_room("id-1", 1);
+            expect(true).toBeFalsy();
+        } catch (e) {
+            expect(true).toBeTruthy();
+        }
+
+        // With profile
+        await init_new_profile();
+
+        const spy = jest.spyOn(ChatManager.prototype, "loadMessagesForRoom").mockResolvedValue(
+            [
+                {
+                    uuid: "1",
+                    epoch: 100,
+                    chat_type: "PUBLIC",
+                    message_content: "content 1"
+                },
+                {
+                    uuid: "2",
+                    epoch: 102,
+                    chat_type: "PUBLIC",
+                    message_content: "content 2"
+                }
+            ]);
+
+        await get_messages_for_room("id-1", 1);
+
+        expect(spy).toHaveBeenCalled();
+    })
 
     test('get public key', async () => {
         // No profile

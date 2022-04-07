@@ -47,6 +47,10 @@ export class ServerCommunication {
         return await this.rln_server.getChatHistory();
     }
 
+    public async getTimeRangeChatHistory(from: number, to: number) {
+        return await this.rln_server.getTimeRangeChatHistory(from, to);
+    }
+
     public async getRlnRoot() {
         return await this.rln_server.getRlnRoot();
     }

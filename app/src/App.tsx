@@ -1,6 +1,6 @@
-import "./App.scss";
-import { BrowserRouter } from "react-router-dom";
-import AppWrapper from "./components/AppWrapper";
+import "./App.scss"
+import { BrowserRouter } from "react-router-dom"
+import AppWrapper from "./components/AppWrapper"
 
 function App() {
   return (
@@ -11,7 +11,7 @@ function App() {
         </div>
       </div>
     </BrowserRouter>
-  );
+  )
 }
 
-export default App;
+export default App

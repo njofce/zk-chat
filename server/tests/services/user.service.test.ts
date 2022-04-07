@@ -1,11 +1,11 @@
 import { clearDatabase } from '../jest.setup';
 import { test, expect, describe, afterEach } from '@jest/globals'
-import BannedUser from "../../src/persistence/model/banned_user/banned_user.model";
 import { IBannedUser } from "../../src/persistence/model/banned_user/banned_user.types";
-import UserService from '../../src/services/user.service';
-import config from "../../src/config"
 import { MerkleTreeNode, MerkleTreeZero } from '../../src/persistence/model/merkle_tree/merkle_tree.model';
 import Hasher from '../../src/util/hasher';
+import UserService from '../../src/services/user.service';
+import config from "../../src/config"
+import BannedUser from "../../src/persistence/model/banned_user/banned_user.model";
 
 describe('Test user service', () => {
 
@@ -178,7 +178,7 @@ describe('Test user service', () => {
         expect(allNodes.length).toEqual(17); // user exists, was not added
     });
 
-    test('remove user - exists', async () => {
+    test('ban user - exists', async () => {
         const user_service = new UserService();
         await testSeedZeros(BigInt(0));
 
@@ -199,16 +199,16 @@ describe('Test user service', () => {
 
         expect(result2).toEqual("Done");
 
-        await user_service.removeUser(BigInt(2 ^ 244).toString(), BigInt(13^120));
+        await user_service.banUser(BigInt(2 ^ 244).toString(), BigInt(13^120));
 
         const allBannedUsers: IBannedUser[] = await user_service.getAllBannedUsers();
         expect(allBannedUsers.length).toEqual(1);
     });
 
-    test('remove user - not exists', async () => {
+    test('ban user - not exists', async () => {
         const user_service = new UserService();
         try {
-            await user_service.removeUser(BigInt(2 ^ 244).toString(), BigInt(11111));
+            await user_service.banUser(BigInt(2 ^ 244).toString(), BigInt(11111));
             expect(false).toBeTruthy();
         } catch(e) {
             expect(e).toEqual("The user doesn't exists");
@@ -253,6 +253,30 @@ describe('Test user service', () => {
         } catch(e) {
             expect(e).toEqual("The user with identity commitment " + hash + " doesn't exists")
         }
+    });
+
+    test('remove users by indexes - exists', async () => {
+        const user_service = new UserService();
+        await testSeedZeros(BigInt(0));
+
+        const hash1 = BigInt(2 ^ 244).toString();
+        const hash2 = BigInt(3 ^ 244).toString();
+
+        await user_service.appendUsers([{
+            index: 1,
+            identityCommitment: hash1
+        }], "id-1");
+
+        await user_service.appendUsers([{
+            index: 2,
+            identityCommitment: hash2
+        }], "id-1");
+
+        await user_service.removeUsersByIndexes([1], 'id-1');
+
+        let deletedUser = await MerkleTreeNode.findByLevelAndIndex(0, 1);
+        expect(deletedUser).not.toBeNull();
+        expect(deletedUser!.hash).not.toEqual(hash1);
     });
 
 });

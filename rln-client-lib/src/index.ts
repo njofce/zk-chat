@@ -15,6 +15,8 @@ import { IPrivateRoom, IDirectRoom } from './room/interfaces';
 import WebsocketClient from './communication/websocket';
 import WsSocketClient from './communication/ws-socket';
 import KeyExchangeManager from './key-exchange';
+import { IChatHistoryDB, IMessage } from './chat/interfaces';
+import { LocalChatDB } from './chat/db';
 
 let communication: ServerCommunication | null = null;
 let generated_storage_provider: StorageProvider | null = null;
@@ -22,6 +24,7 @@ let generated_cryptography: ICryptography | null = null;
 let profile_manager: ProfileManager | null = null;
 let key_exchange_manager: KeyExchangeManager | null = null;
 let chat_manager: ChatManager;
+let message_db: IChatHistoryDB;
 
 let get_proof_callback: (nullifier: string, signal: string, storage_artifacts: any, rln_identitifer: any) => Promise <any>;
 
@@ -43,6 +46,10 @@ const init = async (
         communication = new ServerCommunication(new RLNServerApi(server_config.serverUrl), socket_client);
         await communication.init();
     }
+
+    if (message_db == null) {
+        message_db = new LocalChatDB();
+    }
     
     if (storage_provider) {
         generated_storage_provider = storage_provider;
@@ -57,7 +64,7 @@ const init = async (
     }
 
     profile_manager = new ProfileManager(generated_storage_provider, generated_cryptography);
-    chat_manager = new ChatManager(profile_manager, communication, generated_cryptography);
+    chat_manager = new ChatManager(profile_manager, communication, generated_cryptography, message_db);
 
     const root: string = await communication.getRlnRoot();
     const leaves: string[] = await communication.getLeaves();
@@ -98,7 +105,7 @@ const send_message = async (chat_room_id: string, raw_message: string) => {
     await chat_manager.sendMessage(chat_room_id, raw_message, get_proof_callback);
 }
 
-const receive_message = async(receive_msg_callback: (message: any, chat_room_id: string) => void) => {
+const receive_message = async(receive_msg_callback: (message: IMessage, chat_room_id: string) => void) => {
     if (profile_manager == null || chat_manager == null)
         throw "init() not called";
 
@@ -247,6 +254,9 @@ const create_direct_room = async (name: string, receiver_public_key: string) => 
     return room;
 }
 
+/**
+ * @deprecated use persistent storage for chat history.
+ */
 const get_chat_history = async () => {
     if (generated_cryptography == null || communication == null || profile_manager == null)
         throw "init() not called";
@@ -266,6 +276,36 @@ const get_chat_history = async () => {
     }
 
     return groupBy(decrypted_messages, "room_id");
+}
+
+const sync_message_history = async () => {
+    if (generated_cryptography == null || communication == null || profile_manager == null)
+        throw "init() not called";
+
+    const timestampNow: number = new Date().getTime();
+
+    await chat_manager.syncMessagesForAllRooms(timestampNow);
+}
+
+const delete_messages_for_room = async(room_id: string) => {
+    if (generated_cryptography == null || communication == null || profile_manager == null)
+        throw "init() not called";
+
+    await chat_manager.deleteMessageHistoryForRoom(room_id);
+}
+
+const get_messages_for_room = async(room_id: string, from_timestamp: number) => {
+    if (generated_cryptography == null || communication == null || profile_manager == null)
+        throw "init() not called";
+
+    return await chat_manager.loadMessagesForRoom(room_id, from_timestamp);
+}
+
+const get_messages_for_rooms = async (room_ids: string[], from_timestamp: number) => {
+    if (generated_cryptography == null || communication == null || profile_manager == null)
+        throw "init() not called";
+
+    return await chat_manager.loadMessagesForRooms(room_ids, from_timestamp);
 }
 
 const get_public_key = async() => {
@@ -354,6 +394,10 @@ export {
     update_direct_room_key,
     create_direct_room, 
     get_chat_history, 
+    sync_message_history,
+    delete_messages_for_room,
+    get_messages_for_room,
+    get_messages_for_rooms,
     get_public_key,
     export_profile,
     recover_profile,

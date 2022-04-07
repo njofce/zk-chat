@@ -46,7 +46,7 @@ class InterRepSynchronizer {
         let tree_root_changed = false;
 
         // 2. For each group, check the status in database. Only load new members for group if the size in db is different than the new size of the group
-        for (let    g of allGroupsOnNet) {
+        for (let g of allGroupsOnNet) {
             const g_id = g.provider + "_" + g.name;
             const groupInDb: IGroup | undefined = groupsInDb.find(x => x.group_id == g_id && x.name == g.name && x.provider == g.provider);
 
@@ -57,26 +57,43 @@ class InterRepSynchronizer {
                     // Add all members to the tree
                     await this.userService.appendUsers(groupMembers, g_id);
                     // Persist the group
-                    await this.groupService.saveGroup(g_id, g.provider, g.name, g.numberOfLeaves);
+                    await this.groupService.saveGroup(g_id, g.provider, g.name, g.size, g.numberOfLeaves);
 
                     tree_root_changed = true;
                 } catch (e) {
                     console.log("Unknown error while saving group", e);
                 }
             } else {
-                // Group exists, load new members only if sizes differ (new members got added in InterRep)
-                if (g.numberOfLeaves > groupInDb.size) {
+                // Group exists locally, load new members only if the number of leaves in interep is > number of leaves stored locally
+                if (g.numberOfLeaves > groupInDb.number_of_leaves) {
                     // Load members from groupInDb.size up to g.numberOfLeaves
-                    const groupMembers: IGroupMember[] = await this.loadGroupMembersWithPagination(g.provider, g.name, groupInDb.size, g.numberOfLeaves);
+                    const groupMembers: IGroupMember[] = await this.loadGroupMembersWithPagination(g.provider, g.name, groupInDb.number_of_leaves, g.numberOfLeaves);
                     try {
                         // Add group members to the tree
                         await this.userService.appendUsers(groupMembers, g_id);
-                        // Update group in DB
-                        await this.groupService.updateSize(g_id, g.numberOfLeaves);
+                        // Update group leaf count in DB
+                        await this.groupService.updateNumberOfLeaves(g_id, g.numberOfLeaves);
 
                         tree_root_changed = true;
                     } catch (e) {
-                        console.log("Unknown error while saving group", e);
+                        console.log("Unknown error while saving group - appending new members", e);
+                    }
+                }
+
+                // Group exists locally, delete members that were removed from interep.
+                if (g.size != groupInDb.size) {
+                    // Load all deleted indexes from interep
+                    const indexesOfRemovedMembers: number[] = await this.loadRemovedGroupMembersWithPagination(g.provider, g.name, 0, g.size);
+                    try {
+                        // Remove members from the tree
+                        await this.userService.removeUsersByIndexes(indexesOfRemovedMembers, groupInDb.group_id);
+                        
+                        // Update group size in DB
+                        await this.groupService.updateSize(g_id, g.size);
+
+                        tree_root_changed = true;
+                    } catch (e) {
+                        console.log("Unknown error while saving group - removing deleted members", e);
                     }
                 }
             }
@@ -104,6 +121,24 @@ class InterRepSynchronizer {
         }
 
         return loadedMembers;
+    }
+
+    private async loadRemovedGroupMembersWithPagination(provider: string, name: string, offset: number, to: number): Promise<number[]> {
+        let indexesOfDeletedMembers: number[] = [];
+
+        const limit: number = 100;
+
+        let indexes: number[] = await interRepFunctions.getRemovedMembersForGroup(provider, name, limit, offset);
+
+        indexesOfDeletedMembers = indexesOfDeletedMembers.concat(indexes);
+
+        while (indexes.length + limit <= to) {
+            offset += limit;
+            indexes = await interRepFunctions.getRemovedMembersForGroup(provider, name, limit, offset);
+            indexesOfDeletedMembers = indexesOfDeletedMembers.concat(indexes);
+        }
+
+        return indexesOfDeletedMembers;
     }
 
     private async continuousSync() {

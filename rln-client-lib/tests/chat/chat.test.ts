@@ -1,14 +1,16 @@
-import { StorageProvider } from '../../src/storage/interfaces';
-import { jest, test, expect, describe, beforeAll, beforeEach } from '@jest/globals'
-import { ICryptography, IKeyPair } from '../../src/crypto/interfaces';
-import ProfileManager from '../../src/profile';
-import { ServerCommunication } from '../../src/communication';
+import "../../src/hasher";
 import RLNServerApi from '../../src/communication/api';
 import WsSocketClient from '../../src/communication/ws-socket';
 import ChatManager from '../../src/chat/index';
 import MockDate from 'mockdate';
-
-import "../../src/hasher";
+import ProfileManager from '../../src/profile';
+import { IMessage } from './../../../server/dist/src/persistence/model/message/message.types.d';
+import { StorageProvider } from '../../src/storage/interfaces';
+import { jest, test, expect, describe, beforeAll, beforeEach } from '@jest/globals'
+import { ICryptography, IKeyPair } from '../../src/crypto/interfaces';
+import { ServerCommunication } from '../../src/communication';
+import { IChatHistoryDB } from '../../src/chat/interfaces';
+import { deepClone } from '../../src/util';
 
 const ws = require("ws");
 
@@ -128,6 +130,35 @@ export class LocalTestCryptography implements ICryptography {
 
 }
 
+class LocalTestMessageDB implements IChatHistoryDB {
+
+    private messages = {};
+
+    async saveMessage(roomId: string, message: IMessage) {
+        if (this.messages[roomId] == undefined) {
+            this.messages[roomId] = [deepClone(message)];
+        } else {
+            this.messages[roomId].push(deepClone(message));
+        }
+    }
+
+    async getMessagesForRoom(roomId: string, fromTimestamp: number): Promise<any> {
+        return this.messages[roomId];
+    }
+
+    async getMessagesForRooms(roomIdS: string[], fromTimestamp: number): Promise<any> {
+        return {}
+    }
+
+    async getMaxTimestampForAllMessages(): Promise<number> {
+        return 0;
+    }
+
+    async deleteAllMessagesForRoom(roomId: string) {
+        this.messages[roomId] = [];
+    }
+
+}
 
 describe('Chat test', () => {
 
@@ -141,6 +172,7 @@ describe('Chat test', () => {
     let profileManager: ProfileManager;
 
     let chatManager: ChatManager;
+    let chatDB: IChatHistoryDB;
 
     const proof_generator_callback = async (nullifier: string, signal: string, storage_artifacts: any, rln_identitifer: any): Promise<any> => {
         return JSON.stringify({
@@ -172,8 +204,9 @@ describe('Chat test', () => {
         server = new RLNServerApi("");
         socketClient = new WsSocketClient("");
         communication = new ServerCommunication(server, socketClient);
+        chatDB = new LocalTestMessageDB();
 
-        chatManager = new ChatManager(profileManager, communication, crypto);
+        chatManager = new ChatManager(profileManager, communication, crypto, chatDB);
 
         MockDate.reset();
     });
@@ -247,7 +280,12 @@ describe('Chat test', () => {
     test('decrypt message - no rooms', async () => {
         jest.spyOn(profileManager, "getUserRoomsForChatType").mockResolvedValue([]);
 
-        const decrypted = await chatManager.decryptMessage("test message");
+        const decrypted = await chatManager.decryptMessage({
+            chat_type: "DIRECT",
+            uuid: "1",
+            epoch: 12345,
+            message_content: "test content"
+        });
 
         expect(decrypted).toEqual([null, null]);
     });
@@ -345,5 +383,148 @@ describe('Chat test', () => {
 
         expect(decrypted).toEqual([null, null]);
     });
+
+    test('sync messages for all rooms', async () => {
+        jest.spyOn(profileManager, "getUserRoomsForChatType").mockResolvedValue([
+            {
+                "id": "test-1",
+                "type": "PUBLIC",
+                "symmetric_key": "test_symmetric_key"
+            }
+        ]);
+
+        jest.spyOn(communication, "getTimeRangeChatHistory").mockImplementation(async (from: number, to: number) => {
+
+            if (from == 1) {
+                return {
+                        requestedFromTimestamp: 0,
+                        requestedToTimestamp: 10000,
+                        returnedFromTimestamp: 0,
+                        returnedToTimestamp: 999,
+                        messages: [
+                            {
+                                uuid: "1",
+                                epoch: 100,
+                                chat_type: "PUBLIC",
+                                message_content: "content 1"
+                            },
+                            {
+                                uuid: "2",
+                                epoch: 400,
+                                chat_type: "PUBLIC",
+                                message_content: "content 2"
+                            },
+                            {
+                                uuid: "3",
+                                epoch: 500,
+                                chat_type: "PUBLIC",
+                                message_content: "content 3"
+                            },
+                            {
+                                uuid: "4",
+                                epoch: 800,
+                                chat_type: "PUBLIC",
+                                message_content: "content 4"
+                            },
+                            {
+                                uuid: "5",
+                                epoch: 999,
+                                chat_type: "PUBLIC",
+                                message_content: "content 5"
+                            }
+                        ],
+                        limit: 5
+                };
+            } else if (from == 1000) {
+                return {
+                    requestedFromTimestamp: 1000,
+                    requestedToTimestamp: 10000,
+                    returnedFromTimestamp: 1000,
+                    returnedToTimestamp: 2000,
+                    messages: [
+                        {
+                            uuid: "6",
+                            epoch: 1800,
+                            chat_type: "PUBLIC",
+                            message_content: "content 6"
+                        },
+                        {
+                            uuid: "7",
+                            epoch: 2000,
+                            chat_type: "PUBLIC",
+                            message_content: "content 7"
+                        }
+                    ],
+                    limit: 5
+                };
+            }
+
+        });
+
+        jest.spyOn(crypto, "decryptMessageSymmetric").mockImplementation(async (cyphertext: string, symm_key: string) => {
+            return cyphertext;
+        });
+
+        jest.spyOn(chatDB, "getMaxTimestampForAllMessages").mockResolvedValue(0);
+
+        const toTimestamp = 10000;
+        await chatManager.syncMessagesForAllRooms(toTimestamp)
+
+        const allMessages: IMessage[] = await chatDB.getMessagesForRoom("test-1", 1);
+        expect(allMessages.length).toEqual(7);
+
+    });
+
+    test('delete messages for a given room', async () => {
+        await chatDB.saveMessage('room-1', {
+            uuid: "1",
+            epoch: 100,
+            chat_type: "PUBLIC",
+            message_content: "content 1"
+        });
+        await chatDB.saveMessage('room-1', {
+            uuid: "2",
+            epoch: 102,
+            chat_type: "PUBLIC",
+            message_content: "content 2"
+        });
+        await chatDB.saveMessage('room-2', {
+            uuid: "3",
+            epoch: 105,
+            chat_type: "PUBLIC",
+            message_content: "content 3"
+        });
+
+        const messagesForRoomBeforeDelete: IMessage[] = await chatManager.loadMessagesForRoom('room-2', 1);
+        expect(messagesForRoomBeforeDelete.length).toEqual(1);
+
+        await chatManager.deleteMessageHistoryForRoom('room-2');
+        const messagesForRoomAfterDelete: IMessage[] = await chatManager.loadMessagesForRoom('room-2', 1);
+        expect(messagesForRoomAfterDelete.length).toEqual(0);
+    });
+
+    test('load messages for a given room', async () => {
+        await chatDB.saveMessage('room-1', {
+            uuid: "1",
+            epoch: 100,
+            chat_type: "PUBLIC",
+            message_content: "content 1"
+        });
+        await chatDB.saveMessage('room-1', {
+            uuid: "2",
+            epoch: 102,
+            chat_type: "PUBLIC",
+            message_content: "content 2"
+        });
+        await chatDB.saveMessage('room-2', {
+            uuid: "3",
+            epoch: 105,
+            chat_type: "PUBLIC",
+            message_content: "content 3"
+        });
+
+        const messages: IMessage[] = await chatManager.loadMessagesForRoom('room-1', 1);
+        expect(messages.length).toEqual(2);
+    })
 
 });
