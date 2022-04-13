@@ -55,7 +55,7 @@ const ChatMessagesWrapper = ({
   currentActiveRoom
 }: ChatMessagesProps) => {
   const dispatch = useAppDispatch()
-  const sortedHistory = chatHistory.sort((a, b) => a.epoch - b.epoch)
+  const sortedHistory = chatHistory.sort((a, b) => a.timestamp - b.timestamp)
   const chatHistoryRef = useRef(sortedHistory)
   const loadingMessages = useAppSelector((state) => state.ChatReducer.loading)
 
@@ -72,7 +72,7 @@ const ChatMessagesWrapper = ({
     dispatch(
       loadMessagesForRoom(
         currentActiveRoom.id,
-        new Date(lastMessage.epoch).getTime(),
+        new Date(lastMessage.timestamp).getTime(),
         false,
         {
           onSuccess: (res: any) => {

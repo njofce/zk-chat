@@ -25,20 +25,21 @@ export class LocalChatDB implements IChatHistoryDB {
             roomId: roomId,
             epoch: message.epoch,
             chat_type: message.chat_type,
-            message_content: message.message_content
+            message_content: message.message_content,
+            timestamp: message.timestamp
         })
     }
 
     /**
      * Returns messages for a given room with a maximum limit of {@link LocalChatDB.MAX_NUMBER_OF_MESSAGES_TO_FETCH_FROM_DB},
-     * ordered in reverse starting from the message with the nearest epoch to the provided {@link fromTimestamp}.
+     * ordered in reverse starting from the message with the nearest timestamp to the provided {@link fromTimestamp}.
      */
     public async getMessagesForRoom(roomId: string, fromTimestamp: number): Promise<IMessage[]> {
         const messages: IZkMessage[] = await this.db.messages
-            .orderBy('epoch')
+            .orderBy('timestamp')
             .reverse()
             .and(message => {
-                return message.roomId == roomId && new Date(message.epoch) < new Date(fromTimestamp)
+                return message.roomId == roomId && new Date(message.timestamp) < new Date(fromTimestamp)
             })
             .limit(LocalChatDB.MAX_NUMBER_OF_MESSAGES_TO_FETCH_FROM_DB)
             .toArray();
@@ -48,7 +49,8 @@ export class LocalChatDB implements IChatHistoryDB {
                     uuid: message.uuid,
                     epoch: message.epoch,
                     chat_type: message.chat_type,
-                    message_content: message.message_content
+                    message_content: message.message_content,
+                    timestamp: message.timestamp
                 }
         });
 
@@ -56,7 +58,7 @@ export class LocalChatDB implements IChatHistoryDB {
 
     /**
      * Returns messages for the given rooms with a maximum limit of {@link LocalChatDB.MAX_NUMBER_OF_MESSAGES_TO_FETCH_FROM_DB},
-     * ordered in reverse starting from the message with the nearest epoch to the provided {@link fromTimestamp}.
+     * ordered in reverse starting from the message with the nearest timestamp to the provided {@link fromTimestamp}.
      */
     public async getMessagesForRooms(roomIds: string[], fromTimestamp: number): Promise<{ [key: string]: IMessage[] }> {
         const messagesForRooms: { [key: string]: IMessage[] } = {};
@@ -73,10 +75,10 @@ export class LocalChatDB implements IChatHistoryDB {
      * From all the stored messages in IndexedDB, this method returns the maximum timestamp. In case no messages are found in the local database, -1 is returned.
      */
     public async getMaxTimestampForAllMessages(): Promise<number> {
-        const mostRecentMessage = await this.db.messages.orderBy('epoch').reverse().first();
+        const mostRecentMessage = await this.db.messages.orderBy('timestamp').reverse().first();
 
         if (mostRecentMessage != undefined) {
-            return mostRecentMessage.epoch;
+            return mostRecentMessage.timestamp;
         }
 
         return -1;
@@ -98,7 +100,7 @@ export class ZKChatDB extends Dexie {
         super(LocalChatDB.DB_NAME);
 
         this.version(1).stores({
-            messages: '++id, roomId, epoch'
+            messages: '++id, roomId, timestamp'
         });
     }
 }
@@ -110,4 +112,5 @@ interface IZkMessage {
     epoch: number;
     chat_type: string;
     message_content: string;
+    timestamp: number;
 }

@@ -611,7 +611,8 @@ describe('Test main', () => {
                     uuid: "id-1",
                     chat_type: "PUBLIC",
                     message_content: "Decrypted 1",
-                    epoch: 1
+                    epoch: 1,
+                    timestamp: 1
                 }, 'room-1'];
             }
             if (message.uuid == 'id-2') {
@@ -619,7 +620,8 @@ describe('Test main', () => {
                     uuid: "id-2",
                     chat_type: "PUBLIC",
                     message_content: "Decrypted 2",
-                    epoch: 2
+                    epoch: 2,
+                    timestamp: 2
                 }, 'room-1'];
             }
             if (message.uuid == 'id-3') {
@@ -627,7 +629,8 @@ describe('Test main', () => {
                     uuid: "id-3",
                     chat_type: "PUBLIC",
                     message_content: "Decrypted 3",
-                    epoch: 3
+                    epoch: 3,
+                    timestamp: 3
                 }, 'room-2'];
             }
 
@@ -696,13 +699,15 @@ describe('Test main', () => {
                     uuid: "1",
                     epoch: 100,
                     chat_type: "PUBLIC",
-                    message_content: "content 1"
+                    message_content: "content 1",
+                    timestamp: 100
                 },
                 {
                     uuid: "2",
                     epoch: 102,
                     chat_type: "PUBLIC",
-                    message_content: "content 2"
+                    message_content: "content 2",
+                    timestamp: 102
                 }
             ]);
 

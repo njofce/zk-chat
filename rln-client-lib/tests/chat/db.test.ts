@@ -19,7 +19,8 @@ describe('Message db test', () => {
             uuid: 'id-1',
             epoch: 123,
             chat_type: "PUBLIC",
-            message_content: "test message"
+            message_content: "test message",
+            timestamp: 123
         })
 
         const messageCount = await testChatDB.messages.where('roomId').equals('testRoom').count();
@@ -81,7 +82,8 @@ describe('Message db test', () => {
                 uuid: 'id-' + i,
                 epoch: timestamp,
                 chat_type: "PUBLIC",
-                message_content: "test message " + i
+                message_content: "test message " + i,
+                timestamp: timestamp
             });
 
             timestamp += 10 * 1000; // Increase timestamp by 10 seconds for every stored message
@@ -97,21 +99,24 @@ describe('Message db test', () => {
             uuid: 'id-1',
             epoch: 1,
             chat_type: "PUBLIC",
-            message_content: "test message 1"
+            message_content: "test message 1",
+            timestamp: 1
         });
 
         await chatDB.saveMessage('testRoom2', {
             uuid: 'id-2',
             epoch: 2,
             chat_type: "PUBLIC",
-            message_content: "test message 2"
+            message_content: "test message 2",
+            timestamp: 2
         });
 
         await chatDB.saveMessage('testRoom2', {
             uuid: 'id-3',
             epoch: 3,
             chat_type: "PUBLIC",
-            message_content: "test message 3"
+            message_content: "test message 3",
+            timestamp: 3
         });
 
         await chatDB.deleteAllMessagesForRoom('testRoom2');
@@ -130,7 +135,8 @@ describe('Message db test', () => {
                 uuid: 'id-' + i,
                 epoch: timestamp,
                 chat_type: "PUBLIC",
-                message_content: "test message " + i
+                message_content: "test message " + i,
+                timestamp: timestamp
             });
 
             timestamp += 10 * 1000; // Increase timestamp by 10 seconds for every stored message

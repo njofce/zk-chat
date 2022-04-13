@@ -40,6 +40,7 @@ export interface IMessage {
     epoch: number;
     chat_type: string;
     message_content: string;
+    timestamp: number;
 }
 
 /**

@@ -233,31 +233,36 @@ describe('Test api', () => {
                     uuid: "1",
                     epoch: 100,
                     chat_type: "PUBLIC",
-                    message_content: "content 1"
+                    message_content: "content 1",
+                    timestamp: 100
                 },
                 {
                     uuid: "2",
                     epoch: 400,
                     chat_type: "PUBLIC",
-                    message_content: "content 2"
+                    message_content: "content 2",
+                    timestamp: 400
                 },
                 {
                     uuid: "3",
                     epoch: 500,
                     chat_type: "PUBLIC",
-                    message_content: "content 3"
+                    message_content: "content 3",
+                    timestamp: 500
                 },
                 {
                     uuid: "4",
                     epoch: 800,
                     chat_type: "PUBLIC",
-                    message_content: "content 4"
+                    message_content: "content 4",
+                    timestamp: 800
                 },
                 {
                     uuid: "5",
                     epoch: 999,
                     chat_type: "PUBLIC",
-                    message_content: "content 5"
+                    message_content: "content 5",
+                    timestamp: 999
                 }
             ],
             limit: 5
