@@ -21,7 +21,8 @@ class ChatService {
                     uuid: message.uuid,
                     epoch: message.epoch,
                     chat_type: message.chat_type,
-                    message_content: message.message_content
+                    message_content: message.message_content,
+                    timestamp: message.timestamp
                 }
             });
     }
@@ -32,7 +33,7 @@ class ChatService {
         }
 
         return await Message.getMessagesInTimeRange(from, to, ChatService.MESSAGE_COUNT_LIMIT);
-    } 
+    }
 
 }
 

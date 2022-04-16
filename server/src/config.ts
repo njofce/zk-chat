@@ -19,5 +19,6 @@ export default {
     RLN_IDENTIFIER: parseInt(process.env.RLN_IDENTIFIER || "518137101") || 518137101,
     MESSAGES_CHANNEL: process.env.MESSAGES_CHANNEL || "messages",
     MESSAGES_BROADCAST: process.env.MESSAGES_BROADCAST || "message-broadcast",
-    UPDATES_CHANNEL: process.env.UPDATES_CHANNEL || "updates"
+    UPDATES_CHANNEL: process.env.UPDATES_CHANNEL || "updates",
+    DELETE_MESSAGES_OLDER_THAN_DAYS: parseInt(process.env.DELETE_MESSAGES_OLDER_THAN_DAYS || "5") || 5,
 };

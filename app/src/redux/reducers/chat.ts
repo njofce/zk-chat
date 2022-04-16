@@ -170,7 +170,10 @@ const ChatReducer = (state = defaultState, action: AnyAction): RoomsState => {
         start: (prevState) => ({ ...prevState }),
         success: (prevState) => ({
           ...prevState,
-          [meta.roomId]: []
+          chatHistory:{
+            [meta.roomId]: []
+          }
+          
         }),
         finish: (prevState) => ({ ...prevState })
       })

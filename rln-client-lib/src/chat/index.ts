@@ -129,7 +129,8 @@ class ChatManager {
                             uuid: message.uuid,
                             epoch: message.epoch,
                             chat_type: message.chat_type,
-                            message_content: decrypted
+                            message_content: decrypted,
+                            timestamp: message.timestamp
                         },
                         room.id
                     ];

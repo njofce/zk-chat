@@ -72,7 +72,7 @@ const ChatMessages = ({ currentActiveRoom }: ChatMessagesProps) => {
   );
   //@ts-ignore
   const chatHistoryByRoom: any[] = useAppSelector(
-    (state) => state.ChatReducer.chatHistory[currentActiveRoom.id]
+    (state) => state.ChatReducer.chatHistory[currentActiveRoom.id] || []
   )
   const stayOnBottom: boolean = useAppSelector(
     (state) => state.ChatReducer.stayOnBottom

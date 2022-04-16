@@ -50,7 +50,6 @@ describe('Test chat service', () => {
     });
 
     test('get messages in time range - invalid range', async () => {
-        jest.setTimeout(30000);
         const chatService = new ChatService();
 
         try {
@@ -63,7 +62,6 @@ describe('Test chat service', () => {
     })
 
     test('get messages in time range - 1', async () => {
-        jest.setTimeout(30000);
         const chatService = new ChatService();
 
         for (let i = 0; i < 100; i++) {
@@ -82,7 +80,6 @@ describe('Test chat service', () => {
     })
 
     test('get messages in time range - 2', async () => {
-        jest.setTimeout(30000);
         const chatService = new ChatService();
 
         for (let i = 0; i < 100; i++) {
@@ -101,7 +98,6 @@ describe('Test chat service', () => {
     })
 
     test('get messages in time range - pagination single page', async () => {
-        jest.setTimeout(30000);
         const chatService = new ChatService();
 
         for (let i = 0; i < ChatService.MESSAGE_COUNT_LIMIT + 100; i++) {
@@ -123,7 +119,6 @@ describe('Test chat service', () => {
     })
 
     test('get messages in time range - pagination single page no items', async () => {
-        jest.setTimeout(30000);
         const chatService = new ChatService();
 
         const numberOfMessagesMoreThanLimit = 10;
@@ -139,7 +134,6 @@ describe('Test chat service', () => {
     })
 
     test('get messages in time range - pagination all pages', async () => {
-        jest.setTimeout(30000);
         const chatService = new ChatService();
 
         for (let i = 0; i < ChatService.MESSAGE_COUNT_LIMIT + 100; i++) {
@@ -170,6 +164,19 @@ describe('Test chat service', () => {
         expect(messages.length).toEqual(ChatService.MESSAGE_COUNT_LIMIT + 100);
     })
 
+    test('delete older messages', async() => {
+        // There will be MESSAGE_COUNT_LIMIT messages in the DB.
+        for (let i = 0; i < ChatService.MESSAGE_COUNT_LIMIT; i++) {
+            const timestamp = timestampTodayMs + 60000 * i; // 1 minute apart
+            await insertMessage(i, timestamp);
+        }
+
+        // Remove first 10
+        await Message.deleteMessagesOlderThanDate(timestampTodayMs + 60000 * 10);
+
+        const allMessagesInDB: any[] = await Message.find({});
+        expect(allMessagesInDB.length).toEqual(ChatService.MESSAGE_COUNT_LIMIT - 10);
+    })
 
 });
 
@@ -179,5 +186,6 @@ const insertMessage = async(id: number, epoch: number) => {
     message1.epoch = epoch;
     message1.chat_type = 'PUBLIC';
     message1.message_content = 'some encrypted content here';
+    message1.timestamp = epoch;
     await message1.save();
 }

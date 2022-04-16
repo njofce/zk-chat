@@ -1,19 +1,17 @@
-import { RLNFullProof } from '@zk-kit/protocols';
-import { getYShareFromFullProof } from './../util/types';
 import * as path from "path";
 import * as fs from "fs";
 
+import { randomUUID } from "crypto";
+import { constructRLNMessage, RLNMessage } from "../util/types";
+import { getUserFromShares, isZkProofValid, verifyEpoch } from '../util/proof_utils';
 import { IMessage } from '../persistence/model/message/message.types';
+import { ISyncMessage, SyncType } from '../communication/socket/config';
 import Message from "../persistence/model/message/message.model";
 import PubSub from '../communication/pub_sub';
-import { ISyncMessage, SyncType } from '../communication/socket/config';
 import UserService from './user.service';
 import RequestStatsService from "./request_stats.service";
 import config from "../config";
-import { randomUUID } from "crypto";
 import Hasher from "../util/hasher";
-import { constructRLNMessage, RLNMessage } from "../util/types";
-import { getUserFromShares, isZkProofValid, verifyEpoch } from '../util/proof_utils';
 
 /**
  * The core service that handles every message coming from the websocket channel. The message format is deserialized and validated properly.
@@ -116,7 +114,8 @@ class MessageHandlerService {
             uuid: randomUUID(),
             epoch: message.epoch,
             chat_type: message.chat_type,
-            message_content: message.message_content
+            message_content: message.message_content,
+            timestamp: new Date().getTime()
         });
 
         return await msg.save();

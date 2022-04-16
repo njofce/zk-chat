@@ -12,6 +12,7 @@ import InterRepSynchronizer from "./interrep";
 import { seedZeros } from "./util/seed";
 import Hasher from "./util/hasher";
 import config from "./config";
+import { runMessageCleanupJob } from "./jobs/cleanup";
 
 const main = async () => {
 
@@ -30,6 +31,9 @@ const main = async () => {
     const nodeSynchronizer: NodeSynchronizer = createNodeSync(redisPubSub, socketServer);
 
     const app = createServer();
+
+    await runMessageCleanupJob();
+    
     app.listen(config.SERVER_PORT, () => {
         console.log(`The chat server is running on port ${config.SERVER_PORT}!`);
     });

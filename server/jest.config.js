@@ -31,5 +31,6 @@ module.exports = {
             "statements": 80
         }
     },
-    verbose: true
+    verbose: true,
+    testTimeout: 20000
 }

@@ -7,12 +7,12 @@ import { IMessage } from "./message.types";
  * @deprecated use the endpoint to get messages by time range
  */
 export async function getDailyMessages(this: typeof Message,): Promise<IMessage[]> {
-    return this.find({ epoch: { $gte: new Date(new Date().setHours(0, 0, 0, 0)).getTime() }});
+    return this.find({ timestamp: { $gte: new Date(new Date().setHours(0, 0, 0, 0)).getTime() }});
 }
 
 export async function getMessagesInTimeRange(this: typeof Message, from: Date, to: Date, limit: number): Promise<ITimeRangeMessages> {
 
-    const foundMessagesOrdered: IMessage[] = await this.find({ epoch: { $gte: from.getTime(), $lt: to.getTime() } }, null, {limit: limit, sort: {epoch: 1}}).exec();
+    const foundMessagesOrdered: IMessage[] = await this.find({ timestamp: { $gte: from.getTime(), $lt: to.getTime() } }, null, {limit: limit, sort: {epoch: 1}}).exec();
 
     const returnedFromTimestamp: number = foundMessagesOrdered.length > 0 ? foundMessagesOrdered[0].epoch : from.getTime();
     const returnedToTimestamp: number = foundMessagesOrdered.length > 0 ? foundMessagesOrdered[foundMessagesOrdered.length - 1].epoch : to.getTime();
@@ -25,4 +25,8 @@ export async function getMessagesInTimeRange(this: typeof Message, from: Date, t
         messages: foundMessagesOrdered,
         limit: limit
     }
+}
+
+export async function deleteMessagesOlderThanDate(this: typeof Message, timestamp: number): Promise<void> {
+    await this.deleteMany({ timestamp: { $lt: timestamp}});
 }
