@@ -17,10 +17,8 @@ export async function runMessageCleanupJob() {
             const timestampNow = new Date().getTime();
             const timestampToDeleteFrom = timestampNow - MS_PER_DAY * config.DELETE_MESSAGES_OLDER_THAN_DAYS;
             await Message.deleteMessagesOlderThanDate(timestampToDeleteFrom);
-            console.log("Cleaning up old messages", timestampNow);
-
         } catch (error: any) {
-            console.log("Error while running cron job", error);
+            console.log("Error while running message cleanup job", error);
         }
     })
 

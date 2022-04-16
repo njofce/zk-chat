@@ -86,8 +86,8 @@ const GeneratePublicKeyModal = ({
           >
             {" "}
             {isInviteCopied
-              ? "Invite code copied"
-              : "Copy the invite code below"}{" "}
+              ? "Public key copied"
+              : "Copy the public key"}{" "}
           </ReactTooltip>
           <StyledTextarea rows={10} defaultValue={generatedInvite} disabled />
           <FontAwesomeIcon
