@@ -50,7 +50,6 @@ describe('Test chat service', () => {
     });
 
     test('get messages in time range - invalid range', async () => {
-        jest.setTimeout(30000);
         const chatService = new ChatService();
 
         try {
@@ -63,7 +62,6 @@ describe('Test chat service', () => {
     })
 
     test('get messages in time range - 1', async () => {
-        jest.setTimeout(30000);
         const chatService = new ChatService();
 
         for (let i = 0; i < 100; i++) {
@@ -82,7 +80,6 @@ describe('Test chat service', () => {
     })
 
     test('get messages in time range - 2', async () => {
-        jest.setTimeout(30000);
         const chatService = new ChatService();
 
         for (let i = 0; i < 100; i++) {
@@ -101,7 +98,6 @@ describe('Test chat service', () => {
     })
 
     test('get messages in time range - pagination single page', async () => {
-        jest.setTimeout(30000);
         const chatService = new ChatService();
 
         for (let i = 0; i < ChatService.MESSAGE_COUNT_LIMIT + 100; i++) {
@@ -123,7 +119,6 @@ describe('Test chat service', () => {
     })
 
     test('get messages in time range - pagination single page no items', async () => {
-        jest.setTimeout(30000);
         const chatService = new ChatService();
 
         const numberOfMessagesMoreThanLimit = 10;
@@ -139,7 +134,6 @@ describe('Test chat service', () => {
     })
 
     test('get messages in time range - pagination all pages', async () => {
-        jest.setTimeout(30000);
         const chatService = new ChatService();
 
         for (let i = 0; i < ChatService.MESSAGE_COUNT_LIMIT + 100; i++) {
@@ -171,8 +165,6 @@ describe('Test chat service', () => {
     })
 
     test('delete older messages', async() => {
-        jest.setTimeout(30000);
-
         // There will be MESSAGE_COUNT_LIMIT messages in the DB.
         for (let i = 0; i < ChatService.MESSAGE_COUNT_LIMIT; i++) {
             const timestamp = timestampTodayMs + 60000 * i; // 1 minute apart
