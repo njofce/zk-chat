@@ -98,7 +98,7 @@ services:
     labels:
       - 'traefik.enable=true'
       - 'traefik.docker.network=rlnanonymouschat_apinetwork'
-      - 'traefik.http.routers.client.rule=Host(`www.zkchat.org`)'
+      - 'traefik.http.routers.client.rule=Host(`www.zkchat.org`) || Host(`zkchat.org`)'
       - 'traefik.http.routers.client.tls=true'
       - 'traefik.http.routers.client.tls.certresolver=lets-encrypt'
 
@@ -106,7 +106,7 @@ services:
       - PORT=3000
       - REACT_APP_SERVER_HOST=https://api.zkchat.org
       - REACT_APP_SOCKET_HOST=wss://api-ws.zkchat.org
-      - REACT_APP_ENV=http://www.zkchat.org
+      - REACT_APP_ENV=https://www.zkchat.org
     depends_on:
       - mongo
       - redis
