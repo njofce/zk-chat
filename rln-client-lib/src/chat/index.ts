@@ -82,13 +82,15 @@ class ChatManager {
         const roomData: any = await this.profile_manager.getRoomById(chat_room_id);
         const encryptedMessage: string = await this.profile_manager.encryptMessageForRoom(chat_room_id, raw_message);
 
+        const senderHandle: string = this.profile_manager.getUserHandle();
         // Send message
         const message = {
             zk_proof: proofData.fullProof,
             x_share: proofData.xShare,
             epoch: proofData.epoch,
             chat_type: roomData.type,
-            message_content: encryptedMessage
+            message_content: encryptedMessage,
+            sender: senderHandle
         }
 
         this.communication_manager.sendMessage(JSON.stringify(message));
@@ -130,7 +132,8 @@ class ChatManager {
                             epoch: message.epoch,
                             chat_type: message.chat_type,
                             message_content: decrypted,
-                            timestamp: message.timestamp
+                            timestamp: message.timestamp,
+                            sender: message.sender
                         },
                         room.id
                     ];

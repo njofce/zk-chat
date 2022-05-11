@@ -338,6 +338,27 @@ const recover_profile = async (profile_data: string) => {
     await chat_manager.checkRootUpToDate();
 }
 
+const update_username = async (newName: string) => {
+    if (profile_manager == null)
+        throw "init() not called";
+
+    await profile_manager.updateUsername(newName)
+}
+
+const get_user_handle = async () => {
+    if (profile_manager == null)
+        throw "init() not called";
+
+    return await profile_manager.getUserHandle()
+}
+
+const get_username = () => {
+    if (profile_manager == null)
+        throw "init() not called";
+
+    return profile_manager.getUserName()
+}
+
 const get_contacts = async() => {
     if (profile_manager == null)
         throw "init() not called";
@@ -405,5 +426,8 @@ export {
     get_contact,
     insert_contact,
     delete_contact,
-    update_contact
+    update_contact,
+    update_username,
+    get_user_handle,
+    get_username
 }

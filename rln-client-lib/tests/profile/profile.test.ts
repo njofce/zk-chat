@@ -94,7 +94,9 @@ describe('Test profile', () => {
             private: [],
             direct: []
         },
-        contacts: {}
+        contacts: {},
+        username: "test",
+        user_id: 3749
     }
 
     let crypto: ICryptography;
@@ -155,6 +157,8 @@ describe('Test profile', () => {
                 "user_private_key": "val1",
                 "user_public_key": "val1",
                 "rooms": {},
+                "username": "test",
+                "user_id": 348979
             });
         expect(formatInvalid3).toBeFalsy();
 
@@ -170,11 +174,31 @@ describe('Test profile', () => {
                     "private": [],
                     "direct": []
                 },
-                "contacts": {}
+                "contacts": {},
+                "username": "test",
+                "user_id": 348979
             });
         expect(formatValid).toBeTruthy();
 
     });
+
+    test('update username', async () => {
+        await profileManager.recoverProfile(testProfile);
+
+        expect(await profileManager.profileExists()).toBeTruthy();
+
+        profileManager.updateUsername('test-updated')
+
+        expect(profileManager.getUserName()).toEqual('test-updated')
+    })
+
+    test('get user handle', async () => {
+        await profileManager.recoverProfile(testProfile);
+
+        expect(await profileManager.profileExists()).toBeTruthy();
+
+        expect(profileManager.getUserHandle()).toEqual('test#3749')
+    })
 
     test('recover profile', async () => {
         await profileManager.recoverProfile(testProfile);

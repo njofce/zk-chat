@@ -8,7 +8,8 @@ import {
   delete_messages_for_room,
   get_messages_for_room,
   get_messages_for_rooms,
-  sync_message_history
+  sync_message_history,
+  get_user_handle
 } from "rln-client-lib"
 import { IMessage } from "rln-client-lib/dist/src/chat/interfaces"
 import {
@@ -103,4 +104,10 @@ export const GET_TRUSTED_CONTACTS = "GET_TRUSTED_CONTACTS"
 export const getTrustedContacts = () => ({
   type: GET_TRUSTED_CONTACTS,
   promise: get_contacts()
+})
+
+export const GET_USER_HANDLE = "GET_USER_HANDLE"
+export const getUserHandle = () => ({
+  type: GET_USER_HANDLE,
+  promise: get_user_handle()
 })

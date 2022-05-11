@@ -8,6 +8,7 @@ const MessageSchemaFields: Record<keyof IMessage, any> = {
     chat_type: { type: String, required: true, unique: false },
     message_content: { type: String, required: true, unique: false },
     timestamp: { type: Number, required: true, unique: false },
+    sender: { type: String, required: true, unique: false }
 };
 
 const MessageSchema = new Schema<IMessageDocument, IMessageModel>(

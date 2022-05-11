@@ -107,19 +107,22 @@ describe('Test api', () => {
                 uuid: "0001",
                 epoch: 4,
                 chat_type: "PUBLIC",
-                message_content: "encrypted message content"
+                message_content: "encrypted message content",
+                sender: "test"
             },
             {
                 uuid: "0002",
                 epoch: 5,
                 chat_type: "PUBLIC",
-                message_content: "encrypted message content"
+                message_content: "encrypted message content",
+                sender: "test"
             },
             {
                 uuid: "0003",
                 epoch: 6,
                 chat_type: "PUBLIC",
-                message_content: "encrypted message content"
+                message_content: "encrypted message content",
+                sender: "test"
             }
         ];
 
@@ -234,35 +237,40 @@ describe('Test api', () => {
                     epoch: 100,
                     chat_type: "PUBLIC",
                     message_content: "content 1",
-                    timestamp: 100
+                    timestamp: 100,
+                    sender: "test"
                 },
                 {
                     uuid: "2",
                     epoch: 400,
                     chat_type: "PUBLIC",
                     message_content: "content 2",
-                    timestamp: 400
+                    timestamp: 400,
+                    sender: "test"
                 },
                 {
                     uuid: "3",
                     epoch: 500,
                     chat_type: "PUBLIC",
                     message_content: "content 3",
-                    timestamp: 500
+                    timestamp: 500,
+                    sender: "test"
                 },
                 {
                     uuid: "4",
                     epoch: 800,
                     chat_type: "PUBLIC",
                     message_content: "content 4",
-                    timestamp: 800
+                    timestamp: 800,
+                    sender: "test"
                 },
                 {
                     uuid: "5",
                     epoch: 999,
                     chat_type: "PUBLIC",
                     message_content: "content 5",
-                    timestamp: 999
+                    timestamp: 999,
+                    sender: "test"
                 }
             ],
             limit: 5

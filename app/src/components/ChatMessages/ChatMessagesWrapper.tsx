@@ -6,14 +6,17 @@ import { loadMessagesForRoom } from "../../redux/actions/actionCreator"
 import { useAppDispatch } from "../../redux/hooks/useAppDispatch"
 import { useAppSelector } from "../../redux/hooks/useAppSelector"
 
-const StyledSingleMessage = styled.div`
+const StyledMessageContent = styled.div.attrs(
+  (props: { isUserSender: boolean }) => props
+)`
   font-size: 16px;
-  color: black;
+  color: ${(props) => (props.isUserSender ? Colors.ANATRACITE : "#f0f2f5")};
   border-radius: 10px;
   padding: 8px 12px;
   margin-bottom: 16px;
   width: fit-content;
-  text-align: left;
+  background: ${(props) =>
+    props.isUserSender ? "#f0f2f5" : Colors.ANATRACITE};
 `
 const StyledMessagesWrapper = styled.div`
   overflow-y: scroll;
@@ -23,13 +26,6 @@ const StyledMessagesWrapper = styled.div`
     display: none;
   }
   height: 85%;
-  div:nth-child(odd) {
-    background: ${Colors.ANATRACITE};
-    color: white;
-  }
-  div:nth-child(even) {
-    background: #f0f2f5;
-  }
 `
 
 const StyledSpinnerWrapper = styled.div`
@@ -41,6 +37,21 @@ const StyledSpinnerWrapper = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
+`
+const StyledMessageSender = styled.div.attrs(
+  (props: { isUserSender: boolean }) => props
+)`
+  font-size: 14px;
+  color: ${Colors.ANATRACITE};
+  text-align: ${(props) => (props.isUserSender ? "right" : "left")};
+`
+const StyledSingleMessage = styled.div.attrs(
+  (props: { isUserSender: boolean }) => props
+)`
+  margin: 10px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: ${(props) => (props.isUserSender ? "end" : "start")};
 `
 
 interface ChatMessagesProps {
@@ -58,6 +69,9 @@ const ChatMessagesWrapper = ({
   const sortedHistory = chatHistory.sort((a, b) => a.timestamp - b.timestamp)
   const chatHistoryRef = useRef(sortedHistory)
   const loadingMessages = useAppSelector((state) => state.ChatReducer.loading)
+  const userHandle: string = useAppSelector(
+    (state) => state.ChatReducer.userHandle
+  )
 
   const handleScroll = () => {
     // @ts-ignore
@@ -97,7 +111,7 @@ const ChatMessagesWrapper = ({
           animation="grow"
           role="status"
           className="spinner-grow text-secondary"
-        />{" "}
+        />
         <span> Loading messages </span>
       </>
     </StyledSpinnerWrapper>
@@ -105,8 +119,18 @@ const ChatMessagesWrapper = ({
     <StyledMessagesWrapper ref={chatRef}>
       {sortedHistory.length > 0 &&
         sortedHistory.map((messageObj) => (
-          <StyledSingleMessage key={messageObj.uuid}>
-            {messageObj.message_content}
+          <StyledSingleMessage isUserSender={userHandle === messageObj.sender}>
+            <StyledMessageSender
+              isUserSender={userHandle === messageObj.sender}
+            >
+              {messageObj.sender}
+            </StyledMessageSender>
+            <StyledMessageContent
+              key={messageObj.uuid}
+              isUserSender={userHandle === messageObj.sender}
+            >
+              {messageObj.message_content}
+            </StyledMessageContent>
           </StyledSingleMessage>
         ))}
     </StyledMessagesWrapper>

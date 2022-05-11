@@ -1,25 +1,28 @@
 import React, { useState } from "react"
 import styled from "styled-components"
-import { faFileExport } from "@fortawesome/free-solid-svg-icons"
-import { faUserPlus } from "@fortawesome/free-solid-svg-icons"
-import { faKey } from "@fortawesome/free-solid-svg-icons"
-import { faPlusCircle, faUserLock } from "@fortawesome/free-solid-svg-icons"
+import {
+  faPlusCircle,
+  faUserLock,
+  faAddressCard,
+  faFileExport,
+  faUserPlus,
+  faKey
+} from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import RoomOptionsModal from "../Modals"
 import ReactTooltip from "react-tooltip"
 import { saveAs } from "file-saver"
-
 import * as Colors from "../../constants/colors"
 import JoinPrivateRoomModal from "../Modals/privateRoomModal"
 import TrustedContactsModal from "../Modals/trustedContactsModal"
 import GeneratePublicKeyModal from "../Modals/generatePublicKey"
 import { export_profile } from "rln-client-lib"
+import UpdateUsernameModal from "../Modals/updateUsernameModal"
 
 const StyledButtonsWrapper = styled.div`
   display: flex;
   justify-content: space-evenly;
   position: relative;
-  top: 20px;
   svg {
     font-size: 30px;
     cursor: pointer;
@@ -34,6 +37,7 @@ const RoomHandlingButtons = () => {
   const [toggleJoinPrivateRoom, setToggleJoinPrivateRoom] = useState(false)
   const [toggleGeneratePublicKey, setToggleGeneratePublicKey] = useState(false)
   const [toggleTrustedContacts, setToggleTrustedContacts] = useState(false)
+  const [toggleUpdateUsername, setToggleUpdateUsername] = useState(false)
 
   const handleExportProfileClick = async () => {
     try {
@@ -120,6 +124,24 @@ const RoomHandlingButtons = () => {
       >
         Trusted Contacts
       </ReactTooltip>
+      <FontAwesomeIcon
+        icon={faAddressCard}
+        onClick={() => setToggleUpdateUsername(true)}
+        data-tip
+        data-for="UpdateUsername"
+      />
+      <ReactTooltip
+        event="mouseenter"
+        eventOff="click mouseleave"
+        id="UpdateUsername"
+        backgroundColor={Colors.BERRY_PINK}
+      >
+        Update username
+      </ReactTooltip>
+      <UpdateUsernameModal
+        setToggleUpdateUsername={setToggleUpdateUsername}
+        toggleUpdateUsername={toggleUpdateUsername}
+      />
       <RoomOptionsModal
         toggleModal={toggleModal}
         setToggleModal={setToggleModal}

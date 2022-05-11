@@ -4,6 +4,7 @@ import * as Colors from "../../constants/colors"
 import {
   addActiveChatRoom,
   getRoomsAction,
+  getUserHandle,
   Room
 } from "../../redux/actions/actionCreator"
 import { useAppDispatch } from "../../redux/hooks/useAppDispatch"
@@ -15,7 +16,7 @@ const StyledChatRoomWrapper = styled.div`
   height: 100vh;
   box-shadow: 0px 8px 14px 0px #a0a0a0;
   border-radius: 18px;
-  padding: 20px 40px;
+  padding: 20px 40px 0 40px;
   margin-right: 16px;
 `
 const StyledChatRoomCell = styled.div`
@@ -47,20 +48,28 @@ const StyledChatRoomsWrapper = styled.div`
   }
   height: 85%;
 `
+const StyledBanner = styled.div`
+  color: ${Colors.BERRY_PINK};
+  font-weight: 600;
+  font-size: 20px;
+  padding: 10px;
+`
 
 const ChatRooms = () => {
   const rooms: any = useAppSelector((state) => state.ChatReducer.rooms)
+  const userHandle: string = useAppSelector(
+    (state) => state.ChatReducer.userHandle
+  )
   const dispatch = useAppDispatch()
 
   useEffect(() => {
     dispatch(getRoomsAction())
+    dispatch(getUserHandle())
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
   const handleChatRoomCellClick = (room: Room) => {
     dispatch(addActiveChatRoom(room))
   }
-
   return (
     <>
       <StyledChatRoomWrapper className="col-sm-12 col-md-12 col-lg-4 col-xl-4 h-100">
@@ -81,6 +90,7 @@ const ChatRooms = () => {
           ))}
         </StyledChatRoomsWrapper>
         <RoomHandlingButtons />
+        <StyledBanner>Welcome {userHandle} !</StyledBanner>
       </StyledChatRoomWrapper>
     </>
   )

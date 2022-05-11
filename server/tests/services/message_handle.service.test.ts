@@ -81,6 +81,7 @@ describe('Test message handle service', () => {
                 epoch: String(timestampTodayMs + 50 * 1000), // message second is 50s after  the server timestamp
                 chat_type: "PUBLIC",
                 message_content: "encrypted message content",
+                sender: "Sender"
             };
             await messageHandlerService.handleChatMessage(JSON.stringify(object));
             expect(false).toBeTruthy();
@@ -107,6 +108,7 @@ describe('Test message handle service', () => {
                 epoch: timestampTodayMs - 50 * 1000, // message second is 50s before the server timestamp
                 chat_type: "PUBLIC",
                 message_content: "encrypted message content",
+                sender: "Sender"
             };
             await messageHandlerService.handleChatMessage(JSON.stringify(object));
             expect(false).toBeTruthy();
@@ -135,6 +137,7 @@ describe('Test message handle service', () => {
                 epoch: timestampTodayMs,
                 chat_type: "PUBLIC",
                 message_content: "encrypted message content",
+                sender: "Sender"
             };
             await messageHandlerService.handleChatMessage(JSON.stringify(object));
             expect(false).toBeTruthy();
@@ -165,6 +168,7 @@ describe('Test message handle service', () => {
                 epoch: timestampTodayMs,
                 chat_type: "PUBLIC",
                 message_content: "encrypted message content",
+                sender: "Sender"
             };
             await messageHandlerService.handleChatMessage(JSON.stringify(object));
             expect(false).toBeTruthy();
@@ -212,6 +216,7 @@ describe('Test message handle service', () => {
                 epoch: timestampTodayMs,
                 chat_type: "PUBLIC",
                 message_content: "encrypted message content",
+                sender: "Sender"
             };
             await messageHandlerService.handleChatMessage(JSON.stringify(object));
             expect(removeUserSpy).toBeCalled();
@@ -256,6 +261,7 @@ describe('Test message handle service', () => {
             epoch: timestampTodayMs,
             chat_type: "PUBLIC",
             message_content: "encrypted message content",
+            sender: "Sender"
         };
         const persistedMessage: IMessage = await messageHandlerService.handleChatMessage(JSON.stringify(object));
         expect(persistedMessage.message_content).toEqual("encrypted message content");

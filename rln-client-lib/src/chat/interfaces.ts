@@ -41,6 +41,7 @@ export interface IMessage {
     chat_type: string;
     message_content: string;
     timestamp: number;
+    sender: string;
 }
 
 /**

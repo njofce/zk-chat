@@ -12,7 +12,8 @@ import {
   DELETE_MESSAGES_FOR_ROOM,
   LOAD_MESSAGES_FOR_ROOM,
   LOAD_MESSAGES_FOR_ROOMS,
-  RUN_SYNC_MESSAGE_HISTORY
+  RUN_SYNC_MESSAGE_HISTORY,
+  GET_USER_HANDLE
 } from "../actions/actionCreator";
 import {
   IRooms,
@@ -27,6 +28,7 @@ interface RoomsState {
   trustedContacts: ITrustedContact[];
   chatHistorySyncing: boolean
   stayOnBottom: boolean
+  userHandle: string
   loading: boolean
 }
 
@@ -41,6 +43,7 @@ const defaultState: RoomsState = {
   trustedContacts: [],
   chatHistorySyncing: false,
   stayOnBottom: true,
+  userHandle: "",
   loading: false
 }
 
@@ -185,6 +188,17 @@ const ChatReducer = (state = defaultState, action: AnyAction): RoomsState => {
         success: (prevState) => ({
           ...prevState,
           trustedContacts: Object.values(payload)
+        }),
+        finish: (prevState) => ({ ...prevState })
+      })
+    }
+
+    case GET_USER_HANDLE: {
+      return handle(state, action, {
+        start: (prevState) => ({ ...prevState }),
+        success: (prevState) => ({
+          ...prevState,
+          userHandle: payload
         }),
         finish: (prevState) => ({ ...prevState })
       })

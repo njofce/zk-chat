@@ -8,6 +8,8 @@ export interface IProfile {
     user_public_key: string;
     rooms: IRooms;
     contacts: ITrustedContactsMap;
+    username: string;
+    user_id: number;
 }
 
 export interface IRooms {

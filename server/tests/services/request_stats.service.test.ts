@@ -27,7 +27,8 @@ const testMessage: RLNMessage = {
     x_share: BigInt(123).toString(),
     epoch: "1637837920000",
     chat_type: "PUBLIC",
-    message_content: "encrypted content"
+    message_content: "encrypted content",
+    sender: "Sender"
 }
 
 const testMessages: RLNMessage[] = [
@@ -52,7 +53,8 @@ const testMessages: RLNMessage[] = [
         x_share: BigInt(123).toString(),
         epoch: "1637837930000",
         chat_type: "PUBLIC",
-        message_content: "encrypted content"
+        message_content: "encrypted content",
+        sender: "Sender"
     },
     {
         zk_proof: {
@@ -75,7 +77,8 @@ const testMessages: RLNMessage[] = [
         x_share: BigInt(123).toString(),
         epoch: "1637837920000",
         chat_type: "PUBLIC",
-        message_content: "encrypted content"
+        message_content: "encrypted content",
+        sender: "Sender"
     },
     {
         zk_proof: {
@@ -98,7 +101,8 @@ const testMessages: RLNMessage[] = [
         x_share: BigInt(123).toString(),
         epoch: "1637837920000",
         chat_type: "PUBLIC",
-        message_content: "encrypted content"
+        message_content: "encrypted content",
+        sender: "Sender"
     }]
 
 describe('Test request stats service', () => {
@@ -169,7 +173,8 @@ describe('Test request stats service', () => {
             x_share: BigInt(123).toString(),
             epoch: "1637837920000",
             chat_type: "PUBLIC",
-            message_content: "encrypted content"
+            message_content: "encrypted content",
+            sender: "Sender"
         });
         expect(isDuplicate).toBeTruthy();
     });
@@ -201,7 +206,8 @@ describe('Test request stats service', () => {
             x_share: BigInt(123).toString(),
             epoch: "1637837140000",
             chat_type: "PUBLIC",
-            message_content: "encrypted content"
+            message_content: "encrypted content",
+            sender: "Sender"
         });
         expect(isDuplicate).toBeFalsy();
     });
@@ -233,7 +239,8 @@ describe('Test request stats service', () => {
             x_share: BigInt(123).toString(),
             epoch: "1637837920000",
             chat_type: "PUBLIC",
-            message_content: "encrypted content"
+            message_content: "encrypted content",
+            sender: "Sender"
         }, 2);
 
         expect(isSpam).toBeTruthy();
@@ -266,7 +273,8 @@ describe('Test request stats service', () => {
             x_share: BigInt(123).toString(),
             epoch: "1637837920000",
             chat_type: "PUBLIC",
-            message_content: "encrypted content"
+            message_content: "encrypted content",
+            sender: "Sender"
         }, 3);
 
         expect(isSpam).toBeFalsy();
