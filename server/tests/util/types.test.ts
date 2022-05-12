@@ -31,6 +31,7 @@ describe('Test types', () => {
                 yShare: BigInt(1234).toString(),
                 chat_type: "PUBLIC",
                 message_content: "encrypted message content",
+                sender: "Sender",
                 extra_field: "extra"
             });
             expect(false).toBeTruthy();
@@ -54,7 +55,8 @@ describe('Test types', () => {
             x_share: BigInt(123).toString(),
             epoch: 12345,
             chat_type: "PUBLIC",
-            message_content: "encrypted message content"
+            message_content: "encrypted message content",
+            sender: "Sender"
         });
     });
 

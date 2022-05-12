@@ -31,6 +31,10 @@ class ProfileManager {
         this.cryptography = cryptography;
     }
 
+    private generateRandomID() {
+        return Math.floor(Math.random() * 1000000);
+    }
+
     /**
      * Sync the current in-memory profile to the storage.
      */
@@ -75,7 +79,9 @@ class ProfileManager {
                 private: [],
                 direct: []
             },
-            contacts: {}
+            contacts: {},
+            username: "",
+            user_id: this.generateRandomID()
         }
         this.inMemoryProfile = profile;
         await this.persistProfile();
@@ -88,11 +94,19 @@ class ProfileManager {
 
         const keys: string[] = Object.keys(parsed_profile_data);
 
-        if (keys.length != 7)
+        if (keys.length != 9)
             return false;
 
         const interfaceKeys: string[] = [
-            "rln_identity_commitment", "root_hash", "leaves", "user_private_key", "user_public_key", "rooms", "contacts"
+            "rln_identity_commitment", 
+            "root_hash", 
+            "leaves", 
+            "user_private_key", 
+            "user_public_key", 
+            "rooms", 
+            "contacts", 
+            "username", 
+            "user_id"
         ];
 
         for (let iK of interfaceKeys) {
@@ -115,6 +129,38 @@ class ProfileManager {
         }
 
         return true;
+    }
+
+    /**
+    * Updates the username.
+    */
+    public async updateUsername(newName: string) {
+        if (this.inMemoryProfile != null) {
+            this.inMemoryProfile.username = newName;
+            if (this.inMemoryProfile.user_id == null) {
+                this.inMemoryProfile.user_id = this.generateRandomID();
+            }
+            await this.persistProfile();
+        }
+    }
+
+    /**
+     * Returns the user handle.
+     */
+    public getUserHandle() {
+        if (this.inMemoryProfile && this.inMemoryProfile.username != null && this.inMemoryProfile.user_id != null) {
+            return `${this.inMemoryProfile?.username}#${this.inMemoryProfile?.user_id}`;
+        }
+        return "anon";
+    }
+
+    /**
+     * Returns the username.
+     */
+    public getUserName() {
+        if (this.inMemoryProfile) {
+            return this.inMemoryProfile.username
+        }
     }
 
     /**

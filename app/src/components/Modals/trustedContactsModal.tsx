@@ -6,15 +6,15 @@ import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import ReactTooltip from "react-tooltip"
 import {
-    delete_contact,
-    get_contact,
-    insert_contact,
-    update_contact
-} from "rln-client-lib";
-import { useAppDispatch } from "../../redux/hooks/useAppDispatch";
-import { getTrustedContacts } from "../../redux/actions/actionCreator";
-import { useAppSelector } from "../../redux/hooks/useAppSelector";
-import { toast } from "react-toastify";
+  delete_contact,
+  get_contact,
+  insert_contact,
+  update_contact
+} from "rln-client-lib"
+import { useAppDispatch } from "../../redux/hooks/useAppDispatch"
+import { getTrustedContacts } from "../../redux/actions/actionCreator"
+import { useAppSelector } from "../../redux/hooks/useAppSelector"
+import { toast } from "react-toastify"
 
 const StyledTextarea = styled.textarea`
   border: 1px solid #f0f2f5;
@@ -71,7 +71,7 @@ const StyledContactWrapper = styled.div`
   }
 `
 
-const StyledContactName = styled.div`
+export const StyledContactName = styled.div`
   background: ${Colors.BERRY_PINK};
   border-radius: 8px;
   border: none;
@@ -116,76 +116,76 @@ const TrustedContactsModal = ({
     dispatch(getTrustedContacts())
   }, [toggleTrustedContacts]) // eslint-disable-line react-hooks/exhaustive-deps
 
-    const handleContactDeleting = (name: string) => {
-        if (name) {
-            delete_contact(name)
-                .then(() => dispatch(getTrustedContacts()))
-                .catch(err => toast.error(err));
-        }
-    };
-    
-    return (
-        <Modal centered isOpen={toggleTrustedContacts}>
-            <ModalHeader
-                toggle={() => {
-                    setToggleTrustedContacts(false);
-                }}
-            >
-                Trusted Contacts
-            </ModalHeader>
-            <ModalBody>
-                {trustedContacts.length > 0 ? (
-                    trustedContacts.map(contact => {
-                        return (
-                            <StyledContactWrapper>
-                                {" "}
-                                <StyledContactName>{contact.name}</StyledContactName>
-                                <div>
-                                    <FontAwesomeIcon
-                                        icon={faPen}
-                                        onClick={() => {
-                                            setToggleAddEditModal(true);
-                                            setEditContactName(contact.name);
-                                        }}
-                                        data-tip
-                                        data-for="EditContact"
-                                    />
-                                    <ReactTooltip
-                                        event="mouseenter"
-                                        eventOff="click mouseleave"
-                                        id="EditContact"
-                                        backgroundColor={Colors.ANATRACITE}
-                                    >
-                                        EditContact
-                                    </ReactTooltip>
-                                    <FontAwesomeIcon
-                                        icon={faTrash}
-                                        onClick={() => {
-                                            handleContactDeleting(contact.name);
-                                        }}
-                                        data-tip
-                                        data-for="DeleteContact"
-                                    />
-                                    <ReactTooltip
-                                        event="mouseenter"
-                                        eventOff="click mouseleave"
-                                        id="DeleteContact"
-                                        backgroundColor={Colors.ANATRACITE}
-                                    >
-                                        Delete Contact
-                                    </ReactTooltip>
-                                </div>
-                            </StyledContactWrapper>
-                        );
-                    })
-                ) : (
-                    <StyledContactName> No Trusted Contacts Yet</StyledContactName>
-                )}
-                <StyledButtonWrapper>
-                    <StyledButton onClick={() => setToggleAddEditModal(true)}>
-                        Create Trusted Contact
-                    </StyledButton>
-                </StyledButtonWrapper>
+  const handleContactDeleting = (name: string) => {
+    if (name) {
+      delete_contact(name)
+        .then(() => dispatch(getTrustedContacts()))
+        .catch((err) => toast.error(err))
+    }
+  }
+
+  return (
+    <Modal centered isOpen={toggleTrustedContacts}>
+      <ModalHeader
+        toggle={() => {
+          setToggleTrustedContacts(false)
+        }}
+      >
+        Trusted Contacts
+      </ModalHeader>
+      <ModalBody>
+        {trustedContacts.length > 0 ? (
+          trustedContacts.map((contact) => {
+            return (
+              <StyledContactWrapper>
+                {" "}
+                <StyledContactName>{contact.name}</StyledContactName>
+                <div>
+                  <FontAwesomeIcon
+                    icon={faPen}
+                    onClick={() => {
+                      setToggleAddEditModal(true)
+                      setEditContactName(contact.name)
+                    }}
+                    data-tip
+                    data-for="EditContact"
+                  />
+                  <ReactTooltip
+                    event="mouseenter"
+                    eventOff="click mouseleave"
+                    id="EditContact"
+                    backgroundColor={Colors.ANATRACITE}
+                  >
+                    EditContact
+                  </ReactTooltip>
+                  <FontAwesomeIcon
+                    icon={faTrash}
+                    onClick={() => {
+                      handleContactDeleting(contact.name)
+                    }}
+                    data-tip
+                    data-for="DeleteContact"
+                  />
+                  <ReactTooltip
+                    event="mouseenter"
+                    eventOff="click mouseleave"
+                    id="DeleteContact"
+                    backgroundColor={Colors.ANATRACITE}
+                  >
+                    Delete Contact
+                  </ReactTooltip>
+                </div>
+              </StyledContactWrapper>
+            )
+          })
+        ) : (
+          <StyledContactName> No Trusted Contacts Yet</StyledContactName>
+        )}
+        <StyledButtonWrapper>
+          <StyledButton onClick={() => setToggleAddEditModal(true)}>
+            Create Trusted Contact
+          </StyledButton>
+        </StyledButtonWrapper>
 
         <AddEditContactModal
           name={editContactName}

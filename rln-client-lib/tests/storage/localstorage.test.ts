@@ -16,7 +16,9 @@ describe('Test storage', () => {
             private: [],
             direct: []
         },
-        contacts: {}
+        contacts: {},
+        username: "test",
+        user_id: 348979
     }
 
     let storage: StorageProvider;

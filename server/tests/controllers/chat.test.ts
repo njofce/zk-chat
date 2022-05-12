@@ -11,14 +11,16 @@ const test_messages: IMessage[] = [
         epoch: 123,
         chat_type: 'PUBLIC',
         message_content: 'encrypted content',
-        timestamp: 123
+        timestamp: 123,
+        sender: "Sender name"
     },
     {
         uuid: 'id-2',
         epoch: 124,
         chat_type: 'PUBLIC',
         message_content: 'encrypted content',
-        timestamp: 124
+        timestamp: 124,
+        sender: "Sender name"
     }
 ]
 

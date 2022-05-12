@@ -23,6 +23,11 @@ module.exports = {
         './tests/jest.setup.ts', 
         'fake-indexeddb/auto'
     ],
+    coveragePathIgnorePatterns: [
+        "node_modules",
+        "interfaces",
+        "jestGlobalMocks.ts",
+    ],
     coverageThreshold: {
         'global': {
             "branches": 80,

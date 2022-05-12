@@ -22,7 +22,8 @@ class ChatService {
                     epoch: message.epoch,
                     chat_type: message.chat_type,
                     message_content: message.message_content,
-                    timestamp: message.timestamp
+                    timestamp: message.timestamp,
+                    sender: message.sender
                 }
             });
     }

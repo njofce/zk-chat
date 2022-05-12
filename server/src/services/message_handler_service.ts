@@ -115,7 +115,8 @@ class MessageHandlerService {
             epoch: message.epoch,
             chat_type: message.chat_type,
             message_content: message.message_content,
-            timestamp: new Date().getTime()
+            timestamp: new Date().getTime(),
+            sender: message.sender
         });
 
         return await msg.save();

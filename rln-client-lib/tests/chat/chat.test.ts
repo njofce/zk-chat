@@ -263,7 +263,8 @@ describe('Chat test', () => {
             "x_share": "111",
             "epoch": "1639339320000",
             "chat_type": "PRIVATE",
-            "message_content": "encrypted message"
+            "message_content": "encrypted message",
+            "sender": "anon"
         }));
 
     });
@@ -285,7 +286,8 @@ describe('Chat test', () => {
             uuid: "1",
             epoch: 12345,
             message_content: "test content",
-            timestamp: 12345
+            timestamp: 12345,
+            sender: "Sender"
         });
 
         expect(decrypted).toEqual([null, null]);
@@ -310,10 +312,11 @@ describe('Chat test', () => {
             uuid: "1",
             epoch: 12345,
             message_content: "test content",
-            timestamp: 12345
+            timestamp: 12345,
+            sender: "Sender"
         });
 
-        expect(decrypted).toStrictEqual([{ "chat_type": "DIRECT", "epoch": 12345, "message_content": "decrypted message", "timestamp": 12345, "uuid": "1" }, "test-1"]);
+        expect(decrypted).toStrictEqual([{ "chat_type": "DIRECT", "epoch": 12345, "message_content": "decrypted message", "sender": "Sender", "timestamp": 12345, "uuid": "1" }, "test-1"]);
     });
 
     test('decrypt message - pub or private', async () => {
@@ -332,10 +335,11 @@ describe('Chat test', () => {
             uuid: "1",
             epoch: 12345,
             message_content: "test content",
-            timestamp: 12345
+            timestamp: 12345,
+            sender: "Sender"
         });
 
-        expect(decrypted).toStrictEqual([{ "chat_type": "PUBLIC", "epoch": 12345, "message_content": "decrypted message", "timestamp": 12345, "uuid": "1" }, "test-1"]);
+        expect(decrypted).toStrictEqual([{ "chat_type": "PUBLIC", "epoch": 12345, "message_content": "decrypted message", "sender": "Sender", "timestamp": 12345, "uuid": "1" }, "test-1"]);
     });
 
     test('decrypt message - pub/priv error', async () => {
@@ -356,7 +360,8 @@ describe('Chat test', () => {
             uuid: "1",
             epoch: 12345,
             message_content: "test content",
-            timestamp: 12345
+            timestamp: 12345,
+            sender: "Sender"
         });
 
         expect(decrypted).toEqual([null, null]);
@@ -383,7 +388,8 @@ describe('Chat test', () => {
             uuid: "1",
             epoch: 12345,
             message_content: "test content",
-            timestamp: 12345
+            timestamp: 12345,
+            sender: "Sender"
         });
 
         expect(decrypted).toEqual([null, null]);
@@ -411,31 +417,36 @@ describe('Chat test', () => {
                                 uuid: "1",
                                 epoch: 100,
                                 chat_type: "PUBLIC",
-                                message_content: "content 1"
+                                message_content: "content 1",
+                                sender: "Sender"
                             },
                             {
                                 uuid: "2",
                                 epoch: 400,
                                 chat_type: "PUBLIC",
-                                message_content: "content 2"
+                                message_content: "content 2",
+                                sender: "Sender"
                             },
                             {
                                 uuid: "3",
                                 epoch: 500,
                                 chat_type: "PUBLIC",
-                                message_content: "content 3"
+                                message_content: "content 3",
+                                sender: "Sender"
                             },
                             {
                                 uuid: "4",
                                 epoch: 800,
                                 chat_type: "PUBLIC",
-                                message_content: "content 4"
+                                message_content: "content 4",
+                                sender: "Sender"
                             },
                             {
                                 uuid: "5",
                                 epoch: 999,
                                 chat_type: "PUBLIC",
-                                message_content: "content 5"
+                                message_content: "content 5",
+                                sender: "Sender"
                             }
                         ],
                         limit: 5
@@ -451,13 +462,15 @@ describe('Chat test', () => {
                             uuid: "6",
                             epoch: 1800,
                             chat_type: "PUBLIC",
-                            message_content: "content 6"
+                            message_content: "content 6",
+                            sender: "Sender"
                         },
                         {
                             uuid: "7",
                             epoch: 2000,
                             chat_type: "PUBLIC",
-                            message_content: "content 7"
+                            message_content: "content 7",
+                            sender: "Sender"
                         }
                     ],
                     limit: 5
@@ -486,21 +499,24 @@ describe('Chat test', () => {
             epoch: 100,
             chat_type: "PUBLIC",
             message_content: "content 1",
-            timestamp: 100
+            timestamp: 100,
+            sender: "Sender"
         });
         await chatDB.saveMessage('room-1', {
             uuid: "2",
             epoch: 102,
             chat_type: "PUBLIC",
             message_content: "content 2",
-            timestamp: 102
+            timestamp: 102,
+            sender: "Sender"
         });
         await chatDB.saveMessage('room-2', {
             uuid: "3",
             epoch: 105,
             chat_type: "PUBLIC",
             message_content: "content 3",
-            timestamp: 105
+            timestamp: 105,
+            sender: "Sender"
         });
 
         const messagesForRoomBeforeDelete: IMessage[] = await chatManager.loadMessagesForRoom('room-2', 1);
@@ -517,21 +533,24 @@ describe('Chat test', () => {
             epoch: 100,
             chat_type: "PUBLIC",
             message_content: "content 1",
-            timestamp: 100
+            timestamp: 100,
+            sender: "Sender"
         });
         await chatDB.saveMessage('room-1', {
             uuid: "2",
             epoch: 102,
             chat_type: "PUBLIC",
             message_content: "content 2",
-            timestamp: 102
+            timestamp: 102,
+            sender: "Sender"
         });
         await chatDB.saveMessage('room-2', {
             uuid: "3",
             epoch: 105,
             chat_type: "PUBLIC",
             message_content: "content 3",
-            timestamp: 105
+            timestamp: 105,
+            sender: "Sender"
         });
 
         const messages: IMessage[] = await chatManager.loadMessagesForRoom('room-1', 1);

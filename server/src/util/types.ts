@@ -9,16 +9,17 @@ export interface RLNMessage {
     epoch: string;
     chat_type: string;
     message_content: string;
+    sender: string;
 }
 
 export const constructRLNMessage = (parsedJson: any): RLNMessage => {
     const keys: string[] = Object.keys(parsedJson);
     
-    if (keys.length != 5)
+    if (keys.length != 6)
         throw "Bad message";
 
     const interfaceKeys: string[] = [
-        "zk_proof", "x_share", "epoch", "chat_type", "message_content"
+        "zk_proof", "x_share", "epoch", "chat_type", "message_content", "sender"
     ];
 
     for (let iK of interfaceKeys) {
@@ -33,7 +34,8 @@ export const constructRLNMessage = (parsedJson: any): RLNMessage => {
         x_share: parsedJson.x_share,
         epoch: parsedJson.epoch,
         chat_type: parsedJson.chat_type,
-        message_content: parsedJson.message_content
+        message_content: parsedJson.message_content,
+        sender: parsedJson.sender
     }
 }
 

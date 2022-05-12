@@ -187,5 +187,6 @@ const insertMessage = async(id: number, epoch: number) => {
     message1.chat_type = 'PUBLIC';
     message1.message_content = 'some encrypted content here';
     message1.timestamp = epoch;
+    message1.sender = "Sender";
     await message1.save();
 }
