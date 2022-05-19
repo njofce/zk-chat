@@ -1,0 +1,44 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "strict": true,
+        "target": "ES5",
+        "module": "ES6",
+        "downlevelIteration": true,
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "preserveConstEnums": true,
+        "skipLibCheck": true,
+        "declaration": true,
+        "allowSyntheticDefaultImports": true,
+        "declarationDir": "types",
+        "typeRoots": [
+            "node_modules/@types",
+            "types"
+        ],
+        "outDir": "dist/",
+        "allowJs": true,
+        "rootDir": ".",
+        "noImplicitAny": false,
+    },
+    "ts-node": {
+        "compilerOptions": {
+            "target": "esnext",
+            "module": "commonjs"
+        }
+    },
+    "typeAcquisition": {
+        "include": [
+            "jest"
+        ]
+    },
+    "include": [
+        "src",
+        "tests",
+        "rollup.config.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+}
