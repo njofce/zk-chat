@@ -1,6 +1,6 @@
 {
-    "name": "zk-chat-server-lib",
-    "version": "1.0.0",
+    "name": "zk-chat-server",
+    "version": "1.0.1",
     "description": "ZK Chat server library",
     "main": "dist/index.node.js",
     "repository": "https://github.com/njofce/zk-chat",
@@ -9,7 +9,7 @@
         "import": "./dist/index.mjs",
         "require": "./dist/index.node.js"
     },
-    "types": "dist/types/index.d.ts",
+    "types": "dist/types/src/index.d.ts",
     "publishConfig": {
         "access": "public"
     },

@@ -19,7 +19,7 @@ import {
   IRooms,
   ITrustedContact,
   IMessage
-} from "zk-chat-client-lib";
+} from "zk-chat-client";
 
 interface RoomsState {
   rooms: IRooms;

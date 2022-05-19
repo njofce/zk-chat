@@ -1,5 +1,5 @@
 import express from "express";
-import { initZKChatServer, ZKServerConfigBuilder } from 'zk-chat-server-lib';
+import { initZKChatServer, ZKServerConfigBuilder } from 'zk-chat-server';
 
 var cors = require("cors");
 

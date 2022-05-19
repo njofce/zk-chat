@@ -433,4 +433,5 @@ export {
 }
 export * from "./types"
 export * from "./chat/interfaces"
+export * from "./room/interfaces"
 export * from "./profile/interfaces"
