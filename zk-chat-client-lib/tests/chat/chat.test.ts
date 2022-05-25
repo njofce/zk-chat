@@ -4,12 +4,11 @@ import WsSocketClient from '../../src/communication/ws-socket';
 import ChatManager from '../../src/chat/index';
 import MockDate from 'mockdate';
 import ProfileManager from '../../src/profile';
-import { IMessage } from '../../../server/dist/src/persistence/model/message/message.types';
 import { StorageProvider } from '../../src/storage/interfaces';
 import { jest, test, expect, describe, beforeAll, beforeEach } from '@jest/globals'
 import { ICryptography, IKeyPair } from '../../src/crypto/interfaces';
 import { ServerCommunication } from '../../src/communication';
-import { IChatHistoryDB } from '../../src/chat/interfaces';
+import { IChatHistoryDB, IMessage } from '../../src/chat/interfaces';
 import { deepClone } from '../../src/util';
 
 const ws = require("ws");
