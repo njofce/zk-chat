@@ -15378,10 +15378,10 @@ yocto-queue@^0.1.0:
   resolved "https://registry.yarnpkg.com/yocto-queue/-/yocto-queue-0.1.0.tgz#0294eb3dee05028d31ee1a5fa2c556a6aaf10a1b"
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
 
-zk-chat-client@1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/zk-chat-client/-/zk-chat-client-1.0.2.tgz#c7ba94354fed296f92ddc66659022336ff867a78"
-  integrity sha512-3KCPDDXNNSnvHgSCgDBOyJYyFJSYO6z8KUCqhOOpd9IQ/lBq6+kR11YlTDJgXyJZnCQeccJ/crkZ0ffdeRHbbw==
+zk-chat-client@1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/zk-chat-client/-/zk-chat-client-1.0.4.tgz#5a4a50ed60f4dfb282ed694f7be580dd185e3d35"
+  integrity sha512-6HKMN5sBFq5Wztuix3bO34QZEmqMv5BiMN5jvhMA+BMcPE8Z/BZe5XJBRg8XaSbUjw8YG+bb5xOfSU2/snhYSA==
   dependencies:
     "@zk-kit/identity" "^1.4.1"
     "@zk-kit/protocols" "^1.8.2"
@@ -15392,10 +15392,10 @@ zk-chat-client@1.0.2:
     uuid "^8.3.2"
     ws "^8.3.0"
 
-zk-chat-server@1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/zk-chat-server/-/zk-chat-server-1.0.1.tgz#5354c6f21c3e77164065ae8a009a8d0f23ef68c0"
-  integrity sha512-NrfktmQHw/21OuTiJakwp9W0kupmVm3xFATINewzYsgp+shJndZJahcAapZuy0/t5oCa+8mPCoIkzQ/5LA8aqQ==
+zk-chat-server@1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/zk-chat-server/-/zk-chat-server-1.0.4.tgz#180737f9152d41fb8b042ca1bc25c252e039b4ad"
+  integrity sha512-4vMbsRMZ1bC9vl3Kyk7C48uYM/wv4ZgLDet6jmPiMGexFV9plnb+gvCfAWkGtKt6BMhzk3wMYfmU2BvlQgY7nw==
   dependencies:
     "@zk-kit/identity" "^1.4.1"
     "@zk-kit/protocols" "^1.8.2"

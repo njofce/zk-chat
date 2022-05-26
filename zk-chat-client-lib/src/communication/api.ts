@@ -16,7 +16,7 @@ class RLNServerApi {
         try {
             const res = await axios({
                 method: 'GET',
-                url: this.server_url + "/api/v1/public_room/all",
+                url: this.server_url + "/zk-chat/api/public_room/all",
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
@@ -32,7 +32,7 @@ class RLNServerApi {
         try {
             const res = await axios({
                 method: 'GET',
-                url: this.server_url + "/api/v1/public_room/one/" + id,
+                url: this.server_url + "/zk-chat/api/public_room/one/" + id,
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
@@ -48,7 +48,7 @@ class RLNServerApi {
         try {
             const res = await axios({
                 method: 'POST',
-                url: this.server_url + "/api/v1/public_room/",
+                url: this.server_url + "/zk-chat/api/public_room/",
                 data: {
                     uuid: room_id,
                     name: room_name,
@@ -69,7 +69,7 @@ class RLNServerApi {
         try {
             const res = await axios({
                 method: 'GET',
-                url: this.server_url + "/api/v1/chat/chat_history",
+                url: this.server_url + "/zk-chat/api/chat/chat_history",
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
@@ -85,7 +85,7 @@ class RLNServerApi {
         try {
             const res = await axios({
                 method: 'POST',
-                url: this.server_url + "/api/v1/chat/time_range_chat_history",
+                url: this.server_url + "/zk-chat/api/chat/time_range_chat_history",
                 data: {
                     from: fromTimestamp,
                     to: toTimestamp
@@ -105,7 +105,7 @@ class RLNServerApi {
         try {
             const res = await axios({
                 method: 'GET',
-                url: this.server_url + "/api/v1/user/rln_root",
+                url: this.server_url + "/zk-chat/api/user/rln_root",
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
@@ -121,7 +121,7 @@ class RLNServerApi {
         try {
             const res = await axios({
                 method: 'GET',
-                url: this.server_url + "/api/v1/user/leaves",
+                url: this.server_url + "/zk-chat/api/user/leaves",
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
@@ -137,7 +137,7 @@ class RLNServerApi {
         try {
             const res = await axios({
                 method: 'GET',
-                url: this.server_url + "/api/v1/user/banned",
+                url: this.server_url + "/zk-chat/api/user/banned",
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
@@ -153,7 +153,7 @@ class RLNServerApi {
         try {
             const res = await axios({
                 method: 'POST',
-                url: this.server_url + "/api/v1/key_exchange/get-bundles",
+                url: this.server_url + "/zk-chat/api/key_exchange/get-bundles",
                 data: {
                     receiver_public_key: receiver_public_key
                 },
@@ -172,7 +172,7 @@ class RLNServerApi {
         try {
             const res = await axios({
                 method: 'POST',
-                url: this.server_url + "/api/v1/key_exchange/create-bundle",
+                url: this.server_url + "/zk-chat/api/key_exchange/create-bundle",
                 data: {
                     zk_proof: zk_proof,
                     epoch: epoch,
@@ -197,7 +197,7 @@ class RLNServerApi {
         try {
             const res = await axios({
                 method: 'DELETE',
-                url: this.server_url + "/api/v1/key_exchange/delete-bundles",
+                url: this.server_url + "/zk-chat/api/key_exchange/delete-bundles",
                 data: {
                     zk_proof: zk_proof,
                     epoch: epoch,
