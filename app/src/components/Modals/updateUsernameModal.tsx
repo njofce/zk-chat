@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Modal, ModalBody, ModalHeader } from "reactstrap"
-import { update_username, get_username } from "rln-client-lib"
+import { update_username, get_username } from "zk-chat-client"
 import styled from "styled-components"
 import * as Colors from "../../constants/colors"
 import { getUserHandle } from "../../redux/actions/actionCreator"

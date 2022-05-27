@@ -4,7 +4,7 @@ import styled from "styled-components"
 import * as Colors from "../../constants/colors"
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons"
 import { Room } from "../../redux/actions/actionCreator"
-import { send_message } from "rln-client-lib"
+import { send_message } from "zk-chat-client"
 import { toast } from "react-toastify"
 
 const StyledInput = styled.input`

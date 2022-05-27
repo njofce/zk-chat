@@ -5,7 +5,6 @@ import Dashboard from "../Dashboard"
 import SyncSpinner from "../Spinner"
 import { Routes, Route, Navigate } from "react-router-dom"
 import { useLocation, useNavigate } from "react-router"
-import { get_rooms, init, receive_message } from "rln-client-lib"
 import { useEffect } from "react"
 import { useAppDispatch } from "../../redux/hooks/useAppDispatch"
 import {
@@ -20,8 +19,7 @@ import { ToastContainer } from "react-toastify"
 import 'react-toastify/dist/ReactToastify.css';
 import { generateProof } from "../../util/util";
 import "react-toastify/dist/ReactToastify.css"
-import { IMessage } from "rln-client-lib/dist/src/chat/interfaces"
-import { IRooms } from "rln-client-lib/dist/src/profile/interfaces"
+import { init, receive_message, get_rooms, IRooms } from 'zk-chat-client';
 import { useAppSelector } from "../../redux/hooks/useAppSelector"
 
 const AppWrapper = () => {
@@ -74,7 +72,7 @@ const AppWrapper = () => {
     await receive_message(receiveMessageCallback)
   }
 
-  const receiveMessageCallback = (message: IMessage, roomId: string) => {
+  const receiveMessageCallback = (message: any, roomId: string) => {
     dispatch(addMessageToRoomAction(message, roomId))
   }
 

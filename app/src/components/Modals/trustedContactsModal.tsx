@@ -10,7 +10,7 @@ import {
   get_contact,
   insert_contact,
   update_contact
-} from "rln-client-lib"
+} from "zk-chat-client"
 import { useAppDispatch } from "../../redux/hooks/useAppDispatch"
 import { getTrustedContacts } from "../../redux/actions/actionCreator"
 import { useAppSelector } from "../../redux/hooks/useAppSelector"

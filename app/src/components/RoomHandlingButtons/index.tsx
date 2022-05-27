@@ -16,7 +16,7 @@ import * as Colors from "../../constants/colors"
 import JoinPrivateRoomModal from "../Modals/privateRoomModal"
 import TrustedContactsModal from "../Modals/trustedContactsModal"
 import GeneratePublicKeyModal from "../Modals/generatePublicKey"
-import { export_profile } from "rln-client-lib"
+import { export_profile } from "zk-chat-client"
 import UpdateUsernameModal from "../Modals/updateUsernameModal"
 
 const StyledButtonsWrapper = styled.div`

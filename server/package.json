@@ -19,6 +19,7 @@
         "mongoose": "5.13.13",
         "node-schedule": "^2.1.0",
         "redis": "^3.1.2",
+        "zk-chat-server": "1.0.4",
         "uWebSockets.js": "uNetworking/uWebSockets.js#v20.4.0"
     },
     "devDependencies": {

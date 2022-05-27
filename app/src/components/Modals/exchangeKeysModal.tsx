@@ -8,7 +8,7 @@ import ReactTooltip from "react-tooltip"
 import {
   generate_encrypted_invite_direct_room,
   update_direct_room_key
-} from "rln-client-lib"
+} from "zk-chat-client"
 import { useAppSelector } from "../../redux/hooks/useAppSelector"
 
 const StyledButton = styled.button`

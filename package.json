@@ -8,14 +8,12 @@
   "private": true,
   "workspaces": [
     "server",
-    "rln-client-lib",
     "app"
   ],
   "scripts": {
     "build": "yarn workspaces run build",
     "server": "yarn workspace server start",
     "app": "yarn workspace app start",
-    "test-server": "yarn workspace server test",
-    "test-lib": "yarn workspace rln-client-lib test"
+    "test-server": "yarn workspace server test"
   }
 }

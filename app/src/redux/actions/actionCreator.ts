@@ -9,14 +9,12 @@ import {
   get_messages_for_room,
   get_messages_for_rooms,
   sync_message_history,
-  get_user_handle
-} from "rln-client-lib"
-import { IMessage } from "rln-client-lib/dist/src/chat/interfaces"
-import {
+  get_user_handle,
+  IMessage,
   IDirectRoom,
   IPrivateRoom,
   IPublicRoom
-} from "rln-client-lib/dist/src/room/interfaces"
+} from "zk-chat-client"
 
 export type Room = IDirectRoom | IPublicRoom | IPrivateRoom
 

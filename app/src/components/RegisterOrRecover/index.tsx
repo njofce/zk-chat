@@ -3,7 +3,7 @@ import { useNavigate } from "react-router"
 import styled from "styled-components"
 import * as Colors from "../../constants/colors"
 import RecoverModal from "../Modals/recoverModal"
-import { init, receive_message } from "rln-client-lib"
+import { init, receive_message } from "zk-chat-client"
 import { useDispatch } from "react-redux"
 import {
   addMessageToRoomAction,

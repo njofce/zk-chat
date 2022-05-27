@@ -8,9 +8,9 @@ import {
   get_rooms,
   init,
   receive_message,
-  recover_profile
-} from "rln-client-lib";
-import { IRooms } from "rln-client-lib/dist/src/profile/interfaces";
+  recover_profile,
+  IRooms
+} from "zk-chat-client";
 import { serverUrl, socketUrl } from "../../constants/constants";
 import { generateProof } from "../../util/util";
 import {

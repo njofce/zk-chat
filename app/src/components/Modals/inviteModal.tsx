@@ -5,7 +5,7 @@ import * as Colors from "../../constants/colors";
 import { faCopy } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ReactTooltip from "react-tooltip";
-import { invite_private_room } from "rln-client-lib";
+import { invite_private_room } from "zk-chat-client";
 import { useAppSelector } from "../../redux/hooks/useAppSelector";
 import { Room } from "../../redux/actions/actionCreator";
 import TrustedContactsList from "./trustedContactsList";

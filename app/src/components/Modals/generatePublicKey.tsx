@@ -5,7 +5,7 @@ import * as Colors from "../../constants/colors"
 import { faCopy } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import ReactTooltip from "react-tooltip"
-import { get_public_key } from "rln-client-lib"
+import { get_public_key } from "zk-chat-client"
 
 const StyledTextarea = styled.textarea`
   border: 1px solid #f0f2f5;

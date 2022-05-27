@@ -17,9 +17,9 @@ import {
 } from "../actions/actionCreator";
 import {
   IRooms,
-  ITrustedContact
-} from "rln-client-lib/dist/src/profile/interfaces";
-import { IMessage } from "rln-client-lib/dist/src/chat/interfaces";
+  ITrustedContact,
+  IMessage
+} from "zk-chat-client";
 
 interface RoomsState {
   rooms: IRooms;

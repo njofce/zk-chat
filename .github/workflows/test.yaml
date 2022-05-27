@@ -19,7 +19,7 @@ jobs:
         run: yarn build
 
       - name: Test client lib
-        run: yarn test-lib
+        run: cd zk-chat-client-lib && yarn install && yarn build && yarn test && cd ..
 
       - name: Test server
-        run: yarn test-server
+        run: cd zk-chat-server-lib && yarn install && yarn build && yarn test && cd ..

@@ -3,6 +3,7 @@ mongo-db
 redis-data
 app/build
 app/node_modules
-rln-client-lib/node_modules
+zk-chat-client-lib/node_modules
+zk-server-client-lib/node_modules
 server/node_modules
 npm-debug.log

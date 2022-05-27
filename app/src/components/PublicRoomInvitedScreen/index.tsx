@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useNavigate, useParams } from "react-router"
-import { join_public_room } from "rln-client-lib"
+import { join_public_room } from "zk-chat-client"
 import styled from "styled-components"
 import * as Colors from "../../constants/colors"
 
