@@ -24,6 +24,7 @@ services:
 
   rln-chat-server:
     image: 490752553772.dkr.ecr.eu-central-1.amazonaws.com/zk-chat-api:latest
+    pull_policy: always
     container_name: api
     ports:
       - "8080:8080"
@@ -58,6 +59,7 @@ services:
 
   rln-chat-client:
     image: 490752553772.dkr.ecr.eu-central-1.amazonaws.com/zk-chat-client:latest
+    pull_policy: always
     container_name: client
     ports:
       - "3000:3000"
