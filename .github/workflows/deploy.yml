@@ -2,7 +2,16 @@ name: Deploy
 on:
   #push:
   #  branches: [ main ]
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      build:
+        description: "Build trigger"
+        required: true
+        default: "enable"
+        type: choice
+        options:
+        - enable
+        - disable
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -11,6 +20,8 @@ concurrency:
 jobs:  
   deploy:
     runs-on: ubuntu-latest
+    env:
+      DATA: ${{ github.event.inputs.build }}
     permissions:
       id-token: write
       contents: read
@@ -30,7 +41,7 @@ jobs:
 
       - name: Build and Push images to ECR
         run: |
-          .github/scripts/build.sh
+          .github/scripts/build.sh ${{ env.DATA }}
 
       - name: Create Deployment
         run: |
