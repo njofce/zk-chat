@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Modal, ModalBody, ModalHeader } from "reactstrap"
-import { update_username, get_username } from "zk-chat-client"
+import { update_username, get_username } from "test-zk-chat-client"
 import styled from "styled-components"
 import * as Colors from "../../constants/colors"
 import { getUserHandle } from "../../redux/actions/actionCreator"
@@ -52,7 +52,7 @@ const UpdateUsernameModal = ({
             const currentUsername = get_username()
             setUsername(currentUsername)
         }
-       
+
     }, [toggleUpdateUsername])
 
     const handleUsernameUpdate = () => {

@@ -14966,6 +14966,22 @@ test-pcd-semaphore-signature-pcd@0.6.0:
     react "^18.2.0"
     typescript "^4.5.2"
 
+test-zk-chat-client@1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/test-zk-chat-client/-/test-zk-chat-client-1.0.4.tgz#0b81b38ce02e3b8505ae9d30818ca350c4f22aee"
+  integrity sha512-/Jf2/BMJJoGpv2Tk2cqYyIeDeMVPeXkVU2VVEpbR6W2c2FQZWBpFJ/S+aubAI/8ZqNneB8rZ5QB/ka7vB8OIpA==
+  dependencies:
+    "@zk-kit/identity" "^1.4.1"
+    "@zk-kit/protocols" "^1.8.2"
+    axios "^0.24.0"
+    crypto-js "^4.1.1"
+    dexie "^3.2.1"
+    dotenv "^10.0.0"
+    json-bigint "^1.0.0"
+    rlnjs "^2.0.8"
+    uuid "^8.3.2"
+    ws "^8.3.0"
+
 text-table@0.2.0, text-table@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
@@ -16690,20 +16706,6 @@ yocto-queue@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/yocto-queue/-/yocto-queue-0.1.0.tgz#0294eb3dee05028d31ee1a5fa2c556a6aaf10a1b"
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
-
-zk-chat-client@1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/zk-chat-client/-/zk-chat-client-1.0.4.tgz#5a4a50ed60f4dfb282ed694f7be580dd185e3d35"
-  integrity sha512-6HKMN5sBFq5Wztuix3bO34QZEmqMv5BiMN5jvhMA+BMcPE8Z/BZe5XJBRg8XaSbUjw8YG+bb5xOfSU2/snhYSA==
-  dependencies:
-    "@zk-kit/identity" "^1.4.1"
-    "@zk-kit/protocols" "^1.8.2"
-    axios "^0.24.0"
-    crypto-js "^4.1.1"
-    dexie "^3.2.1"
-    dotenv "^10.0.0"
-    uuid "^8.3.2"
-    ws "^8.3.0"
 
 zk-chat-server@1.0.4:
   version "1.0.4"

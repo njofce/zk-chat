@@ -1,5 +1,5 @@
 {
-    "name": "zk-chat-client",
+    "name": "test-zk-chat-client",
     "version": "1.0.4",
     "description": "ZK Chat client library",
     "main": "dist/index.node.js",

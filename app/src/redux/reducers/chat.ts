@@ -19,7 +19,7 @@ import {
   IRooms,
   ITrustedContact,
   IMessage
-} from "zk-chat-client";
+} from "test-zk-chat-client";
 
 interface RoomsState {
   rooms: IRooms;
@@ -176,7 +176,7 @@ const ChatReducer = (state = defaultState, action: AnyAction): RoomsState => {
           chatHistory:{
             [meta.roomId]: []
           }
-          
+
         }),
         finish: (prevState) => ({ ...prevState })
       })

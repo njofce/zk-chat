@@ -18,7 +18,7 @@ import { ToastContainer } from "react-toastify"
 
 import 'react-toastify/dist/ReactToastify.css';
 import { generateProof } from "../../util/util";
-import { init, receive_message, get_rooms, IRooms } from 'zk-chat-client';
+import { init, receive_message, get_rooms, IRooms } from 'test-zk-chat-client';
 import { useAppSelector } from "../../redux/hooks/useAppSelector"
 import AuthPopup from "../Passport/popup"
 
@@ -38,14 +38,14 @@ const AppWrapper = () => {
 
   const initializeApp = async () => {
     try {
-      console.log("!@# AppWrapper/index.tsx: before generateProof")
-      const proof = await generateProof(
-        "1",
-        "5566 is the best",
-        {depth:16, leaves:[], leavesPerNode:2},
-        "123",
-      );
-      console.log(`!@# proof=`, proof)
+      // console.log("!@# AppWrapper/index.tsx: before generateProof")
+      // const proof = await generateProof(
+      //   "1",
+      //   "5566 is the best",
+      //   {depth:16, leaves:[], leavesPerNode:2},
+      //   "123",
+      // );
+      // console.log(`!@# proof=`, proof)
       console.log("!@# AppWrapper/index.tsx: before init")
       await init({
         serverUrl: serverUrl,
