@@ -10,7 +10,7 @@ import PubSub from "./communication/pub_sub";
 import SocketServer from "./communication/socket/socket_server";
 import MessageHandlerService from "./services/message_handler_service";
 import NodeSynchronizer from "./communication/node_sync";
-import InterRepSynchronizer from "./interrep";
+import SemaphoreSynchronizer from "./semaphore";
 import Hasher from "./util/hasher";
 import UserService from "./services/user.service";
 import KeyExchangeService from "./services/key_exchange_service";
@@ -23,7 +23,7 @@ const createServer = (chatRouter: Router, roomRouter: Router, userRouter: Router
     const app = express();
     app.use(cors());
     app.options("*", cors());
-    
+
     app.use(express.json());
 
     app.use("/zk-chat/api/chat", chatRouter);
@@ -47,8 +47,8 @@ const initZKChatServer = async (config: IZKServerConfig) => {
 
     const keyExchangeService: KeyExchangeService = createKeyExchangeService(config, userService, keyExchangeRequestStatsService, new Hasher());
 
-    const interRepSynchronizer = new InterRepSynchronizer(redisPubSub, groupService, userService, config);
-    await interRepSynchronizer.sync();
+    const semaphoreSynchronizer = new SemaphoreSynchronizer(redisPubSub, groupService, userService, config);
+    await semaphoreSynchronizer.sync();
 
     const messageHandler: MessageHandlerService = createMessageHandler(config, redisPubSub, userService, requestStatsService);
     const socketServer: SocketServer = createSocketServer(config, messageHandler.handleChatMessage);
