@@ -53,7 +53,9 @@ const AppWrapper = () => {
           })
         )
       })
+      console.log("!!!NOOO")
     } catch (error) {
+      console.log("!@# error = ", error)
       navigate("/r-procedure")
     }
   }
