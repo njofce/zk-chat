@@ -1,9 +1,12 @@
-import { RLNFullProof } from "@zk-kit/protocols";
+import { RLNFullProof } from "rlnjs";
+import JSONBig from "json-bigint";
+
 import { IChatHistoryDB, IMessage, ITimeRangeMessages } from './interfaces';
 import { ICryptography } from '../crypto/interfaces';
 import { ServerCommunication } from '../communication/index';
 import ProfileManager from "../profile";
 import Hasher from "../hasher";
+import { IFuncGenerateProof } from "src/types";
 
 /**
  * The core component that is responsible for creating valid ZK proofs for a message, encrypting and dispatching it, as well as receiving and decrypting messages
@@ -49,7 +52,7 @@ class ChatManager {
         return !this.root_up_to_date;
     }
 
-    public async generateProof(proof_generator_callback: (nullifier: string, signal: string, storage_artifacts: any, rln_identitifer: any) => Promise<any>): Promise<IProofData> {
+    public async generateProof(proof_generator_callback: IFuncGenerateProof): Promise<IProofData> {
         let epoch: string = this.getEpoch();
 
         let externalNullifier: string = this.hasher.genExternalNullifier((epoch));
@@ -62,18 +65,17 @@ class ChatManager {
             leavesPerNode: 2
         };
 
-        const proof: string = await proof_generator_callback(externalNullifier, signal, storageArtifacts, ChatManager.RLN_IDENTIFIER.toString());
-        const fullProof: RLNFullProof = JSON.parse(proof);
+        const proof = await proof_generator_callback(externalNullifier, signal, storageArtifacts, ChatManager.RLN_IDENTIFIER.toString());
         const xShare: bigint = this.hasher.genSignalHash(signal);
 
         return {
-            fullProof: fullProof,
+            fullProof: proof,
             xShare: xShare.toString(),
             epoch: epoch
         }
     }
 
-    public async sendMessage(chat_room_id: string, raw_message: string, proof_generator_callback: (nullifier: string, signal: string, storage_artifacts: any, rln_identitifer: any) => Promise<any>) {
+    public async sendMessage(chat_room_id: string, raw_message: string, proof_generator_callback: IFuncGenerateProof) {
         await this.checkRootUpToDate();
         // Generate proof
         const proofData: IProofData = await this.generateProof(proof_generator_callback);
@@ -93,7 +95,8 @@ class ChatManager {
             sender: senderHandle
         }
 
-        this.communication_manager.sendMessage(JSON.stringify(message));
+        const stringified = JSONBig({ useNativeBigInt: true }).stringify(message);
+        this.communication_manager.sendMessage(stringified);
     }
 
     public async registerReceiveMessageHandler(receive_msg_callback: (message: IMessage, chat_room_id: string) => void) {

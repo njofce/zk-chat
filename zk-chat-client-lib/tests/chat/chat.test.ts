@@ -9,6 +9,8 @@ import { jest, test, expect, describe, beforeAll, beforeEach } from '@jest/globa
 import { ICryptography, IKeyPair } from '../../src/crypto/interfaces';
 import { ServerCommunication } from '../../src/communication';
 import { IChatHistoryDB, IMessage } from '../../src/chat/interfaces';
+import { IFuncGenerateProof, IStorageArtifacts } from "../../src";
+import JSONBig from "json-bigint";
 import { deepClone } from '../../src/util';
 
 const ws = require("ws");
@@ -164,7 +166,7 @@ describe('Chat test', () => {
     let communication: ServerCommunication;
     let server: RLNServerApi;
     let socketClient: WsSocketClient;
-    
+
     let crypto: ICryptography;
     let storage: StorageProvider;
 
@@ -173,13 +175,13 @@ describe('Chat test', () => {
     let chatManager: ChatManager;
     let chatDB: IChatHistoryDB;
 
-    const proof_generator_callback = async (nullifier: string, signal: string, storage_artifacts: any, rln_identitifer: any): Promise<any> => {
-        return JSON.stringify({
-            fullProof: {
+    const proof_generator_callback: IFuncGenerateProof = async (epoch: string, signal: string, storage_artifacts: IStorageArtifacts, rln_identitifer: string) => {
+        return {
+            snarkProof: {
                 proof: {
-                    pi_a: "pi_a",
-                    pi_b: "pi_b",
-                    pi_c: "pi_c",
+                    pi_a: ["pi_a"],
+                    pi_b: [["pi_b"]],
+                    pi_c: ["pi_c"],
                     protocol: "p",
                     curve: "c"
                 },
@@ -188,11 +190,12 @@ describe('Chat test', () => {
                     merkleRoot: BigInt(123).toString(),
                     internalNullifier: BigInt(123).toString(),
                     signalHash: BigInt(123).toString(),
-                    epoch: BigInt(123).toString(),
-                    rlnIdentifier: BigInt(123).toString()
+                    externalNullifier: BigInt(123).toString(),
                 }
-            }
-        });
+            },
+            epoch: BigInt(123),
+            rlnIdentifier: BigInt(123),
+        };
     }
 
     beforeEach(async () => {
@@ -229,7 +232,7 @@ describe('Chat test', () => {
     test('send message', async () => {
         MockDate.set(new Date(1639339320000));
         jest.spyOn(global.Math, 'random').mockReturnValue(0.1);
-        
+
         jest.spyOn(profileManager, "getLeaves").mockReturnValue(["1111", "2222"]);
         jest.spyOn(profileManager, "getRoomById").mockResolvedValue({type: "PRIVATE"});
         jest.spyOn(profileManager, "encryptMessageForRoom").mockResolvedValue("encrypted message");
@@ -237,28 +240,11 @@ describe('Chat test', () => {
         const sendMessageSpy = jest.spyOn(communication, "sendMessage").mockResolvedValue();
 
         await chatManager.sendMessage("test-room-1", "raw message", proof_generator_callback);
+        const expectedProof = await proof_generator_callback("1", "signal", {depth:16, leaves: ["1"], leavesPerNode:2}, "1");
 
         expect(sendMessageSpy).toHaveBeenCalledTimes(1);
-        expect(sendMessageSpy).toHaveBeenCalledWith(JSON.stringify({
-            "zk_proof": {
-                "fullProof": {
-                    "proof": {
-                        "pi_a": "pi_a",
-                        "pi_b": "pi_b",
-                        "pi_c": "pi_c",
-                        "protocol": "p",
-                        "curve": "c"
-                    },
-                    "publicSignals": {
-                        "yShare": BigInt(123).toString(),
-                        "merkleRoot": BigInt(123).toString(),
-                        "internalNullifier": BigInt(123).toString(),
-                        "signalHash": BigInt(123).toString(),
-                        "epoch": BigInt(123).toString(),
-                        "rlnIdentifier": BigInt(123).toString()
-                    }
-                }
-            },
+        expect(sendMessageSpy).toHaveBeenCalledWith(JSONBig({ useNativeBigInt: true }).stringify({
+            "zk_proof": expectedProof,
             "x_share": "111",
             "epoch": "1639339320000",
             "chat_type": "PRIVATE",
@@ -271,7 +257,7 @@ describe('Chat test', () => {
     test('register receive message handler', async () => {
         const receiveHandler = (m, r) => { }
         const mockedReceive = jest.spyOn(communication, "receiveMessage").mockResolvedValue();
-        
+
         await chatManager.registerReceiveMessageHandler(receiveHandler);
 
         expect(mockedReceive).toHaveBeenCalled();

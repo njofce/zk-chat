@@ -1,3 +1,4 @@
+import { IFuncGenerateProof } from "../types";
 import ChatManager, { IProofData } from "../chat";
 import { ServerCommunication } from "../communication";
 import { ICryptography } from "../crypto/interfaces";
@@ -6,7 +7,7 @@ import { IKeyExchangeEnabledRoom } from "../room/interfaces";
 
 /**
  * The component that manages the spam-resistant key exchange protocol.
- * 
+ *
  * On startup, a task is scheduled to run the key-exchange protocol every X seconds. The key exchange protocol is ran for all the rooms that
  * support DH key exchange.
  */
@@ -18,9 +19,9 @@ class KeyExchangeManager {
     private cryptography: ICryptography;
     private chatManager: ChatManager;
     private profileManager: ProfileManager;
-    private proofGeneratorCallback: (nullifier: string, signal: string, storage_artifacts: any, rln_identitifer: any) => Promise<any>;
+    private proofGeneratorCallback: IFuncGenerateProof;
 
-    constructor(communication: ServerCommunication, cryptography: ICryptography, chatManager: ChatManager, profileManager: ProfileManager, proofGeneratorCallback: (nullifier: string, signal: string, storage_artifacts: any, rln_identitifer: any) => Promise<any>) {
+    constructor(communication: ServerCommunication, cryptography: ICryptography, chatManager: ChatManager, profileManager: ProfileManager, proofGeneratorCallback: IFuncGenerateProof) {
         this.communication = communication;
         this.cryptography = cryptography;
         this.chatManager = chatManager;
@@ -40,15 +41,15 @@ class KeyExchangeManager {
     }
 
     /**
-     * Generates and posts a key bundle to the server. 
-     * 
+     * Generates and posts a key bundle to the server.
+     *
      * The key bundle includes an encrypted content, which includes the provided DH key exchange public key and the sender public key.
      * The encrypted content is encrypted with a symmetric key, which then gets encrypted with the receiver's public key.
-     * 
+     *
      * The bundle is saved the server, and it can't be linked to the sender in any way.
-     * 
-     * @param dhPublicKey 
-     * @param receiverPublicKey 
+     *
+     * @param dhPublicKey
+     * @param receiverPublicKey
      */
     public async saveKeyExchangeBundle(dhPublicKey: string, receiverPublicKey: string) {
         const userPublicKey = await this.profileManager.getPublicKey();
@@ -78,7 +79,7 @@ class KeyExchangeManager {
 
     /**
      * Runs the automatic key exchange algorithm for all the provided rooms which support key exchange.
-     * 
+     *
      * @param rooms the rooms which support DH key exchange.
      */
     private async runKeyExchangeProtocol(rooms: IKeyExchangeEnabledRoom[]) {
@@ -87,10 +88,10 @@ class KeyExchangeManager {
 
         try {
             const bundlesIntendedForCurrentUser: any[] = await this.communication.getKeyExchangeBundles(userPublicKey);
-        
+
             let bundlesToDeleteFromServer: any[] = []
             for (let bundleIntendedForCurrentUser of bundlesIntendedForCurrentUser) {
-                
+
                 try {
                     const encryptedContentString = bundleIntendedForCurrentUser.encrypted_content;
                     const encryptedSymmetricKey = bundleIntendedForCurrentUser.encrypted_key;

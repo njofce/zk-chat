@@ -1,4 +1,4 @@
-import { RLNFullProof } from '@zk-kit/protocols';
+import { RLNFullProof } from 'rlnjs';
 import RLNServerApi from './api';
 import { SocketClient } from './interfaces';
 
