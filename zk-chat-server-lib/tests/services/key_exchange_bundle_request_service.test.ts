@@ -4,10 +4,21 @@ import KeyExchangeBundleRequestStatsService from '../../src/services/key_exchang
 import KeyExchangeRequestStats from '../../src/persistence/model/key_exchange_request_stats/key_exchange_request_stats.model';
 import { IKeyExchangeRequestStats } from '../../src/persistence/model/key_exchange_request_stats/key_exchange_request_stats.types';
 import { IShares } from '../../src/persistence/model/request_stats/request_stats.types';
+import { RLNFullProof, RLNPublicSignals, RLN } from 'rlnjs';
 
+const xShare = BigInt(123);
+const epoch = BigInt("1637837930000");
 
-const testKeyExchangeMessage: any = {
-    zk_proof: {
+const publicSignals: RLNPublicSignals = {
+    yShare: BigInt(123).toString(),
+    merkleRoot: BigInt(123).toString(),
+    internalNullifier: BigInt(1234).toString(),
+    signalHash: BigInt(1234).toString(),
+    externalNullifier: BigInt(1234).toString(),
+}
+
+const zk_proof: RLNFullProof = {
+    snarkProof: {
         proof: {
             pi_a: [],
             pi_b: [],
@@ -15,83 +26,31 @@ const testKeyExchangeMessage: any = {
             protocol: "p",
             curve: "c"
         },
-        publicSignals: {
-            yShare: BigInt(123).toString(),
-            merkleRoot: BigInt(123).toString(),
-            internalNullifier: BigInt(1234).toString(),
-            signalHash: BigInt(1234).toString(),
-            epoch: BigInt(1234).toString(),
-            rlnIdentifier: BigInt(1234).toString()
-        }
+        publicSignals,
     },
-    x_share: BigInt(123).toString(),
-    epoch: "1637837920000"
+    epoch: BigInt(1234),
+    rlnIdentifier: BigInt(1234),
 }
 
+const testKeyExchangeMessage = {
+    zk_proof,
+    x_share: xShare.toString(),
+    epoch: epoch.toString(),
+}
+
+const epoch2 = BigInt("1637837920000");
+const testKeyExchangeMessage2 = {
+    zk_proof,
+    x_share: xShare.toString(),
+    epoch: epoch2.toString(),
+}
+
+//
 const testMessages: any[] = [
-    {
-        zk_proof: {
-            proof: {
-                pi_a: [],
-                pi_b: [],
-                pi_c: [],
-                protocol: "p",
-                curve: "c"
-            },
-            publicSignals: {
-                yShare: BigInt(123).toString(),
-                merkleRoot: BigInt(123).toString(),
-                internalNullifier: BigInt(1234).toString(),
-                signalHash: BigInt(1234).toString(),
-                epoch: BigInt(1234).toString(),
-                rlnIdentifier: BigInt(1234).toString()
-            }
-        },
-        x_share: BigInt(123).toString(),
-        epoch: "1637837930000"
-    },
-    {
-        zk_proof: {
-            proof: {
-                pi_a: [],
-                pi_b: [],
-                pi_c: [],
-                protocol: "p",
-                curve: "c"
-            },
-            publicSignals: {
-                yShare: BigInt(123).toString(),
-                merkleRoot: BigInt(123).toString(),
-                internalNullifier: BigInt(1234).toString(),
-                signalHash: BigInt(1234).toString(),
-                epoch: BigInt(1234).toString(),
-                rlnIdentifier: BigInt(1234).toString()
-            }
-        },
-        x_share: BigInt(123).toString(),
-        epoch: "1637837920000",
-    },
-    {
-        zk_proof: {
-            proof: {
-                pi_a: [],
-                pi_b: [],
-                pi_c: [],
-                protocol: "p",
-                curve: "c"
-            },
-            publicSignals: {
-                yShare: BigInt(123).toString(),
-                merkleRoot: BigInt(123).toString(),
-                internalNullifier: BigInt(1234).toString(),
-                signalHash: BigInt(1234).toString(),
-                epoch: BigInt(1234).toString(),
-                rlnIdentifier: BigInt(1234).toString()
-            }
-        },
-        x_share: BigInt(123).toString(),
-        epoch: "1637837920000"
-    }]
+    testKeyExchangeMessage,
+    testKeyExchangeMessage2,
+    testKeyExchangeMessage2,
+]
 
 describe('Test key exchange bundle request stats service', () => {
 
@@ -141,25 +100,9 @@ describe('Test key exchange bundle request stats service', () => {
         }
 
         const isDuplicate = await reqStats.isDuplicate(
-            {
-                proof: {
-                    pi_a: [],
-                    pi_b: [],
-                    pi_c: [],
-                    protocol: "p",
-                    curve: "c"
-                },
-                publicSignals: {
-                    yShare: BigInt(123).toString(),
-                    merkleRoot: BigInt(123).toString(),
-                    internalNullifier: BigInt(1234).toString(),
-                    signalHash: BigInt(1234).toString(),
-                    epoch: BigInt(1234).toString(),
-                    rlnIdentifier: BigInt(1234).toString()
-                }
-            }, 
-            "1637837920000",
-            BigInt(123).toString()
+            zk_proof,
+            epoch2.toString(),
+            xShare.toString()
         );
         expect(isDuplicate).toBeTruthy();
     });
@@ -170,26 +113,12 @@ describe('Test key exchange bundle request stats service', () => {
             await reqStats.saveMessage(m.zk_proof, m.epoch, m.x_share);
         }
 
+        const epoch3 = BigInt("1637837140000")
         const isDuplicate = await reqStats.isDuplicate(
-            {
-                proof: {
-                    pi_a: [],
-                    pi_b: [],
-                    pi_c: [],
-                    protocol: "p",
-                    curve: "c"
-                },
-                publicSignals: {
-                    yShare: BigInt(123).toString(),
-                    merkleRoot: BigInt(123).toString(),
-                    internalNullifier: BigInt(123).toString(),
-                    signalHash: BigInt(1234).toString(),
-                    epoch: BigInt(1234).toString(),
-                    rlnIdentifier: BigInt(1234).toString()
-                }
-            },
-            "1637837140000",
-            BigInt(123).toString());
+            zk_proof,
+            epoch3.toString(),
+            xShare.toString(),
+        );
         expect(isDuplicate).toBeFalsy();
     });
 
@@ -200,24 +129,8 @@ describe('Test key exchange bundle request stats service', () => {
         }
 
         const isSpam = await reqStats.isSpam(
-            {
-                proof: {
-                    pi_a: [],
-                    pi_b: [],
-                    pi_c: [],
-                    protocol: "p",
-                    curve: "c"
-                },
-                publicSignals: {
-                    yShare: BigInt(123).toString(),
-                    merkleRoot: BigInt(123).toString(),
-                    internalNullifier: BigInt(1234).toString(),
-                    signalHash: BigInt(1234).toString(),
-                    epoch: BigInt(1234).toString(),
-                    rlnIdentifier: BigInt(1234).toString()
-                }
-            },
-            "1637837920000", 
+            zk_proof,
+            epoch2.toString(),
             2);
 
         expect(isSpam).toBeTruthy();
@@ -230,24 +143,8 @@ describe('Test key exchange bundle request stats service', () => {
         }
 
         const isSpam = await reqStats.isSpam(
-            {
-                proof: {
-                    pi_a: [],
-                    pi_b: [],
-                    pi_c: [],
-                    protocol: "p",
-                    curve: "c"
-                },
-                publicSignals: {
-                    yShare: BigInt(123).toString(),
-                    merkleRoot: BigInt(123).toString(),
-                    internalNullifier: BigInt(123).toString(),
-                    signalHash: BigInt(1234).toString(),
-                    epoch: BigInt(1234).toString(),
-                    rlnIdentifier: BigInt(1234).toString()
-                }
-            },
-            "1637837920000", 
+            zk_proof,
+            epoch2.toString(),
             3);
 
         expect(isSpam).toBeFalsy();

@@ -10,7 +10,7 @@ describe('Test redis pub-sub', () => {
     let pubSub: RedisPubSub;
 
     const channel: string = "test-channel";
-    
+
     beforeEach(async () => {
         clientSub = redis.createClient();
         clientPub = redis.createClient();

@@ -1,4 +1,4 @@
-import { RLNFullProof } from '@zk-kit/protocols';
+import { RLNFullProof } from 'rlnjs';
 import Hasher from '../util/hasher';
 import { IKeyExchangeBundle } from '../persistence/model/key_exchange_bundle/key_exchange_bundle.types';
 import KeyExchangeBundleRequestStatsService from './key_exchange_bundle_request_service';

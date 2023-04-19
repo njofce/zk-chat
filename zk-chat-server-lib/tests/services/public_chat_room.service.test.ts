@@ -16,14 +16,14 @@ describe('Test public room service', () => {
         const room: IPublicChatRoom = await publicRoomService.saveRoom('id-1', 'test-room', 'symmetric-key');
 
         expect(room).not.toBeNull();
-        
+
         const all_rooms: IPublicChatRoom[] = await publicRoomService.getAllRooms();
         expect(all_rooms.length).toEqual(1);
     });
 
     test('get all rooms', async () => {
         const publicRoomService = new PublicRoomService();
-        
+
         await insertPublicRoom(1);
         await insertPublicRoom(2);
 

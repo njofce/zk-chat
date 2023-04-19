@@ -1,5 +1,5 @@
 import { IShares } from '../persistence/model/request_stats/request_stats.types';
-import { RLNFullProof } from "@zk-kit/protocols";
+import { RLNFullProof } from "rlnjs";
 import Hasher from "./hasher";
 import { getYShareFromFullProof } from './types';
 
@@ -19,18 +19,8 @@ export function verifyEpoch(epoch: string, allowedDelay: number): boolean {
 }
 
 export async function isZkProofValid(hasher: Hasher, verifierKey: any, proof: RLNFullProof, root: string): Promise<boolean> {
-
-    return await hasher.verifyProof(verifierKey, {
-        proof: proof.proof,
-        publicSignals: {
-            yShare: proof.publicSignals.yShare,
-            merkleRoot: root,
-            internalNullifier: proof.publicSignals.internalNullifier,
-            signalHash: proof.publicSignals.signalHash,
-            epoch: proof.publicSignals.epoch,
-            rlnIdentifier: proof.publicSignals.rlnIdentifier,
-        }
-    });
+    proof.snarkProof.publicSignals.merkleRoot = root;
+    return await hasher.verifyProof(verifierKey, proof);
 }
 
 export function getUserFromShares(zk_proof: RLNFullProof, x_share: string, hasher: Hasher, shares: IShares[]) {

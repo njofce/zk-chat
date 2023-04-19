@@ -58,7 +58,7 @@ class UserService {
     }
 
     public async appendUsers(users: IGroupMember[], groupId: string): Promise<string> {
-        
+
         if (users.length == 0)
             return "";
 
@@ -73,7 +73,7 @@ class UserService {
         for (const user of users) {
             // No need to do anything if the user was previously added to the tree
             // A user's index is unique within a group, and we use that property to check whether the user was added
-            // to the database previously, even though it's identitiy commitment can be set to zero if the user gets banned.
+            // to the database previously, even though it's identity commitment can be set to zero if the user gets banned.
             const foundUser: IMerkleTreeNode | null = await MerkleTreeNode.findLeafByGroupIdAndIndexInGroup(groupId, user.index);
             if (foundUser) {
                 console.log("User for the given group and index in group exists ", foundUser.hash);
@@ -99,7 +99,7 @@ class UserService {
 
             for (let level = 0; level < this.config.merkleTreeLevels; level++) {
                 if (currentIndex % 2 === 0) {
-                    
+
                     currentNode.siblingHash = zeros[level].hash;
 
                     let parentNode = await MerkleTreeNode.findByLevelAndIndex(level + 1, Math.floor(currentIndex / 2));
@@ -128,7 +128,7 @@ class UserService {
                     currentNode = parentNode;
                 } else {
                     const siblingNode = (await MerkleTreeNode.findByLevelAndIndex(level, currentIndex - 1)) as IMerkleTreeNodeDocument;
-                    
+
                     currentNode.siblingHash = siblingNode.hash;
                     siblingNode.siblingHash = currentNode.hash;
 

@@ -6,7 +6,7 @@ import UserService from '../../src/services/user.service';
 import KeyExchangeBundleRequestStatsService from '../../src/services/key_exchange_bundle_request_service'
 import KeyExchangeService from '../../src/services/key_exchange_service'
 import Hasher from '../../src/util/hasher';
-import { RLNFullProof, RLNPublicSignals } from '@zk-kit/protocols';
+import { RLNFullProof, RLNPublicSignals, RLN } from 'rlnjs';
 import MockDate from 'mockdate';
 import { ZKServerConfigBuilder } from '../../src/config';
 
@@ -22,25 +22,32 @@ describe('Test key exchange service', () => {
 
     const timestampTodayMs = 1637837920000;
 
+    const epoch = BigInt(123);
+    const rlnIdentifier = BigInt(456);
+    const externalNullifier = RLN._genNullifier(epoch, rlnIdentifier);
+
     const publicSignals: RLNPublicSignals = {
         yShare: BigInt(123).toString(),
         merkleRoot: BigInt(123).toString(),
         internalNullifier: BigInt(123).toString(),
         signalHash: BigInt(123).toString(),
-        epoch: BigInt(123).toString(),
-        rlnIdentifier: BigInt(123).toString()
+        externalNullifier: externalNullifier,
     }
-    
+
     const zk_proof: RLNFullProof = {
-        proof: {
-            pi_a: [],
-            pi_b: [],
-            pi_c: [],
-            protocol: "p",
-            curve: "c"
+        snarkProof: {
+            proof: {
+                pi_a: ["pi_a"],
+                pi_b: [["pi_b"]],
+                pi_c: ["pi_c"],
+                protocol: "p",
+                curve: "c"
+            },
+            publicSignals,
         },
-        publicSignals: publicSignals
-    };
+        epoch: epoch,
+        rlnIdentifier: rlnIdentifier,
+    }
 
     beforeEach(async () => {
         userService = new UserService(config);

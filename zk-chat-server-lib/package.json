@@ -27,10 +27,12 @@
         "cors": "^2.8.5",
         "express": "^4.17.1",
         "express-validator": "^6.13.0",
+        "keccak": "^3.0.3",
         "mongodb": "^4.2.0",
         "mongoose": "5.13.13",
         "node-schedule": "^2.1.0",
         "redis": "^3.1.2",
+        "rlnjs": "2.0.8",
         "uWebSockets.js": "uNetworking/uWebSockets.js#v20.4.0"
     },
     "devDependencies": {

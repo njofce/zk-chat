@@ -1,6 +1,7 @@
 import * as path from "path";
 import * as fs from "fs";
 
+import JSONBig from "json-bigint";
 import { randomUUID } from "crypto";
 import { constructRLNMessage, RLNMessage } from "../util/types";
 import { getUserFromShares, isZkProofValid, verifyEpoch } from '../util/proof_utils';
@@ -16,7 +17,7 @@ import { IZKServerConfig } from "../types";
 /**
  * The core service that handles every message coming from the websocket channel. The message format is deserialized and validated properly.
  * The spam rules, as well as the zero knowledge proofs are validated properly, and use is banned if the spam rules are broken.
- * 
+ *
  * When all the checks succeed, the message is persisted in the database and broadcast to all active users.
  */
 class MessageHandlerService {
@@ -42,7 +43,7 @@ class MessageHandlerService {
     public handleChatMessage = async (message: string): Promise<IMessage> => {
         // Validate format of the RLN message
         const validMessage: RLNMessage | null = await this.validateFormat(message);
-        if (validMessage == null) 
+        if (validMessage == null)
             throw "Message format invalid";
 
         // Validate epoch
@@ -60,7 +61,7 @@ class MessageHandlerService {
         if (!validZkProof) {
             throw "ZK Proof is invalid, ignoring message";
         }
-        
+
         // Check spam rules
         const spamRulesViolated = await this.areSpamRulesViolated(validMessage);
 
@@ -88,10 +89,9 @@ class MessageHandlerService {
         // Persist message and broadcast
         const persistedMessage: IMessage = await this.persistMessage(validMessage);
         await this.requestStatsService.saveMessage(validMessage);
-
         const syncMessage: ISyncMessage = {
             type: SyncType.MESSAGE,
-            message: JSON.stringify(persistedMessage)
+            message: JSONBig({ useNativeBigInt: true }).stringify(persistedMessage)
         };
         this.pubSub.publish(syncMessage);
 

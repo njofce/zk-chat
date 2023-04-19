@@ -6,8 +6,14 @@ import RequestStatsService from '../../src/services/request_stats.service'
 import RequestStats from '../../src/persistence/model/request_stats/request_stats.model';
 import { IRequestStats, IShares } from '../../src/persistence/model/request_stats/request_stats.types';
 
-const testMessage: RLNMessage = {
-    zk_proof: {
+// snarkProof: RLNSNARKProof;
+// epoch: bigint;
+// rlnIdentifier: bigint;
+const epoch = BigInt("123");
+const rlnIdentifier = BigInt("456");
+
+const zk_proof = {
+    snarkProof: {
         proof: {
             pi_a: [],
             pi_b: [],
@@ -20,10 +26,15 @@ const testMessage: RLNMessage = {
             merkleRoot: BigInt(123).toString(),
             internalNullifier: BigInt(1234).toString(),
             signalHash: BigInt(1234).toString(),
-            epoch: BigInt(1234).toString(),
-            rlnIdentifier: BigInt(1234).toString()
+            externalNullifier: BigInt(1234).toString()
         }
     },
+    epoch,
+    rlnIdentifier,
+}
+
+const testMessage: RLNMessage = {
+    zk_proof,
     x_share: BigInt(123).toString(),
     epoch: "1637837920000",
     chat_type: "PUBLIC",
@@ -33,23 +44,7 @@ const testMessage: RLNMessage = {
 
 const testMessages: RLNMessage[] = [
     {
-        zk_proof: {
-            proof: {
-                pi_a: [],
-                pi_b: [],
-                pi_c: [],
-                protocol: "p",
-                curve: "c"
-            },
-            publicSignals: {
-                yShare: BigInt(123).toString(),
-                merkleRoot: BigInt(123).toString(),
-                internalNullifier: BigInt(1234).toString(),
-                signalHash: BigInt(1234).toString(),
-                epoch: BigInt(1234).toString(),
-                rlnIdentifier: BigInt(1234).toString()
-            }
-        },
+        zk_proof,
         x_share: BigInt(123).toString(),
         epoch: "1637837930000",
         chat_type: "PUBLIC",
@@ -57,23 +52,7 @@ const testMessages: RLNMessage[] = [
         sender: "Sender"
     },
     {
-        zk_proof: {
-            proof: {
-                pi_a: [],
-                pi_b: [],
-                pi_c: [],
-                protocol: "p",
-                curve: "c"
-            },
-            publicSignals: {
-                yShare: BigInt(123).toString(),
-                merkleRoot: BigInt(123).toString(),
-                internalNullifier: BigInt(1234).toString(),
-                signalHash: BigInt(1234).toString(),
-                epoch: BigInt(1234).toString(),
-                rlnIdentifier: BigInt(1234).toString()
-            }
-        },
+        zk_proof,
         x_share: BigInt(123).toString(),
         epoch: "1637837920000",
         chat_type: "PUBLIC",
@@ -81,23 +60,7 @@ const testMessages: RLNMessage[] = [
         sender: "Sender"
     },
     {
-        zk_proof: {
-            proof: {
-                pi_a: [],
-                pi_b: [],
-                pi_c: [],
-                protocol: "p",
-                curve: "c"
-            },
-            publicSignals: {
-                yShare: BigInt(123).toString(),
-                merkleRoot: BigInt(123).toString(),
-                internalNullifier: BigInt(1234).toString(),
-                signalHash: BigInt(1234).toString(),
-                epoch: BigInt(1234).toString(),
-                rlnIdentifier: BigInt(1234).toString()
-            }
-        },
+        zk_proof,
         x_share: BigInt(123).toString(),
         epoch: "1637837920000",
         chat_type: "PUBLIC",
@@ -125,7 +88,7 @@ describe('Test request stats service', () => {
     test('get shares for message - exists', async () => {
         const reqStats = new RequestStatsService();
         await reqStats.saveMessage(testMessage);
-        
+
         const shares: IShares[] = await reqStats.getRequestStats(testMessage);
         expect(shares.length).toEqual(1);
     });
@@ -153,23 +116,7 @@ describe('Test request stats service', () => {
         }
 
         const isDuplicate = await reqStats.isDuplicate({
-            zk_proof: {
-                proof: {
-                    pi_a: [],
-                    pi_b: [],
-                    pi_c: [],
-                    protocol: "p",
-                    curve: "c"
-                },
-                publicSignals: {
-                    yShare: BigInt(123).toString(),
-                    merkleRoot: BigInt(123).toString(),
-                    internalNullifier: BigInt(1234).toString(),
-                    signalHash: BigInt(1234).toString(),
-                    epoch: BigInt(1234).toString(),
-                    rlnIdentifier: BigInt(1234).toString()
-                }
-            },
+            zk_proof,
             x_share: BigInt(123).toString(),
             epoch: "1637837920000",
             chat_type: "PUBLIC",
@@ -186,23 +133,7 @@ describe('Test request stats service', () => {
         }
 
         const isDuplicate = await reqStats.isDuplicate({
-            zk_proof: {
-                proof: {
-                    pi_a: [],
-                    pi_b: [],
-                    pi_c: [],
-                    protocol: "p",
-                    curve: "c"
-                },
-                publicSignals: {
-                    yShare: BigInt(123).toString(),
-                    merkleRoot: BigInt(123).toString(),
-                    internalNullifier: BigInt(123).toString(),
-                    signalHash: BigInt(1234).toString(),
-                    epoch: BigInt(1234).toString(),
-                    rlnIdentifier: BigInt(1234).toString()
-                }
-            },
+            zk_proof,
             x_share: BigInt(123).toString(),
             epoch: "1637837140000",
             chat_type: "PUBLIC",
@@ -219,23 +150,7 @@ describe('Test request stats service', () => {
         }
 
         const isSpam = await reqStats.isSpam({
-            zk_proof: {
-                proof: {
-                    pi_a: [],
-                    pi_b: [],
-                    pi_c: [],
-                    protocol: "p",
-                    curve: "c"
-                },
-                publicSignals: {
-                    yShare: BigInt(123).toString(),
-                    merkleRoot: BigInt(123).toString(),
-                    internalNullifier: BigInt(1234).toString(),
-                    signalHash: BigInt(1234).toString(),
-                    epoch: BigInt(1234).toString(),
-                    rlnIdentifier: BigInt(1234).toString()
-                }
-            },
+            zk_proof,
             x_share: BigInt(123).toString(),
             epoch: "1637837920000",
             chat_type: "PUBLIC",
@@ -253,23 +168,7 @@ describe('Test request stats service', () => {
         }
 
         const isSpam = await reqStats.isSpam({
-            zk_proof: {
-                proof: {
-                    pi_a: [],
-                    pi_b: [],
-                    pi_c: [],
-                    protocol: "p",
-                    curve: "c"
-                },
-                publicSignals: {
-                    yShare: BigInt(123).toString(),
-                    merkleRoot: BigInt(123).toString(),
-                    internalNullifier: BigInt(123).toString(),
-                    signalHash: BigInt(1234).toString(),
-                    epoch: BigInt(1234).toString(),
-                    rlnIdentifier: BigInt(1234).toString()
-                }
-            },
+            zk_proof,
             x_share: BigInt(123).toString(),
             epoch: "1637837920000",
             chat_type: "PUBLIC",
