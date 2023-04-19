@@ -13643,7 +13643,7 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^3.0.0"
     inherits "^2.0.1"
 
-rlnjs@^2.0.8:
+rlnjs@2.0.8:
   version "2.0.8"
   resolved "https://registry.yarnpkg.com/rlnjs/-/rlnjs-2.0.8.tgz#1440f8aa9c3d1266c4ab9a624a4cbfc08b63e72b"
   integrity sha512-UbB4wZLryC+w8DM39z0fJrDqkNWB5yG8cUTgQHoMcgfLjVb6yubgmCesFhRn9bcrreSad9+3xe17EUU7vPCG/A==
@@ -14966,10 +14966,10 @@ test-pcd-semaphore-signature-pcd@0.6.0:
     react "^18.2.0"
     typescript "^4.5.2"
 
-test-zk-chat-client@1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/test-zk-chat-client/-/test-zk-chat-client-1.0.4.tgz#0b81b38ce02e3b8505ae9d30818ca350c4f22aee"
-  integrity sha512-/Jf2/BMJJoGpv2Tk2cqYyIeDeMVPeXkVU2VVEpbR6W2c2FQZWBpFJ/S+aubAI/8ZqNneB8rZ5QB/ka7vB8OIpA==
+test-zk-chat-client@1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/test-zk-chat-client/-/test-zk-chat-client-1.0.5.tgz#e197c43accc49719cf078220ac559d1702c035fe"
+  integrity sha512-x8lsxg664Z0Trx07Y7YIiR1SB5NkGcY8QQSIZmYws+2yRBJE2a+PdXBLRkqyPpo1xm2KIGwYKjAvfIrFjUXZHg==
   dependencies:
     "@zk-kit/identity" "^1.4.1"
     "@zk-kit/protocols" "^1.8.2"
@@ -14978,7 +14978,7 @@ test-zk-chat-client@1.0.4:
     dexie "^3.2.1"
     dotenv "^10.0.0"
     json-bigint "^1.0.0"
-    rlnjs "^2.0.8"
+    rlnjs "2.0.8"
     uuid "^8.3.2"
     ws "^8.3.0"
 

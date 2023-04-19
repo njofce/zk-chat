@@ -6218,7 +6218,7 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^3.0.0"
     inherits "^2.0.1"
 
-rlnjs@^2.0.8:
+rlnjs@2.0.8:
   version "2.0.8"
   resolved "https://registry.yarnpkg.com/rlnjs/-/rlnjs-2.0.8.tgz#1440f8aa9c3d1266c4ab9a624a4cbfc08b63e72b"
   integrity sha512-UbB4wZLryC+w8DM39z0fJrDqkNWB5yG8cUTgQHoMcgfLjVb6yubgmCesFhRn9bcrreSad9+3xe17EUU7vPCG/A==

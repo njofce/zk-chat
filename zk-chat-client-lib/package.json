@@ -1,6 +1,6 @@
 {
     "name": "test-zk-chat-client",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "description": "ZK Chat client library",
     "main": "dist/index.node.js",
     "repository": "https://github.com/njofce/zk-chat",
@@ -26,7 +26,7 @@
         "dexie": "^3.2.1",
         "dotenv": "^10.0.0",
         "json-bigint": "^1.0.0",
-        "rlnjs": "^2.0.8",
+        "rlnjs": "2.0.8",
         "uuid": "^8.3.2",
         "ws": "^8.3.0"
     },
