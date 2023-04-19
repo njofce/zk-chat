@@ -7,11 +7,11 @@ import Hasher from "../hasher";
 
 /**
  * The core component that is responsible for creating valid ZK proofs for a message, encrypting and dispatching it, as well as receiving and decrypting messages
- * for specific rooms. 
+ * for specific rooms.
  * This component also takes care of updating the tree root and auth path in case it becomes obsolete.
  */
 class ChatManager {
-    
+
     private root_up_to_date: boolean = true;
 
     private profile_manager: ProfileManager;
@@ -58,7 +58,7 @@ class ChatManager {
 
         const storageArtifacts = {
             leaves: this.profile_manager.getLeaves(),
-            depth: 15,
+            depth: 16,
             leavesPerNode: 2
         };
 
@@ -108,7 +108,7 @@ class ChatManager {
             // Save the message to the local DB.
             this.message_db.saveMessage(room_id, decryptedMessage);
 
-            // When the chat history sync in underway, the callback function 
+            // When the chat history sync in underway, the callback function
             // (which would indicate additional interaction with the client) is not called.
             if (!this.chatHistoryIsSyncing) {
                 // Return the message to the calling function, usually the UI app, only if history sync is not in progress.
@@ -147,10 +147,10 @@ class ChatManager {
     }
 
     /**
-     * Loads all messages from the server, from the max timestamp of the messages stored locally until the 
+     * Loads all messages from the server, from the max timestamp of the messages stored locally until the
      * provided toTimestamp, and only stores locally the messages that can be decrypted.
-     * 
-     * A time-range pagination is implemented, where the server returns a number of messages, no more than a certain limit in a single call. 
+     *
+     * A time-range pagination is implemented, where the server returns a number of messages, no more than a certain limit in a single call.
      * The pagination loop ends when the number of returned messages is less than the limit.
      */
     public async syncMessagesForAllRooms(toTimestamp: number): Promise<void> {
@@ -158,7 +158,7 @@ class ChatManager {
         let fromTimestamp: number = await this.message_db.getMaxTimestampForAllMessages() + 1;
 
         if (fromTimestamp == -1) {
-            fromTimestamp = toTimestamp - 24 * 60 * 60 * 100; 
+            fromTimestamp = toTimestamp - 24 * 60 * 60 * 100;
             // If there are no messages stored locally, load only message history for the given day.
         }
 
@@ -186,7 +186,7 @@ class ChatManager {
 
     private async getAndSaveMessagesForTimeRange(fromTimestamp: number, toTimestamp: number): Promise<ITimeRangeMessages | null> {
         let messageData: ITimeRangeMessages = await this.communication_manager.getTimeRangeChatHistory(fromTimestamp, toTimestamp);
-        
+
         if (messageData == null || messageData == undefined) {
             return null;
         }
@@ -232,7 +232,7 @@ class ChatManager {
 
             const new_rln_root = await this.communication_manager.getRlnRoot();
             const new_leaves = await this.communication_manager.getLeaves();
-            
+
             this.profile_manager.updateRootHash(new_rln_root);
             this.profile_manager.updateLeaves(new_leaves);
 

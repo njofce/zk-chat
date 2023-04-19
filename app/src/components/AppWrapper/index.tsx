@@ -18,9 +18,9 @@ import { ToastContainer } from "react-toastify"
 
 import 'react-toastify/dist/ReactToastify.css';
 import { generateProof } from "../../util/util";
-import "react-toastify/dist/ReactToastify.css"
 import { init, receive_message, get_rooms, IRooms } from 'zk-chat-client';
 import { useAppSelector } from "../../redux/hooks/useAppSelector"
+import AuthPopup from "../Passport/popup"
 
 const AppWrapper = () => {
   const navigate = useNavigate()
@@ -38,6 +38,15 @@ const AppWrapper = () => {
 
   const initializeApp = async () => {
     try {
+      console.log("!@# AppWrapper/index.tsx: before generateProof")
+      const proof = await generateProof(
+        "1",
+        "5566 is the best",
+        {depth:16, leaves:[], leavesPerNode:2},
+        "123",
+      );
+      console.log(`!@# proof=`, proof)
+      console.log("!@# AppWrapper/index.tsx: before init")
       await init({
         serverUrl: serverUrl,
         socketUrl: socketUrl
@@ -53,9 +62,9 @@ const AppWrapper = () => {
           })
         )
       })
-      console.log("!!!NOOO")
+      console.log("!@# AppWrapper/index.tsx: after init")
     } catch (error) {
-      console.log("!@# error = ", error)
+      console.log("!@# AppWrapper/index.tsx: error =", error)
       navigate("/r-procedure")
     }
   }
@@ -88,6 +97,7 @@ const AppWrapper = () => {
           <Routes>
             <Route path="/r-procedure" element={<RegisterOrRecover />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/popup" element={<AuthPopup />} />
             <Route
               path="/public/:roomId"
               element={<PublicRoomInvitedScreen />}

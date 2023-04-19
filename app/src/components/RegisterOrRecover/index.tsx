@@ -76,9 +76,8 @@ const RegisterOrRecover = () => {
 
   const getActiveIdentity = async () => {
     console.info("getting the identity from zk-keeper")
-    const { injected } = window as any
-    const client = await injected.connect()
-    const id = await client.getActiveIdentity(1, 2)
+    // FIXME: get ID from passport
+    const id = "abcd"
     return id
   }
 

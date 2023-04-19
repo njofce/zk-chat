@@ -1,6 +1,6 @@
 ## Server library for anonymous chat using RLN and InterRep
 
-You can install this library in any existing server, though you need to make sure to allocate 2 specific ports for HTTP and Websocket communication. 
+You can install this library in any existing server, though you need to make sure to allocate 2 specific ports for HTTP and Websocket communication.
 
 Use the following snippet to initialize the server library, using the default configuration.
 
@@ -25,7 +25,7 @@ serverConfig: IZKServerConfig = {
     dnConnectionString: "mongodb://localhost:27017",
     serverPort: 8080,
     socketServerPort: 8081,
-    merkleTreeLevels: 15,
+    merkleTreeLevels: 16,
     spamThreshold: 2,
     epochAllowedDelayThreshold: 20,
     interepSyncIntervalSeconds: 300,
@@ -57,7 +57,7 @@ export default {
     DB_CONNECTION_STRING: process.env.DB_CONNECTION_STRING || "mongodb://localhost:27017",
     SERVER_PORT: parseInt(process.env.SERVER_PORT || "8080") || 8080,
     SOCKET_SERVER_PORT: parseInt(process.env.SOCKET_SERVER_PORT || "8081") || 8081,
-    MERKLE_TREE_LEVELS: parseInt(process.env.MERKLE_TREE_LEVELS || "15", 10) || 15,
+    MERKLE_TREE_LEVELS: parseInt(process.env.MERKLE_TREE_LEVELS || "16", 10) || 16,
     SPAM_TRESHOLD: parseInt(process.env.SPAM_TRESHOLD || "2", 2) || 2,
     EPOCH_ALLOWED_DELAY_THRESHOLD: parseInt(process.env.EPOCH_ALLOWED_DELAY_THRESHOLD || "20", 20) || 20,
     INTERREP_SYNC_INTERVAL_SECONDS: parseInt(process.env.INTERREP_SYNC_INTERVAL_SECONDS || "300") || 300,
@@ -105,7 +105,7 @@ const createAppServer = () => {
     const app = express();
     app.use(cors());
     app.options("*", cors());
-    
+
     app.use(express.json());
 
     app.get("/health", (req, res) => {

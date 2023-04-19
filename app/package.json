@@ -4,6 +4,11 @@
   "private": true,
   "homepage": "",
   "dependencies": {
+    "@pcd/pcd-types": "0.4.0",
+    "@semaphore-protocol/group": "^3.2.3",
+    "@semaphore-protocol/identity": "^3.2.3",
+    "test-pcd-semaphore-group-pcd": "0.7.0",
+    "rlnjs": "^2.0.8",
     "@fortawesome/fontawesome-free-regular": "^5.0.13",
     "@fortawesome/fontawesome-svg-core": "^1.2.36",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
