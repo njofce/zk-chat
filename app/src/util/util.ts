@@ -34,5 +34,22 @@ export const generateProof: IFuncGenerateProof = async(
     if (!pcd) {
         throw new Error("Failed to generate RLN proof")
     }
-    return pcd.toRLNFullProof();
+    const fullProof = pcd.toRLNFullProof();
+    // NOTE: explicitly convert the `BigInt` to `string` to avoid the error
+    const snarkProof = fullProof.snarkProof;
+    const publicSignals = snarkProof.publicSignals;
+    return {
+        snarkProof: {
+            proof: snarkProof.proof,
+            publicSignals: {
+                yShare: String(publicSignals.yShare),
+                merkleRoot: String(publicSignals.merkleRoot),
+                internalNullifier: String(publicSignals.internalNullifier),
+                signalHash: String(publicSignals.signalHash),
+                externalNullifier: String(publicSignals.externalNullifier),
+            },
+        },
+        epoch: fullProof.epoch,
+        rlnIdentifier: fullProof.rlnIdentifier,
+    }
 }
