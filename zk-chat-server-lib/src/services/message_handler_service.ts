@@ -88,6 +88,7 @@ class MessageHandlerService {
 
         // Persist message and broadcast
         const persistedMessage: IMessage = await this.persistMessage(validMessage);
+        console.log(`!@# persistedMessage = `, persistedMessage);
         await this.requestStatsService.saveMessage(validMessage);
         const syncMessage: ISyncMessage = {
             type: SyncType.MESSAGE,

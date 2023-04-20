@@ -1,5 +1,5 @@
 import express from "express";
-import { initZKChatServer, ZKServerConfigBuilder } from 'zk-chat-server';
+import { initZKChatServer, ZKServerConfigBuilder } from 'test-zk-chat-server';
 import config from "./config";
 
 var cors = require("cors");
@@ -31,7 +31,7 @@ const createAppServer = () => {
     const app = express();
     app.use(cors());
     app.options("*", cors());
-    
+
     app.use(express.json());
 
     app.get("/health", (req, res) => {

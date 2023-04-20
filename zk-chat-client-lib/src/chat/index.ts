@@ -55,8 +55,6 @@ class ChatManager {
     public async generateProof(proof_generator_callback: IFuncGenerateProof): Promise<IProofData> {
         let epoch: string = this.getEpoch();
 
-        let externalNullifier: string = this.hasher.genExternalNullifier((epoch));
-
         const signal: string = this.generateRandomSignal();
 
         const storageArtifacts = {
@@ -65,8 +63,9 @@ class ChatManager {
             leavesPerNode: 2
         };
 
-        const proof = await proof_generator_callback(externalNullifier, signal, storageArtifacts, ChatManager.RLN_IDENTIFIER.toString());
+        const proof = await proof_generator_callback(epoch, signal, storageArtifacts, ChatManager.RLN_IDENTIFIER.toString());
         const xShare: bigint = this.hasher.genSignalHash(signal);
+        console.log("!@# chat/index.ts::generateProof: xShare = ", xShare.toString(), "epoch = ", epoch)
 
         return {
             fullProof: proof,
@@ -76,6 +75,7 @@ class ChatManager {
     }
 
     public async sendMessage(chat_room_id: string, raw_message: string, proof_generator_callback: IFuncGenerateProof) {
+        console.log("!@# chat/index.ts::sendMessage: chat_room_id = ", chat_room_id, "raw_message = ", raw_message)
         await this.checkRootUpToDate();
         // Generate proof
         const proofData: IProofData = await this.generateProof(proof_generator_callback);
@@ -94,8 +94,11 @@ class ChatManager {
             message_content: encryptedMessage,
             sender: senderHandle
         }
+        console.log("!@# chat/index.ts::sendMessage: message = ", message);
 
         const stringified = JSONBig({ useNativeBigInt: true }).stringify(message);
+
+        console.log("!@# chat/index.ts::sendMessage: stringified = ", stringified);
         this.communication_manager.sendMessage(stringified);
     }
 

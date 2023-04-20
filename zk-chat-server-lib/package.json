@@ -1,6 +1,6 @@
 {
-    "name": "zk-chat-server",
-    "version": "1.0.4",
+    "name": "test-zk-chat-server",
+    "version": "1.0.5",
     "description": "ZK Chat server library",
     "main": "dist/index.node.js",
     "repository": "https://github.com/njofce/zk-chat",

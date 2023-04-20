@@ -10204,6 +10204,15 @@ keccak@^3.0.0:
     node-gyp-build "^4.2.0"
     readable-stream "^3.6.0"
 
+keccak@^3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/keccak/-/keccak-3.0.3.tgz#4bc35ad917be1ef54ff246f904c2bbbf9ac61276"
+  integrity sha512-JZrLIAJWuZxKbCilMpNz5Vj7Vtb4scDG3dMXLOsbzBmQGyjwE61BbW7bJkfKKCShXiQZt3T6sBgALRtmd+nZaQ==
+  dependencies:
+    node-addon-api "^2.0.0"
+    node-gyp-build "^4.2.0"
+    readable-stream "^3.6.0"
+
 keyv@^3.0.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/keyv/-/keyv-3.1.0.tgz#ecc228486f69991e49e9476485a5be1e8fc5c4d9"
@@ -14959,10 +14968,10 @@ test-pcd-semaphore-signature-pcd@^0.4.3:
     react "^17.0.2"
     typescript "^4.5.2"
 
-test-zk-chat-client@1.0.5:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/test-zk-chat-client/-/test-zk-chat-client-1.0.5.tgz#e197c43accc49719cf078220ac559d1702c035fe"
-  integrity sha512-x8lsxg664Z0Trx07Y7YIiR1SB5NkGcY8QQSIZmYws+2yRBJE2a+PdXBLRkqyPpo1xm2KIGwYKjAvfIrFjUXZHg==
+test-zk-chat-client@1.0.13:
+  version "1.0.13"
+  resolved "https://registry.yarnpkg.com/test-zk-chat-client/-/test-zk-chat-client-1.0.13.tgz#646f2a5dbd1f624d36a21d81201d44c5aa48c07b"
+  integrity sha512-QxONr9Bq4mB1hdEGTqhivOPXTGJhGqwNmq7nuwnaPrAquNZHm+aK79ahk685jlTWfr934ILequ9Nek75lqiYtg==
   dependencies:
     "@zk-kit/identity" "^1.4.1"
     "@zk-kit/protocols" "^1.8.2"
@@ -14974,6 +14983,48 @@ test-zk-chat-client@1.0.5:
     rlnjs "2.0.8"
     uuid "^8.3.2"
     ws "^8.3.0"
+
+test-zk-chat-server@1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/test-zk-chat-server/-/test-zk-chat-server-1.0.5.tgz#a42ebd65b1895f0b14570f1587beba04dd0ee2ef"
+  integrity sha512-NjE0UHaDlxhOl8y9xN+1x55SDTFLluLuI+5+k6gCNrTM2vGbD2d9gujVDtmWw73wAQJJmxWza4tJCijQWiCb5g==
+  dependencies:
+    "@zk-kit/identity" "^1.4.1"
+    "@zk-kit/protocols" "^1.8.2"
+    axios "^0.24.0"
+    bigint-conversion "2.1.12"
+    circomlib "0.5.5"
+    cors "^2.8.5"
+    express "^4.17.1"
+    express-validator "^6.13.0"
+    keccak "^3.0.3"
+    mongodb "^4.2.0"
+    mongoose "5.13.13"
+    node-schedule "^2.1.0"
+    redis "^3.1.2"
+    rlnjs "2.0.8"
+    uWebSockets.js uNetworking/uWebSockets.js#v20.4.0
+
+test-zk-chat-server@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/test-zk-chat-server/-/test-zk-chat-server-1.0.4.tgz#9bb26f27fee01f6d05f63fd4c5dfef3e08cd2493"
+  integrity sha512-FGA/wGzu2WQqQI77SozGlv1W4usgMBXX/Skn8wREdN7FRx6yRe9aCdO5Pl/OG1HrBUmsJOBSADANybNhIhrnSQ==
+  dependencies:
+    "@zk-kit/identity" "^1.4.1"
+    "@zk-kit/protocols" "^1.8.2"
+    axios "^0.24.0"
+    bigint-conversion "2.1.12"
+    circomlib "0.5.5"
+    cors "^2.8.5"
+    express "^4.17.1"
+    express-validator "^6.13.0"
+    keccak "^3.0.3"
+    mongodb "^4.2.0"
+    mongoose "5.13.13"
+    node-schedule "^2.1.0"
+    redis "^3.1.2"
+    rlnjs "2.0.8"
+    uWebSockets.js uNetworking/uWebSockets.js#v20.4.0
 
 text-table@0.2.0, text-table@^0.2.0:
   version "0.2.0"
@@ -15352,7 +15403,7 @@ typescript@^4.9.5:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.9.5.tgz#095979f9bcc0d09da324d58d03ce8f8374cbe65a"
   integrity sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==
 
-uWebSockets.js@uNetworking/uWebSockets.js#v20.4.0:
+"uWebSockets.js@github:uNetworking/uWebSockets.js#v20.4.0", uWebSockets.js@uNetworking/uWebSockets.js#v20.4.0:
   version "20.4.0"
   resolved "https://codeload.github.com/uNetworking/uWebSockets.js/tar.gz/65f39bdff763be3883e6cf18e433dd4fec155845"
 
@@ -16699,22 +16750,3 @@ yocto-queue@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/yocto-queue/-/yocto-queue-0.1.0.tgz#0294eb3dee05028d31ee1a5fa2c556a6aaf10a1b"
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
-
-zk-chat-server@1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/zk-chat-server/-/zk-chat-server-1.0.4.tgz#180737f9152d41fb8b042ca1bc25c252e039b4ad"
-  integrity sha512-4vMbsRMZ1bC9vl3Kyk7C48uYM/wv4ZgLDet6jmPiMGexFV9plnb+gvCfAWkGtKt6BMhzk3wMYfmU2BvlQgY7nw==
-  dependencies:
-    "@zk-kit/identity" "^1.4.1"
-    "@zk-kit/protocols" "^1.8.2"
-    axios "^0.24.0"
-    bigint-conversion "2.1.12"
-    circomlib "0.5.5"
-    cors "^2.8.5"
-    express "^4.17.1"
-    express-validator "^6.13.0"
-    mongodb "^4.2.0"
-    mongoose "5.13.13"
-    node-schedule "^2.1.0"
-    redis "^3.1.2"
-    uWebSockets.js uNetworking/uWebSockets.js#v20.4.0

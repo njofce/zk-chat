@@ -25,6 +25,7 @@ export const generateProof: IFuncGenerateProof = async(
     storage_artifacts: IStorageArtifacts,
     rln_identitifer: string,
 ): Promise<RLNFullProof> => {
+    console.log("!@# app/src/util/util.ts::generateProof: epoch = ", epoch, "signal = ", signal, "rln_identitifer = ", rln_identitifer);
     const pcd = await generateRLNProof(
         BigInt(epoch),
         signal,
