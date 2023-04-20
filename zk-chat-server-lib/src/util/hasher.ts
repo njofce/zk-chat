@@ -40,9 +40,11 @@ export default class Hasher {
      */
     public async verifyProof(verifierKey: VerificationKey, proof: RLNFullProof): Promise<boolean> {
         // Inline rln.verifyProof
-        const expectedExternalNullifier = RLN._genNullifier(BigInt(proof.epoch), BigInt(proof.rlnIdentifier));
-        if (expectedExternalNullifier !== BigInt(proof.snarkProof.publicSignals.externalNullifier)) {
-        throw new Error('External nullifier does not match')
+        const expectedExternalNullifier = BigInt(RLN._genNullifier(BigInt(proof.epoch), BigInt(proof.rlnIdentifier)));
+        const actualExternalNullifier = BigInt(proof.snarkProof.publicSignals.externalNullifier);
+        if (expectedExternalNullifier !== actualExternalNullifier) {
+            console.log("!@# externalNullifier mismatch: expected = ", expectedExternalNullifier, ", actual = ", actualExternalNullifier);
+            return false;
         }
         return await RLN.verifySNARKProof(verifierKey, proof.snarkProof);
     }

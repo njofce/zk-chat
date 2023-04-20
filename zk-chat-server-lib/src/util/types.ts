@@ -40,11 +40,9 @@ export const constructRLNMessage = (parsedJson: any): RLNMessage => {
 }
 
 export const getNullifierFromFullProof = (proof: RLNFullProof): string => {
-    console.log(`!@# getNullifierFromFullProof: proof = `, proof)
     return proof.snarkProof.publicSignals.internalNullifier.toString();
 }
 
 export const getYShareFromFullProof = (proof: RLNFullProof): string => {
-    console.log(`!@# getYShareFromFullProof: proof = `, proof)
     return proof.snarkProof.publicSignals.yShare.toString();
 }

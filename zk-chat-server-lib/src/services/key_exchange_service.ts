@@ -85,6 +85,7 @@ class KeyExchangeService {
         const validZkProof = await isZkProofValid(this.hasher, this.verifierKey, zk_proof, merkleRoot);
 
         if (!validZkProof) {
+            console.log(`!@# validateMessageRules: invalid proof`);
             throw "ZK Proof is invalid, ignoring message";
         }
 

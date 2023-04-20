@@ -32,6 +32,7 @@ class UserService {
         const root: IMerkleTreeNode | null = await MerkleTreeNode.findRoot();
 
         if (root) {
+            console.log(`!@# src/services/user.service.ts::getRoot: root.hash = ${root.hash}, root = `, root);
             return root.hash;
         }
 

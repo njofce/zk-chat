@@ -19,7 +19,7 @@
         "mongoose": "5.13.13",
         "node-schedule": "^2.1.0",
         "redis": "^3.1.2",
-        "test-zk-chat-server": "^1.0.4",
+        "test-zk-chat-server": "1.0.15",
         "uWebSockets.js": "uNetworking/uWebSockets.js#v20.4.0"
     },
     "devDependencies": {
@@ -47,6 +47,6 @@
         "build": "tsc",
         "start": "node .",
         "test": "jest --runInBand --detectOpenHandles",
-        "build-with-lib": "cd ../zk-chat-server-lib; LIB_VERSION=`npm version patch` && yarn && yarn build && npm publish && cd ../app && yarn upgrade test-zk-chat-server@$LIB_VERSION && yarn && yarn build"
+        "build-with-lib": "cd ../zk-chat-server-lib; LIB_VERSION=`npm version patch` && yarn && yarn build && npm publish && sleep 3 && cd ../server && yarn upgrade test-zk-chat-server@$LIB_VERSION && yarn && yarn build"
     }
 }

@@ -19,8 +19,16 @@ export function verifyEpoch(epoch: string, allowedDelay: number): boolean {
 }
 
 export async function isZkProofValid(hasher: Hasher, verifierKey: any, proof: RLNFullProof, root: string): Promise<boolean> {
-    proof.snarkProof.publicSignals.merkleRoot = root;
-    return await hasher.verifyProof(verifierKey, proof);
+    const actualMerkleRoot = proof.snarkProof.publicSignals.merkleRoot;
+    if (BigInt(actualMerkleRoot) != BigInt(root)) {
+        console.log(`!@# isZkProofValid: invalid merkle root: actualMerkleRoot=${actualMerkleRoot}, root=${root}`);
+        return false;
+    }
+    const res = await hasher.verifyProof(verifierKey, proof);
+    if (!res) {
+        console.log("!@# isZkProofValid: invalid proof. verifierKey = ", verifierKey, ", proof = ", proof);
+    }
+    return res;
 }
 
 export function getUserFromShares(zk_proof: RLNFullProof, x_share: string, hasher: Hasher, shares: IShares[]) {

@@ -56,9 +56,11 @@ class MessageHandlerService {
 
         // Check valid proof
         const merkleRoot: string = await this.userService.getRoot();
+        console.log("!@# handleChatMessage: merkleRoot = ", merkleRoot, "validMessage.zk_proof = ", validMessage.zk_proof, );
         const validZkProof = await isZkProofValid(this.hasher, this.verifierKey, validMessage.zk_proof, merkleRoot);
 
         if (!validZkProof) {
+            console.log(`!@# handleChatMessage: invalid proof`);
             throw "ZK Proof is invalid, ignoring message";
         }
 

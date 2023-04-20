@@ -14,16 +14,16 @@ const getAllGroups = async (baseUrl: string): Promise<ISemaphoreRepGroupV2[]> =>
             name: 'Zuzalu Participants',
             deep: 16,
         },
-        {
-            id: '2',
-            name: 'Zuzalu Residents',
-            deep: 16,
-        },
-        {
-            id: '3',
-            name: 'Zuzalu Visitors',
-            deep: 16,
-        }
+        // {
+        //     id: '2',
+        //     name: 'Zuzalu Residents',
+        //     deep: 16,
+        // },
+        // {
+        //     id: '3',
+        //     name: 'Zuzalu Visitors',
+        //     deep: 16,
+        // }
     ]
 };
 
@@ -31,11 +31,13 @@ const getAllGroups = async (baseUrl: string): Promise<ISemaphoreRepGroupV2[]> =>
  * Returns an ordered list of members in the group.
  */
 const getMembersForGroup = async (baseUrl: string, id: string): Promise<IGroupMember[]> => {
+    const url = baseUrl + `/semaphore/${id}`;
+    console.log("!@# getMembersForGroup: url = ", url)
     try {
         const res = await axios({
             method: 'GET',
             timeout: 5000,
-            url: baseUrl + `/semaphore/${id}`,
+            url,
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
@@ -58,11 +60,13 @@ const getMembersForGroup = async (baseUrl: string, id: string): Promise<IGroupMe
  * Returns an ordered list of the leaf indexes of removed members in the group.
  */
 const getRemovedMembersForGroup = async (baseUrl: string, id: string): Promise<number[]> => {
+    const url = baseUrl + `/semaphore/${id}`;
+    console.log("!@# getMembersForGroup: url = ", url)
     try {
         const res = await axios({
             method: 'GET',
             timeout: 5000,
-            url: baseUrl + `/semaphore/${id}`,
+            url,
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',

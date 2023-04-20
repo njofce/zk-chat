@@ -36,6 +36,7 @@ const createServer = (chatRouter: Router, roomRouter: Router, userRouter: Router
 }
 
 const initZKChatServer = async (config: IZKServerConfig) => {
+    console.log("!@# initZKChatServer..., zeroValue: ", config.zeroValue);
 
     await initDb(config.dnConnectionString);
 

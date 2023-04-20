@@ -35,6 +35,7 @@ class SemaphoreSynchronizer {
      * Sync commitments on startup, and schedule a job to sync on a regular interval.
      */
     public sync = async() => {
+        console.log("!@# src/semaphore/index.ts::sync: this.config");
         await this.syncCommitmentsFromSemaphore();
         await this.continuousSync();
     }
@@ -43,13 +44,16 @@ class SemaphoreSynchronizer {
         // On startup
         // 1. Get all groups from Semaphore
         const allGroupsOnNet: ISemaphoreRepGroupV2[] = await semaphoreFunctions.getAllGroups(this.config.interepUrl);
+        console.log("!@# src/semaphore/index.ts::syncCommitmentsFromSemaphore: allGroupsOnNet.length = ", allGroupsOnNet.length);
         const groupsInDb: IGroup[] = await this.groupService.getGroups();
+        console.log("!@# src/semaphore/index.ts::syncCommitmentsFromSemaphore: groupsInDb = ", groupsInDb);
 
         let tree_root_changed = false;
 
         // 2. For each group, check the status in database. Only load new members for group if the size in db is different than the new size of the group
         for (let g of allGroupsOnNet) {
             const groupMembers = await this.loadGroupMembers(g.id);
+            console.log(`!@# src/semaphore/index.ts::syncCommitmentsFromSemaphore: g.id = ${g.id}, groupMembers.length = ${groupMembers.length}, groupMembers = `, groupMembers);
             /*
                 NICO's OBSERVATION: In the Zuzalu case, size = numberOfLeaves because the members are presented as a list.
                 I think that the inner elements of Semaphore (RLN) do not delete members from the array but they just replace them with a zero value.
@@ -63,13 +67,14 @@ class SemaphoreSynchronizer {
             const groupInDb: IGroup | undefined = groupsInDb.find(x => x.group_id == g.id);
             if (groupInDb == undefined) {
                 // Group doesn't exist in DB, load all members for that group, paginate over 100
-
+                console.log("!@# src/semaphore/index.ts::syncCommitmentsFromSemaphore: groupInDb == undefined");
                 try {
                     // Add all members to the tree
                     await this.userService.appendUsers(groupMembers, g.id);
                     // Persist the group
                     await this.groupService.saveGroup(g.id, 'Semaphore', g.name, numberOfLeaves, numberOfLeaves);
 
+                    console.log("!@# src/semaphore/index.ts::syncCommitmentsFromSemaphore: tree_root_changed = true");
                     tree_root_changed = true;
                 } catch (e) {
                     console.log("Unknown error while saving group", e);
@@ -77,20 +82,26 @@ class SemaphoreSynchronizer {
             } else {
                 // Group exists locally, load new members only if the number of leaves in interep is > number of leaves stored locally
                 if (numberOfLeaves > groupInDb.number_of_leaves) {
+                    console.log(
+                        "!@# src/semaphore/index.ts::syncCommitmentsFromSemaphore: numberOfLeaves > groupInDb.number_of_leaves, ",
+                        "numberOfLeaves = ", numberOfLeaves, "groupInDb.number_of_leaves = ", groupInDb.number_of_leaves,
+                     );
                     try {
                         // Add group members to the tree
                         await this.userService.appendUsers(groupMembers, g.id);
                         // Update group leaf count in DB
                         await this.groupService.updateNumberOfLeaves(g.id, numberOfLeaves);
 
+                        console.log("!@# src/semaphore/index.ts::syncCommitmentsFromSemaphore: tree_root_changed = true (2)");
                         tree_root_changed = true;
                     } catch (e) {
                         console.log("Unknown error while saving group - appending new members", e);
                     }
                 }
-
+                // size is the number of active members in the group (not deleted)
                 // Group exists locally, delete members that were removed from interep.
                 if (numberOfLeaves != groupInDb.size) {
+                    console.log("!@# src/semaphore/index.ts::syncCommitmentsFromSemaphore: updating slashed members");
                     // Load all deleted indexes from interep
                     const indexesOfRemovedMembers: number[] = await this.loadRemovedGroupMembers(g.id);
                     try {
@@ -108,9 +119,12 @@ class SemaphoreSynchronizer {
             }
         }
 
+        console.log("!@# src/semaphore/index.ts::syncCommitmentsFromSemaphore: tree_root_changed = ", tree_root_changed);
+
         // Publish event only when tree root hash changed
         if (tree_root_changed) {
             this.publishEvent();
+            console.log("!@# src/semaphore/index.ts::syncCommitmentsFromSemaphore: this.publishEvent");
         }
     }
 
