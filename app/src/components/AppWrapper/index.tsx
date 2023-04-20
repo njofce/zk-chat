@@ -21,6 +21,8 @@ import { generateProof } from "../../util/util";
 import { init, receive_message, get_rooms, IRooms } from 'test-zk-chat-client';
 import { useAppSelector } from "../../redux/hooks/useAppSelector"
 import AuthPopup from "../Passport/popup"
+import { Identity } from "@semaphore-protocol/identity"
+import { getIdentityCommitment } from "../../util/request-passport-client"
 
 const AppWrapper = () => {
   const navigate = useNavigate()
@@ -46,7 +48,6 @@ const AppWrapper = () => {
       //   "123",
       // );
       // console.log(`!@# proof=`, proof)
-      console.log("!@# AppWrapper/index.tsx: before init")
       await init({
         serverUrl: serverUrl,
         socketUrl: socketUrl

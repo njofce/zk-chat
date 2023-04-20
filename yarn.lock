@@ -13135,13 +13135,6 @@ react@^17.0.2:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
 
-react@^18.2.0:
-  version "18.2.0"
-  resolved "https://registry.yarnpkg.com/react/-/react-18.2.0.tgz#555bd98592883255fa00de14f1151a917b5d77d5"
-  integrity sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==
-  dependencies:
-    loose-envify "^1.1.0"
-
 reactstrap@^9.0.1:
   version "9.0.1"
   resolved "https://registry.yarnpkg.com/reactstrap/-/reactstrap-9.0.1.tgz#a6b205861f3e83da55063bc04ba1a069e969f21d"
@@ -14924,10 +14917,10 @@ test-exclude@^6.0.0:
     glob "^7.1.4"
     minimatch "^3.0.4"
 
-test-pcd-semaphore-group-pcd@0.7.0:
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/test-pcd-semaphore-group-pcd/-/test-pcd-semaphore-group-pcd-0.7.0.tgz#bad60ada1a0af50de556d66e0544847d38e1f5cc"
-  integrity sha512-1OuGPwtoUBsZxm4fahUDTDS6q8R/Fo1NDbkihey4K0niYMlMt6qi0QHvSi3HfiYWbekcroVKa5rAfdTAXHzFnQ==
+test-pcd-semaphore-group-pcd@^0.7.2:
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/test-pcd-semaphore-group-pcd/-/test-pcd-semaphore-group-pcd-0.7.2.tgz#f3932ee3b93b2a125bbe42620eccbb549886d9d9"
+  integrity sha512-8SlYhh2/HLyWn1wrcsMwkFxp7RcTP9xZiZPDgCdIVqCuVVaURLVh8fNxMHjESU26PPcRfbYW2X6xwSLiUai0bQ==
   dependencies:
     "@pcd/eslint-config-custom" "0.4.0"
     "@pcd/pcd-types" "0.4.0"
@@ -14942,14 +14935,14 @@ test-pcd-semaphore-group-pcd@0.7.0:
     "@types/uuid" "^9.0.0"
     js-sha256 "^0.9.0"
     json-bigint "^1.0.0"
-    test-pcd-semaphore-signature-pcd "0.6.0"
+    test-pcd-semaphore-signature-pcd "^0.4.3"
     typescript "^4.9.5"
     uuid "^9.0.0"
 
-test-pcd-semaphore-signature-pcd@0.6.0:
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/test-pcd-semaphore-signature-pcd/-/test-pcd-semaphore-signature-pcd-0.6.0.tgz#8f2e1cb383d474b61864ebb47c22791a0ad013a4"
-  integrity sha512-8xYoptobHXDD3dOUXHlyxzrSS8Nfgv+wac2hudeqebFXoWGeXWf3zCGNAE3hQZudvj7FOOriF4s3ash7QCmWhQ==
+test-pcd-semaphore-signature-pcd@^0.4.3:
+  version "0.4.3"
+  resolved "https://registry.yarnpkg.com/test-pcd-semaphore-signature-pcd/-/test-pcd-semaphore-signature-pcd-0.4.3.tgz#bbe0cff1a64c35a88a8e66d9dcd9fdf738f73f11"
+  integrity sha512-bXW7v8vzY1PrQ0uYkZeI7iJTagUKJO1Ba1mB+eidFOXUCWz4fZEnNpEgLAgmBOjASK2HfWOaFm/0rH7EIKOaQQ==
   dependencies:
     "@pcd/pcd-types" "0.4.0"
     "@pcd/tsconfig" "0.4.0"
@@ -14963,7 +14956,7 @@ test-pcd-semaphore-signature-pcd@0.6.0:
     "@types/react-dom" "^17.0.11"
     js-sha256 "^0.9.0"
     json-bigint "^1.0.0"
-    react "^18.2.0"
+    react "^17.0.2"
     typescript "^4.5.2"
 
 test-zk-chat-client@1.0.5:

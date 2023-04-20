@@ -11,6 +11,7 @@ import {
 } from "../../redux/actions/actionCreator"
 import { serverUrl, socketUrl } from "../../constants/constants"
 import { generateProof } from "../../util/util";
+import { getIdentityCommitment } from "../../util/request-passport-client"
 
 const StyledRegisterWrapper = styled.div`
   background: ${Colors.ANATRACITE};
@@ -75,10 +76,13 @@ const RegisterOrRecover = () => {
   }
 
   const getActiveIdentity = async () => {
-    console.info("getting the identity from zk-keeper")
-    // FIXME: get ID from passport
-    const id = "abcd"
-    return id
+    console.info("getting the identity from Zuzalu Passport")
+    const identityCommitment = await getIdentityCommitment();
+    console.log("!@# identityCommitment = ", identityCommitment);
+    if (!identityCommitment) {
+      throw new Error("failed to get the identity from Zuzalu Passport")
+    }
+    return identityCommitment.claim.identityCommitment;
   }
 
   const receiveMessageCallback = (message: any, roomId: string) => {

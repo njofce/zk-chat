@@ -1,6 +1,7 @@
 // Mostly copied from @pcd/passport-interface and consumer-client
 import { ArgsOf, PCD, PCDPackage, ArgumentTypeName } from "@pcd/pcd-types";
 import { RLNPCDPackage } from "./rln-pcd";
+import { SemaphoreSignaturePCDPackage } from "test-pcd-semaphore-signature-pcd";
 
 
 export enum PCDRequestType {
@@ -65,32 +66,6 @@ export function constructPassportPcdAddRequestUrl(
   return `${passportOrigin}?request=${JSON.stringify(req)}`;
 }
 
-// export function passportReceiveRequest(
-//   url: string
-// ): PCDGetRequest | PCDAddRequest | undefined {
-//   const URL = new URLSearchParams(url);
-
-//   const request = JSON.parse(URL.get("request") || "");
-
-//   if (isPassportAddRequest(request)) {
-//     return request;
-//   }
-
-//   if (isPassportGetRequest(request)) {
-//     return request;
-//   }
-
-//   return undefined;
-// }
-
-// export function isPassportGetRequest(req: any): req is PCDGetRequest {
-//   return req.type === PCDRequestType.Get;
-// }
-
-// export function isPassportAddRequest(req: any): req is PCDAddRequest {
-//   return req.type === PCDRequestType.Add;
-// }
-
 export function requestZuzaluRLNUrl(
   urlToPassportWebsite: string,
   returnUrl: string,
@@ -131,6 +106,38 @@ export function requestZuzaluRLNUrl(
         argumentType: ArgumentTypeName.BigInt,
         userProvided: false,
         value: epoch ?? "1",
+      },
+    },
+    {
+      proveOnServer: proveOnServer,
+    }
+  );
+
+  return url;
+}
+
+export function requestSemaphoreSignatureUrl(
+  urlToPassportWebsite: string,
+  returnUrl: string,
+  messageToSign: string,
+  proveOnServer?: boolean
+) {
+  const url = constructPassportPcdGetRequestUrl<
+    typeof SemaphoreSignaturePCDPackage
+  >(
+    urlToPassportWebsite,
+    returnUrl,
+    SemaphoreSignaturePCDPackage.name,
+    {
+      identity: {
+        argumentType: ArgumentTypeName.PCD,
+        value: undefined,
+        userProvided: true,
+      },
+      signedMessage: {
+        argumentType: ArgumentTypeName.String,
+        value: messageToSign,
+        userProvided: false,
       },
     },
     {

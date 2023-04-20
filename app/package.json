@@ -7,7 +7,7 @@
     "@pcd/pcd-types": "0.4.0",
     "@semaphore-protocol/group": "^3.2.3",
     "@semaphore-protocol/identity": "^3.2.3",
-    "test-pcd-semaphore-group-pcd": "0.7.0",
+    "test-pcd-semaphore-group-pcd": "^0.7.2",
     "rlnjs": "2.0.8",
     "test-zk-chat-client": "1.0.5",
     "@fortawesome/fontawesome-free-regular": "^5.0.13",
