@@ -66,6 +66,7 @@ class MessageHandlerService {
 
         // Check spam rules
         const spamRulesViolated = await this.areSpamRulesViolated(validMessage);
+        console.log(`!@# handleChatMessage: spamRulesViolated = `, spamRulesViolated);
 
         if (spamRulesViolated) {
             const requestStats = await this.requestStatsService.getRequestStats(validMessage);

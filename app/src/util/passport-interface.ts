@@ -1,7 +1,11 @@
 // Mostly copied from @pcd/passport-interface and consumer-client
+import { Group } from "@semaphore-protocol/group";
 import { ArgsOf, PCD, PCDPackage, ArgumentTypeName } from "@pcd/pcd-types";
-import { RLNPCDPackage } from "./rln-pcd";
 import { SemaphoreSignaturePCDPackage } from "test-pcd-semaphore-signature-pcd";
+import {
+  serializeSemaphoreGroup,
+} from "test-pcd-semaphore-group-pcd";
+import { RLNPCDPackage } from "./rln-pcd";
 
 
 export enum PCDRequestType {
@@ -69,7 +73,7 @@ export function constructPassportPcdAddRequestUrl(
 export function requestZuzaluRLNUrl(
   urlToPassportWebsite: string,
   returnUrl: string,
-  urlToSemaphoreGroup: string,
+  group: Group,
   rlnIdentifier: string,
   signal: string,
   epoch: string,
@@ -95,7 +99,7 @@ export function requestZuzaluRLNUrl(
       group: {
         argumentType: ArgumentTypeName.Object,
         userProvided: false,
-        remoteUrl: urlToSemaphoreGroup,
+        value: serializeSemaphoreGroup(group, "test name"),
       },
       signal: {
         argumentType: ArgumentTypeName.String,

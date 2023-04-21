@@ -32,7 +32,6 @@ const getAllGroups = async (baseUrl: string): Promise<ISemaphoreRepGroupV2[]> =>
  */
 const getMembersForGroup = async (baseUrl: string, id: string): Promise<IGroupMember[]> => {
     const url = baseUrl + `/semaphore/${id}`;
-    console.log("!@# getMembersForGroup: url = ", url)
     try {
         const res = await axios({
             method: 'GET',
@@ -61,7 +60,6 @@ const getMembersForGroup = async (baseUrl: string, id: string): Promise<IGroupMe
  */
 const getRemovedMembersForGroup = async (baseUrl: string, id: string): Promise<number[]> => {
     const url = baseUrl + `/semaphore/${id}`;
-    console.log("!@# getMembersForGroup: url = ", url)
     try {
         const res = await axios({
             method: 'GET',

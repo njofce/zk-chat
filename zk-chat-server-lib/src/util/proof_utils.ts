@@ -3,15 +3,18 @@ import { RLNFullProof } from "rlnjs";
 import Hasher from "./hasher";
 import { getYShareFromFullProof } from './types';
 
-export function verifyEpoch(epoch: string, allowedDelay: number): boolean {
-    const serverTimestamp = new Date();
 
-    serverTimestamp.setSeconds(Math.floor(serverTimestamp.getSeconds() / 10) * 10);
-    serverTimestamp.setMilliseconds(0);
-    const messageTimestamp = new Date(parseInt(epoch));
+// TODO: Should be in config?
+const SECONDS_PER_EPOCH = 100;
+
+export function verifyEpoch(epoch: string, allowedDelay: number): boolean {
+    const millisecondsPerEpoch = SECONDS_PER_EPOCH * 1000;
+    const serverEpoch = BigInt(Math.floor(Date.now() / millisecondsPerEpoch) * millisecondsPerEpoch);
+    const messageEpoch = BigInt(epoch);
 
     // Tolerate a difference of EPOCH_ALLOWED_DELAY_THRESHOLD seconds between client and server timestamp
-    const difference_in_seconds = Math.abs(serverTimestamp.getTime() - messageTimestamp.getTime()) / 1000;
+    const difference_in_seconds = Math.abs(Number(serverEpoch - messageEpoch)) / 1000;
+    console.log(`!@# verifyEpoch: serverEpoch=${serverEpoch}, messageEpoch=${messageEpoch}, difference_in_seconds=${difference_in_seconds}, allowedDelay=${allowedDelay}`)
     if (difference_in_seconds >= allowedDelay)
         return false;
 

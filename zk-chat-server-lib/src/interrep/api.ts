@@ -11,9 +11,10 @@ const DEFAULT_GROUP_ID = "1"
 const getAllGroups = async (baseUrl: string): Promise<IInterRepGroupV2[]> => {
     const membersRaw = await getMembersForGroup(baseUrl);
     const members = membersRaw.map((member: IGroupMember) => member.identityCommitment);
-    const group2 = new Group(DEFAULT_GROUP_ID, DEFAULT_DEPTH);
-    group2.addMembers(members);
-    const merkleRoot = group2.generateMerkleProof(0).root;
+    const group = new Group(DEFAULT_GROUP_ID, DEFAULT_DEPTH);
+    group.addMembers(members);
+    const merkleRoot = String(group.root);
+    console.log("!@# getAllGroups: members.length=", members.length, ", merkleRoot=", merkleRoot);
     return [
         {
             root: merkleRoot,

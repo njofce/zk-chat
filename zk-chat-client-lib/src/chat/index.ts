@@ -8,6 +8,8 @@ import ProfileManager from "../profile";
 import Hasher from "../hasher";
 import { IFuncGenerateProof } from "src/types";
 
+const SECONDS_PER_EPOCH = 100;
+
 /**
  * The core component that is responsible for creating valid ZK proofs for a message, encrypting and dispatching it, as well as receiving and decrypting messages
  * for specific rooms.
@@ -247,14 +249,11 @@ class ChatManager {
     }
 
     /**
-     * Returns rounded timestamp to the nearest 10-second in milliseconds.
+     * Returns rounded timestamp to the nearest SECONDS_PER_EPOCH-second in milliseconds.
      */
     private getEpoch = (): string => {
-        const timeNow = new Date();
-        timeNow.setSeconds(Math.floor(timeNow.getSeconds() / 10) * 10);
-        timeNow.setMilliseconds(0);
-
-        return timeNow.getTime().toString();
+        const millisecondsPerEpoch = SECONDS_PER_EPOCH * 1000;
+        return BigInt(Math.floor(Date.now() / millisecondsPerEpoch) * millisecondsPerEpoch).toString()
     }
 
     private generateRandomSignal = () => {

@@ -1,13 +1,19 @@
-import { PASSPORT_URL, SEMAPHORE_GROUP_URL } from "../constants/zuzalu";
+import axios, { AxiosResponse } from 'axios';
+import { Group } from "@semaphore-protocol/group";
+import { SemaphoreSignaturePCD, SemaphoreSignaturePCDPackage } from "test-pcd-semaphore-signature-pcd";
+import { PASSPORT_URL } from "../constants/zuzalu";
 import {
   requestZuzaluRLNUrl,
   requestSemaphoreSignatureUrl,
 } from "./passport-interface";
-import { SemaphoreSignaturePCD, SemaphoreSignaturePCDPackage } from "test-pcd-semaphore-signature-pcd";
 import { RLNPCD, RLNPCDPackage } from "./rln-pcd";
 
+import { serverUrl } from "../constants/constants";
 
-const DEFAULT_SIGNED_MESSAGE = "zk-chat-get-identity-commitment"
+// FIXME: reuse from zk-chat-client
+const DEFAULT_DEPTH = 16
+const DEFAULT_GROUP_ID = "1"
+const DEFAULT_SIGNED_MESSAGE = "zk-chat-get-identity-commitment";
 
 // Popup window will redirect to the passport to request a proof.
 // Open the popup window under the current domain, let it redirect there:
@@ -65,6 +71,27 @@ export async function getIdentityCommitment(
   });
 }
 
+async function getSlashedGroup(): Promise<Group> {
+  const url = serverUrl + "/zk-chat/api/user/leaves";
+  const res: AxiosResponse = await axios({
+    method: 'GET',
+    url,
+    headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+    },
+  });
+  const data = res.data as string[];
+  // data contains an array of leaves in hex without `0x`.
+  // E.g. in the format `["270c97128e2ec97b40c5774cb7f1ebf9b7abe704a13de12ea8fab656f30f4107","345b74e96c572951c50285495f19c175338fe3e03a5a6a040bf8a8da1f1d4ec","35fc1eef2dc43bc0c13e54a5104743952121ce5f957e4623fe553f7881232a1"]`
+  // We need to convert it to an array of decimal strings
+  const members = data.map((leaf) => BigInt("0x" + leaf).toString());
+  const group = new Group(DEFAULT_GROUP_ID, DEFAULT_DEPTH);
+  group.addMembers(members);
+  console.log("!@# getSlashedGroup: got slashed group from url=", url, ", root=", group.root)
+  return group;
+}
+
 
 export async function generateRLNProof(
   epoch: bigint,
@@ -74,10 +101,11 @@ export async function generateRLNProof(
 ): Promise<RLNPCD | undefined> {
   return new Promise(async (resolve, reject) => {
     const returnUrl = window.location.origin + "/popup";
+    const group = await getSlashedGroup();
     const popupUrl = requestZuzaluRLNUrl(
       PASSPORT_URL,
       returnUrl,
-      SEMAPHORE_GROUP_URL,
+      group,
       rlnIdentifier.toString(),
       signal,
       epoch.toString(),
