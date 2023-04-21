@@ -11,6 +11,7 @@ import SocketServer from "./communication/socket/socket_server";
 import MessageHandlerService from "./services/message_handler_service";
 import NodeSynchronizer from "./communication/node_sync";
 import SemaphoreSynchronizer from "./semaphore";
+import InterRepSynchronizer from "./interrep";
 import Hasher from "./util/hasher";
 import UserService from "./services/user.service";
 import KeyExchangeService from "./services/key_exchange_service";
@@ -48,8 +49,8 @@ const initZKChatServer = async (config: IZKServerConfig) => {
 
     const keyExchangeService: KeyExchangeService = createKeyExchangeService(config, userService, keyExchangeRequestStatsService, new Hasher());
 
-    const semaphoreSynchronizer = new SemaphoreSynchronizer(redisPubSub, groupService, userService, config);
-    await semaphoreSynchronizer.sync();
+    const interRepSynchronizer = new InterRepSynchronizer(redisPubSub, groupService, userService, config);
+    await interRepSynchronizer.sync();
 
     const messageHandler: MessageHandlerService = createMessageHandler(config, redisPubSub, userService, requestStatsService);
     const socketServer: SocketServer = createSocketServer(config, messageHandler.handleChatMessage);

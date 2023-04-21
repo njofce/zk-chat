@@ -15743,10 +15743,10 @@ test-zk-chat-client@1.0.15:
     uuid "^8.3.2"
     ws "^8.3.0"
 
-test-zk-chat-server@1.0.15:
-  version "1.0.15"
-  resolved "https://registry.yarnpkg.com/test-zk-chat-server/-/test-zk-chat-server-1.0.15.tgz#cd9950e137adc97578385ec056a719d196c633d7"
-  integrity sha512-6m7m2XMVD+bH+R+ak16b22h47/pJ4x0UQSYpUwIW4aKehDQ+f509QOBnlr4PdiuedZrFPp15xrtHITKB19HB6Q==
+test-zk-chat-server@1.0.17:
+  version "1.0.17"
+  resolved "https://registry.yarnpkg.com/test-zk-chat-server/-/test-zk-chat-server-1.0.17.tgz#515c347df89bce7e9fc318a126ab1869bc4599b3"
+  integrity sha512-on5XALfap4CMcjgSTOntJ9688KhQZWfFPtZjdKsSb7CPI9/VsUOukP5iu2EuvUK7XWs/hGEF3jLE9yKiMX32ag==
   dependencies:
     "@zk-kit/identity" "^1.4.1"
     "@zk-kit/protocols" "^1.8.2"
