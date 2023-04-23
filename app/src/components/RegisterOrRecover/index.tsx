@@ -93,8 +93,7 @@ const RegisterOrRecover = () => {
     <StyledRegisterWrapper>
       <StyledButtonsContainer>
         <StyledRButton color={Colors.DARK_YELLOW} onClick={handleRegisterClick}>
-          {" "}
-          Register{" "}
+          Register
         </StyledRButton>
         <StyledRButton
           color={Colors.PASTEL_RED}

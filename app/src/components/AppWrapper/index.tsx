@@ -1,4 +1,3 @@
-import React from "react"
 import PublicRoomInvitedScreen from "../PublicRoomInvitedScreen"
 import RegisterOrRecover from "../RegisterOrRecover"
 import Dashboard from "../Dashboard"
@@ -21,8 +20,6 @@ import { generateProof } from "../../util/util";
 import { init, receive_message, get_rooms, IRooms } from 'test-zk-chat-client';
 import { useAppSelector } from "../../redux/hooks/useAppSelector"
 import AuthPopup from "../Passport/popup"
-import { Identity } from "@semaphore-protocol/identity"
-import { getIdentityCommitment } from "../../util/request-passport-client"
 
 const AppWrapper = () => {
   const navigate = useNavigate()
