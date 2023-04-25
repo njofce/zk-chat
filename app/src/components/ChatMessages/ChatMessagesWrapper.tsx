@@ -118,8 +118,11 @@ const ChatMessagesWrapper = ({
   ) : (
     <StyledMessagesWrapper ref={chatRef}>
       {sortedHistory.length > 0 &&
-        sortedHistory.map((messageObj) => (
-          <StyledSingleMessage isUserSender={userHandle === messageObj.sender}>
+        sortedHistory.map((messageObj, index) => (
+          <StyledSingleMessage
+            key={ 'message-'+index }
+            isUserSender={userHandle === messageObj.sender}
+          >
             <StyledMessageSender
               isUserSender={userHandle === messageObj.sender}
             >
