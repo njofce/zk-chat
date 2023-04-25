@@ -72,6 +72,7 @@ class MessageHandlerService {
             const requestStats = await this.requestStatsService.getRequestStats(validMessage);
 
             const user = getUserFromShares(validMessage.zk_proof, validMessage.x_share, this.hasher, requestStats);
+            console.log(`!@# handleChatMessage: recovered user's secret. idCommitment=`, user.idCommitment, ", secret=", user.secret, ", message=", message);
 
             // Ban User
             await this.userService.banUser(user.idCommitment, user.secret);
