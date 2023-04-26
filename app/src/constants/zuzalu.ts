@@ -4,8 +4,8 @@ export const IS_PROD = process.env.NODE_ENV === "production";
 
 export const PASSPORT_URL = IS_PROD
   ? "https://zupass.org/"
-  : "http://localhost:3000/";
+  : `${process.env.REACT_APP_PASSPORT_SERVER}/`;
 
 export const SEMAPHORE_GROUP_URL = IS_PROD
   ? "https://api.pcd-passport.com/semaphore/1"
-  : "http://localhost:3002/semaphore/1";
+  : `${process.env.REACT_APP_PASSPORT_CLIENT}/semaphore/1`;
