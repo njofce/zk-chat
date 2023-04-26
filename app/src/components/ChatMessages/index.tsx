@@ -14,7 +14,7 @@ import { useAppSelector } from "../../redux/hooks/useAppSelector"
 import Input from "../Input"
 import ReactTooltip from "react-tooltip"
 import ChatMessagesWrapper from "./ChatMessagesWrapper"
-import { delete_messages_for_room } from "zk-chat-client"
+import { delete_messages_for_room } from "test-zk-chat-client"
 
 const StyledChatContainer = styled.div`
   background: white;

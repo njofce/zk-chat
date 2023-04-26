@@ -22,7 +22,7 @@ describe('Test user service', () => {
         for (let i = 0; i < 5; i++) {
             await insertBannedUser(i);
         }
-        
+
         const allBannedUsers: IBannedUser[] = await user_service.getAllBannedUsers();
         const total: number = await user_service.countBanned();
 
@@ -142,7 +142,7 @@ describe('Test user service', () => {
         expect(result).toEqual("Done");
 
         const allNodes = await MerkleTreeNode.find({});
-        expect(allNodes.length).toEqual(16);
+        expect(allNodes.length).toEqual(config.merkleTreeLevels + 1);
     });
 
     test('append users - with zeros, user exists', async () => {
@@ -157,7 +157,7 @@ describe('Test user service', () => {
         expect(result1).toEqual("Done");
 
         let allNodes = await MerkleTreeNode.find({});
-        expect(allNodes.length).toEqual(16);
+        expect(allNodes.length).toEqual(config.merkleTreeLevels + 1);
 
         const result2 = await user_service.appendUsers([{
             index: 2,
@@ -167,7 +167,7 @@ describe('Test user service', () => {
         expect(result2).toEqual("Done");
 
         allNodes = await MerkleTreeNode.find({});
-        expect(allNodes.length).toEqual(17);
+        expect(allNodes.length).toEqual(config.merkleTreeLevels + 2);
 
         const result3 = await user_service.appendUsers([{
             index: 1,
@@ -177,7 +177,7 @@ describe('Test user service', () => {
         expect(result3).toEqual("Done");
 
         allNodes = await MerkleTreeNode.find({});
-        expect(allNodes.length).toEqual(17); // user exists, was not added
+        expect(allNodes.length).toEqual(config.merkleTreeLevels + 2); // user exists, was not added
     });
 
     test('ban user - exists', async () => {
@@ -192,7 +192,7 @@ describe('Test user service', () => {
         expect(result1).toEqual("Done");
 
         let allNodes = await MerkleTreeNode.find({});
-        expect(allNodes.length).toEqual(16);
+        expect(allNodes.length).toEqual(config.merkleTreeLevels + 1);
 
         const result2 = await user_service.appendUsers([{
             index: 2,
@@ -231,7 +231,7 @@ describe('Test user service', () => {
         expect(result1).toEqual("Done");
 
         let allNodes = await MerkleTreeNode.find({});
-        expect(allNodes.length).toEqual(16);
+        expect(allNodes.length).toEqual(config.merkleTreeLevels + 1);
 
         const result2 = await user_service.appendUsers([{
             index: 2,

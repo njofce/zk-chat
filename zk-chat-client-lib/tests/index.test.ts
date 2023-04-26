@@ -29,7 +29,9 @@ import {
     update_contact,
     update_username,
     get_username,
-    get_user_handle
+    get_user_handle,
+    IFuncGenerateProof,
+    IStorageArtifacts
 } from '../src/index';
 
 import ProfileManager from '../src/profile';
@@ -37,6 +39,7 @@ import { ICryptography, IKeyPair } from '../src/crypto/interfaces';
 import ChatManager from '../src/chat';
 import WebCryptography from '../src/crypto/web_cryptography';
 import KeyExchangeManager from '../src/key-exchange';
+import { RLNFullProof } from 'rlnjs';
 
 
 /**
@@ -167,13 +170,13 @@ class LocalTestCryptography implements ICryptography {
 
 describe('Test main', () => {
 
-    const proof_generator_callback = async (nullifier: string, signal: string, storage_artifacts: any, rln_identitifer: any): Promise<any> => {
-        return JSON.stringify({
-            fullProof: {
+    const proof_generator_callback: IFuncGenerateProof = async (epoch: string, signal: string, storage_artifacts: IStorageArtifacts, rln_identitifer: string): Promise<RLNFullProof> => {
+        return {
+            snarkProof: {
                 proof: {
-                    pi_a: "pi_a",
-                    pi_b: "pi_b",
-                    pi_c: "pi_c",
+                    pi_a: ["pi_a"],
+                    pi_b: [["pi_b"]],
+                    pi_c: ["pi_c"],
                     protocol: "p",
                     curve: "c"
                 },
@@ -182,11 +185,12 @@ describe('Test main', () => {
                     merkleRoot: BigInt(123).toString(),
                     internalNullifier: BigInt(123).toString(),
                     signalHash: BigInt(123).toString(),
-                    epoch: BigInt(123).toString(),
-                    rlnIdentifier: BigInt(123).toString()
+                    externalNullifier: BigInt(123).toString(),
                 }
-            }
-        });
+            },
+            epoch: BigInt(123),
+            rlnIdentifier: BigInt(123),
+        };
     }
 
     beforeEach(async () => {
@@ -207,7 +211,7 @@ describe('Test main', () => {
             await init({
                 serverUrl: "test1",
                 socketUrl: "ws://test2"
-            }, 
+            },
             proof_generator_callback);
             expect(true).toBeFalsy();
         } catch(e) {
@@ -225,7 +229,7 @@ describe('Test main', () => {
         await init({
             serverUrl: "test1",
             socketUrl: "ws://test2"
-        }, 
+        },
         proof_generator_callback);
         expect(true).toBeTruthy();
     });
@@ -249,10 +253,10 @@ describe('Test main', () => {
         await init({
                 serverUrl: "test1",
                 socketUrl: "ws://test2"
-            }, 
+            },
             proof_generator_callback,
-            "test_id_commitment", 
-            new TestStorageProvider(), 
+            "test_id_commitment",
+            new TestStorageProvider(),
             new LocalTestCryptography(1000));
         expect(initProfileSpy).toHaveBeenCalled();
     });
@@ -366,9 +370,9 @@ describe('Test main', () => {
             return "created";
         });
         jest.spyOn(ProfileManager.prototype, "addPublicRoom").mockImplementation(async (room) => {
-           
+
         })
-    
+
         await create_public_room("test room 1");
         expect(true).toBeTruthy();
     });
@@ -464,7 +468,7 @@ describe('Test main', () => {
         await create_private_room("test room 1");
         expect(true).toBeTruthy();
     });
-    
+
     test('invite private room', async () => {
         // No profile
         try {
@@ -989,8 +993,8 @@ describe('Test main', () => {
         await init({
             serverUrl: "test1",
             socketUrl: "ws://test2"
-        }, 
-        proof_generator_callback, 
+        },
+        proof_generator_callback,
         "test_id_commitment");
 
         return initProfileSpy;

@@ -14,7 +14,7 @@ import {
   IDirectRoom,
   IPrivateRoom,
   IPublicRoom
-} from "zk-chat-client"
+} from "test-zk-chat-client"
 
 export type Room = IDirectRoom | IPublicRoom | IPrivateRoom
 

@@ -16,7 +16,7 @@ import WsSocketClient from './communication/ws-socket';
 import KeyExchangeManager from './key-exchange';
 import { IChatHistoryDB, IMessage } from './chat/interfaces';
 import { LocalChatDB } from './chat/db';
-import { IServerConfig } from './types';
+import { IFuncGenerateProof, IServerConfig } from './types';
 
 let communication: ServerCommunication | null = null;
 let generated_storage_provider: StorageProvider | null = null;
@@ -26,14 +26,16 @@ let key_exchange_manager: KeyExchangeManager | null = null;
 let chat_manager: ChatManager;
 let message_db: IChatHistoryDB;
 
-let get_proof_callback: (nullifier: string, signal: string, storage_artifacts: any, rln_identitifer: any) => Promise <any>;
+let get_proof_callback: IFuncGenerateProof;
 
 const init = async (
     server_config: IServerConfig,
-    proof_generator_callback: (nullifier: string, signal: string, storage_artifacts: any, rln_identitifer: any) => Promise < any >,
-    identitiy_commitment?: string, 
-    storage_provider?: StorageProvider, 
+    proof_generator_callback: IFuncGenerateProof,
+    identitiy_commitment?: string,
+    storage_provider?: StorageProvider,
     cryptography?: ICryptography) => {
+
+    console.log("!@# init: begin")
 
     if (communication == null) {
         let socket_client: SocketClient;
@@ -50,7 +52,7 @@ const init = async (
     if (message_db == null) {
         message_db = new LocalChatDB();
     }
-    
+
     if (storage_provider) {
         generated_storage_provider = storage_provider;
     } else {
@@ -122,7 +124,7 @@ const create_public_room = async(name: string) => {
     const room_id = uuidv4();
     const symmetric_key: string = await generated_cryptography.generateSymmetricKey();
     const created = await communication.createPublicRoom(room_id, name, symmetric_key);
-    
+
     if (created == null)
         throw "Server error! Room could not be created";
 
@@ -160,7 +162,7 @@ const join_public_room = async(room_id: string) => {
         }
     }
     throw "Room already exists as part of your profile.";
-    
+
 }
 
 const create_private_room = async (name: string) => {
@@ -234,7 +236,7 @@ const create_direct_room = async (name: string, receiver_public_key: string) => 
         throw "Room name cannot have more than " + ProfileManager.ROOM_NAME_MAX_LENGTH + " characters";
 
     const room_id = uuidv4();
-    
+
     const dh_keypair: IKeyPair = await generated_cryptography.generateECDHKeyPair()
 
     const room: IDirectRoom = {
@@ -250,7 +252,7 @@ const create_direct_room = async (name: string, receiver_public_key: string) => 
     await profile_manager.addDirectRoom(room);
 
     await key_exchange_manager?.saveKeyExchangeBundle(dh_keypair.publicKey, receiver_public_key);
-    
+
     return room;
 }
 
@@ -327,12 +329,12 @@ const recover_profile = async (profile_data: string) => {
         throw "init() not called";
 
     const parsed_profile_data = JSON.parse(profile_data);
-    
+
     if (await profile_manager.validateFormat(parsed_profile_data) == false)
         throw "Profile data invalid";
 
     await profile_manager.recoverProfile(parsed_profile_data);
-    
+
     // Refresh root and leaves
     await chat_manager.setRootObsolete();
     await chat_manager.checkRootUpToDate();
@@ -401,20 +403,20 @@ const syncRlnData = (event: string) => {
     }
 }
 
-export { 
-    init, 
-    get_rooms, 
-    send_message, 
-    receive_message, 
-    create_public_room, 
+export {
+    init,
+    get_rooms,
+    send_message,
+    receive_message,
+    create_public_room,
     join_public_room,
-    create_private_room, 
-    invite_private_room, 
-    join_private_room, 
+    create_private_room,
+    invite_private_room,
+    join_private_room,
     generate_encrypted_invite_direct_room,
     update_direct_room_key,
-    create_direct_room, 
-    get_chat_history, 
+    create_direct_room,
+    get_chat_history,
     sync_message_history,
     delete_messages_for_room,
     get_messages_for_room,

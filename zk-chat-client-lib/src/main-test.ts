@@ -85,7 +85,7 @@ class LocalTestMessageDB implements IChatHistoryDB {
     async saveMessage(roomId: string, message: IMessage) {
 
     }
-    
+
     async getMessagesForRoom(roomId: string, fromTimestamp: number): Promise<any> {
         return [];
     }
@@ -119,9 +119,9 @@ const main = async () => {
         "identityTrapdoor":"f064ac44608d02370c8f2942d048ac040ccedd241907e0297f50279d9621d5",
         "secret":["9dd8ec97c78ec5c26fee7791e6ecca93f68fae7d9b5a050c12dfda6181bc88", "f064ac44608d02370c8f2942d048ac040ccedd241907e0297f50279d9621d5"]
     }`);
- 
+
     const idCommitment: BigInt = zkIdentity.genIdentityCommitment();
-    
+
     const id_commitment = idCommitment.toString();
     await profile.initProfile(
         id_commitment,
@@ -141,16 +141,26 @@ const main = async () => {
         dh_private_key: "test 2"
     })
 
-    await chat.sendMessage("test-1", "This is a raw test message", async (nullifier: string, signal: string, storage_artifacts: any, rln_identitifer: any) => {
+    await chat.sendMessage("test-1", "This is a raw test message", async (epoch: string, signal: string, storage_artifacts: any, rln_identitifer: any) => {
         return {
-            proof: {
-                pi_a: [],
-                pi_b: [],
-                pi_c: [],
-                protocol: "",
-                curve: ""
+            snarkProof: {
+                proof: {
+                    pi_a: ["pi_a"],
+                    pi_b: [["pi_b"]],
+                    pi_c: ["pi_c"],
+                    protocol: "p",
+                    curve: "c"
+                },
+                publicSignals: {
+                    yShare: BigInt(123).toString(),
+                    merkleRoot: BigInt(123).toString(),
+                    internalNullifier: BigInt(123).toString(),
+                    signalHash: BigInt(123).toString(),
+                    externalNullifier: BigInt(123).toString(),
+                }
             },
-            publicSignals: []
+            epoch: BigInt(123),
+            rlnIdentifier: BigInt(123),
         };
     });
 

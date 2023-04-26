@@ -1,4 +1,4 @@
-import { RLNFullProof } from '@zk-kit/protocols';
+import { RLNFullProof } from 'rlnjs';
 import axios from 'axios';
 
 /**
@@ -169,6 +169,7 @@ class RLNServerApi {
     };
 
     public saveKeyExchangeBundle = async (zk_proof: RLNFullProof, epoch: string, x_share: string, encrypted_content: string, content_hash: string, encrypted_key: string, receiver_public_key: string): Promise<any | null> => {
+        console.log(`!@# zk_proof =`, zk_proof)
         try {
             const res = await axios({
                 method: 'POST',

@@ -70,7 +70,7 @@ const getMembersForGroupMock = async (baseUrl: string, provider: string, name: s
     testMembers_g3[21].identityCommitment = "0";
     testMembers_g3[30].identityCommitment = "0";
     testMembers_g3[45].identityCommitment = "0";
-    
+
     if (provider == 'github' && name == 'GOLD')
         return testMembers_g1;
     else if (provider == 'twitter' && name == 'GOLD')
@@ -100,8 +100,8 @@ describe('Test interrep synchronizer', () => {
         userService = new UserService(ZKServerConfigBuilder.get().build());
 
         subgraphFunctions.getAllGroups = getAllGroupsMock;
-        subgraphFunctions.getMembersForGroup = getMembersForGroupMock;
-        subgraphFunctions.getRemovedMembersForGroup = getRemovedMembersForGroupMock;
+        //subgraphFunctions.getMembersForGroup = getMembersForGroupMock;
+        //subgraphFunctions.getRemovedMembersForGroup = getRemovedMembersForGroupMock;
 
         synchronizer = new InterRepSynchronizer(testPubSub, groupService, userService, ZKServerConfigBuilder.get().build());
     })

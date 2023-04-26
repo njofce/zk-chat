@@ -1,10 +1,10 @@
-import { RLNFullProof } from '@zk-kit/protocols';
+import { RLNFullProof } from 'rlnjs';
 import { getYShareFromFullProof } from '../util/types';
 import KeyExchangeRequestStats from "../persistence/model/key_exchange_request_stats/key_exchange_request_stats.model"
 import { getNullifierFromFullProof } from "../util/types";
 
 /**
- * Encapsulates the functionality of handling the request stats for key exchange messages, for detecting spam and duplicates. 
+ * Encapsulates the functionality of handling the request stats for key exchange messages, for detecting spam and duplicates.
  */
 class KeyExchangeBundleRequestStatsService {
 

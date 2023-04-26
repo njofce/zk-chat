@@ -1,17 +1,22 @@
-import { RLNFullProof } from "@zk-kit/protocols";
+import { RLNFullProof } from "rlnjs";
+import JSONBig from "json-bigint";
+
 import { IChatHistoryDB, IMessage, ITimeRangeMessages } from './interfaces';
 import { ICryptography } from '../crypto/interfaces';
 import { ServerCommunication } from '../communication/index';
 import ProfileManager from "../profile";
 import Hasher from "../hasher";
+import { IFuncGenerateProof } from "src/types";
+
+const SECONDS_PER_EPOCH = 100;
 
 /**
  * The core component that is responsible for creating valid ZK proofs for a message, encrypting and dispatching it, as well as receiving and decrypting messages
- * for specific rooms. 
+ * for specific rooms.
  * This component also takes care of updating the tree root and auth path in case it becomes obsolete.
  */
 class ChatManager {
-    
+
     private root_up_to_date: boolean = true;
 
     private profile_manager: ProfileManager;
@@ -49,31 +54,30 @@ class ChatManager {
         return !this.root_up_to_date;
     }
 
-    public async generateProof(proof_generator_callback: (nullifier: string, signal: string, storage_artifacts: any, rln_identitifer: any) => Promise<any>): Promise<IProofData> {
+    public async generateProof(proof_generator_callback: IFuncGenerateProof): Promise<IProofData> {
         let epoch: string = this.getEpoch();
-
-        let externalNullifier: string = this.hasher.genExternalNullifier((epoch));
 
         const signal: string = this.generateRandomSignal();
 
         const storageArtifacts = {
             leaves: this.profile_manager.getLeaves(),
-            depth: 15,
+            depth: 16,
             leavesPerNode: 2
         };
 
-        const proof: string = await proof_generator_callback(externalNullifier, signal, storageArtifacts, ChatManager.RLN_IDENTIFIER.toString());
-        const fullProof: RLNFullProof = JSON.parse(proof);
+        const proof = await proof_generator_callback(epoch, signal, storageArtifacts, ChatManager.RLN_IDENTIFIER.toString());
         const xShare: bigint = this.hasher.genSignalHash(signal);
+        console.log("!@# chat/index.ts::generateProof: xShare = ", xShare.toString(), "epoch = ", epoch)
 
         return {
-            fullProof: fullProof,
+            fullProof: proof,
             xShare: xShare.toString(),
             epoch: epoch
         }
     }
 
-    public async sendMessage(chat_room_id: string, raw_message: string, proof_generator_callback: (nullifier: string, signal: string, storage_artifacts: any, rln_identitifer: any) => Promise<any>) {
+    public async sendMessage(chat_room_id: string, raw_message: string, proof_generator_callback: IFuncGenerateProof) {
+        console.log("!@# chat/index.ts::sendMessage: chat_room_id = ", chat_room_id, "raw_message = ", raw_message)
         await this.checkRootUpToDate();
         // Generate proof
         const proofData: IProofData = await this.generateProof(proof_generator_callback);
@@ -92,8 +96,12 @@ class ChatManager {
             message_content: encryptedMessage,
             sender: senderHandle
         }
+        console.log("!@# chat/index.ts::sendMessage: message = ", message);
 
-        this.communication_manager.sendMessage(JSON.stringify(message));
+        const stringified = JSONBig({ useNativeBigInt: true }).stringify(message);
+
+        console.log("!@# chat/index.ts::sendMessage: stringified = ", stringified);
+        this.communication_manager.sendMessage(stringified);
     }
 
     public async registerReceiveMessageHandler(receive_msg_callback: (message: IMessage, chat_room_id: string) => void) {
@@ -108,7 +116,7 @@ class ChatManager {
             // Save the message to the local DB.
             this.message_db.saveMessage(room_id, decryptedMessage);
 
-            // When the chat history sync in underway, the callback function 
+            // When the chat history sync in underway, the callback function
             // (which would indicate additional interaction with the client) is not called.
             if (!this.chatHistoryIsSyncing) {
                 // Return the message to the calling function, usually the UI app, only if history sync is not in progress.
@@ -147,10 +155,10 @@ class ChatManager {
     }
 
     /**
-     * Loads all messages from the server, from the max timestamp of the messages stored locally until the 
+     * Loads all messages from the server, from the max timestamp of the messages stored locally until the
      * provided toTimestamp, and only stores locally the messages that can be decrypted.
-     * 
-     * A time-range pagination is implemented, where the server returns a number of messages, no more than a certain limit in a single call. 
+     *
+     * A time-range pagination is implemented, where the server returns a number of messages, no more than a certain limit in a single call.
      * The pagination loop ends when the number of returned messages is less than the limit.
      */
     public async syncMessagesForAllRooms(toTimestamp: number): Promise<void> {
@@ -158,7 +166,7 @@ class ChatManager {
         let fromTimestamp: number = await this.message_db.getMaxTimestampForAllMessages() + 1;
 
         if (fromTimestamp == -1) {
-            fromTimestamp = toTimestamp - 24 * 60 * 60 * 100; 
+            fromTimestamp = toTimestamp - 24 * 60 * 60 * 100;
             // If there are no messages stored locally, load only message history for the given day.
         }
 
@@ -186,7 +194,7 @@ class ChatManager {
 
     private async getAndSaveMessagesForTimeRange(fromTimestamp: number, toTimestamp: number): Promise<ITimeRangeMessages | null> {
         let messageData: ITimeRangeMessages = await this.communication_manager.getTimeRangeChatHistory(fromTimestamp, toTimestamp);
-        
+
         if (messageData == null || messageData == undefined) {
             return null;
         }
@@ -232,7 +240,7 @@ class ChatManager {
 
             const new_rln_root = await this.communication_manager.getRlnRoot();
             const new_leaves = await this.communication_manager.getLeaves();
-            
+
             this.profile_manager.updateRootHash(new_rln_root);
             this.profile_manager.updateLeaves(new_leaves);
 
@@ -241,14 +249,11 @@ class ChatManager {
     }
 
     /**
-     * Returns rounded timestamp to the nearest 10-second in milliseconds.
+     * Returns rounded timestamp to the nearest SECONDS_PER_EPOCH-second in milliseconds.
      */
     private getEpoch = (): string => {
-        const timeNow = new Date();
-        timeNow.setSeconds(Math.floor(timeNow.getSeconds() / 10) * 10);
-        timeNow.setMilliseconds(0);
-
-        return timeNow.getTime().toString();
+        const millisecondsPerEpoch = SECONDS_PER_EPOCH * 1000;
+        return BigInt(Math.floor(Date.now() / millisecondsPerEpoch) * millisecondsPerEpoch).toString()
     }
 
     private generateRandomSignal = () => {

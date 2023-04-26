@@ -4,8 +4,8 @@ const main = async () => {
 
     const app = createAppServer();
 
-    app.listen(3002, () => {
-        console.log(`The app server is running on port ${3002}!`);
+    app.listen(5567, () => {
+        console.log(`The app server is running on port ${5567}!`);
     });
 }
 

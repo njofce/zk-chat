@@ -8,12 +8,12 @@ import interRepFunctions from "./api";
 import { IZKServerConfig } from "../types";
 
 /**
- * Synchronize the InterRep tree with the local database. 
- * 
+ * Synchronize the InterRep tree with the local database.
+ *
  * The algorithms first retrieves all groups from InterRep,
  * without any pagination assuming the number of existing groups is lower than 100. After that, it tries to check
  * the status of each loaded group with the group stored in the database. For any group which doesn't exist in the
- * database, or the size of the group stored in the database is lower than the size of the retrieved group, 
+ * database, or the size of the group stored in the database is lower than the size of the retrieved group,
  * the members are retrieved, using pagination, stored in the database, and the respective group is updated in the
  * database.
  */
@@ -89,7 +89,6 @@ class InterRepSynchronizer {
                     try {
                         // Remove members from the tree
                         await this.userService.removeUsersByIndexes(indexesOfRemovedMembers, groupInDb.group_id);
-                        
                         // Update group size in DB
                         await this.groupService.updateSize(g_id, g.size);
 
@@ -108,39 +107,12 @@ class InterRepSynchronizer {
     }
 
     private async loadGroupMembersWithPagination(provider: string, name: string, offset: number, to: number): Promise<IGroupMember[]> {
-        let loadedMembers: IGroupMember[] = [];
-
-        const limit: number = 100;
-
-        let members: IGroupMember[] = await interRepFunctions.getMembersForGroup(this.config.interepUrl, provider, name, limit, offset);
-
-        loadedMembers = loadedMembers.concat(members);
-
-        while (members.length + limit <= to) {
-            offset += limit;
-            members = await interRepFunctions.getMembersForGroup(this.config.interepUrl, provider, name, limit, offset);
-            loadedMembers = loadedMembers.concat(members);
-        }
-
-        return loadedMembers;
+        const members: IGroupMember[] = await interRepFunctions.getMembersForGroup(this.config.interepUrl);
+        return members.slice(offset, to);
     }
 
     private async loadRemovedGroupMembersWithPagination(provider: string, name: string, offset: number, to: number): Promise<number[]> {
-        let indexesOfDeletedMembers: number[] = [];
-
-        const limit: number = 100;
-
-        let indexes: number[] = await interRepFunctions.getRemovedMembersForGroup(this.config.interepUrl, provider, name, limit, offset);
-
-        indexesOfDeletedMembers = indexesOfDeletedMembers.concat(indexes);
-
-        while (indexes.length + limit <= to) {
-            offset += limit;
-            indexes = await interRepFunctions.getRemovedMembersForGroup(this.config.interepUrl, provider, name, limit, offset);
-            indexesOfDeletedMembers = indexesOfDeletedMembers.concat(indexes);
-        }
-
-        return indexesOfDeletedMembers;
+        return [];
     }
 
     private async continuousSync() {

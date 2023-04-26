@@ -55,6 +55,12 @@ export async function isSpamRequest(
             $count: "num_requests",
         },
     ]);
+    console.log(
+        "!@# src/persitence/model/request_stats/request_stats.statics.ts: isSpamRequest: requests=",
+        requests.length,
+        "epoch=", epoch, "nullifier=", nullifier,
+        " numRequests=", numRequests,
+    );
 
     return requests.length === 1 && requests[0].num_requests >= numRequests;
 }

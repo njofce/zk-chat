@@ -1,8 +1,7 @@
-import { RLNFullProof, StrBigInt } from '@zk-kit/protocols';
+import { RLNFullProof, StrBigInt } from 'rlnjs';
 import { jest, beforeAll, afterAll } from '@jest/globals'
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
-import Hasher from '../src/util/hasher';
 
 let mongo: MongoMemoryServer;
 

@@ -10,7 +10,7 @@ import {
   receive_message,
   recover_profile,
   IRooms
-} from "zk-chat-client";
+} from "test-zk-chat-client";
 import { serverUrl, socketUrl } from "../../constants/constants";
 import { generateProof } from "../../util/util";
 import {

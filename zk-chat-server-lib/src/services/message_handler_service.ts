@@ -1,6 +1,7 @@
 import * as path from "path";
 import * as fs from "fs";
 
+import JSONBig from "json-bigint";
 import { randomUUID } from "crypto";
 import { constructRLNMessage, RLNMessage } from "../util/types";
 import { getUserFromShares, isZkProofValid, verifyEpoch } from '../util/proof_utils';
@@ -16,7 +17,7 @@ import { IZKServerConfig } from "../types";
 /**
  * The core service that handles every message coming from the websocket channel. The message format is deserialized and validated properly.
  * The spam rules, as well as the zero knowledge proofs are validated properly, and use is banned if the spam rules are broken.
- * 
+ *
  * When all the checks succeed, the message is persisted in the database and broadcast to all active users.
  */
 class MessageHandlerService {
@@ -42,7 +43,7 @@ class MessageHandlerService {
     public handleChatMessage = async (message: string): Promise<IMessage> => {
         // Validate format of the RLN message
         const validMessage: RLNMessage | null = await this.validateFormat(message);
-        if (validMessage == null) 
+        if (validMessage == null)
             throw "Message format invalid";
 
         // Validate epoch
@@ -55,19 +56,23 @@ class MessageHandlerService {
 
         // Check valid proof
         const merkleRoot: string = await this.userService.getRoot();
+        console.log("!@# handleChatMessage: merkleRoot = ", merkleRoot, "validMessage.zk_proof = ", validMessage.zk_proof, );
         const validZkProof = await isZkProofValid(this.hasher, this.verifierKey, validMessage.zk_proof, merkleRoot);
 
         if (!validZkProof) {
+            console.log(`!@# handleChatMessage: invalid proof`);
             throw "ZK Proof is invalid, ignoring message";
         }
-        
+
         // Check spam rules
         const spamRulesViolated = await this.areSpamRulesViolated(validMessage);
+        console.log(`!@# handleChatMessage: spamRulesViolated = `, spamRulesViolated);
 
         if (spamRulesViolated) {
             const requestStats = await this.requestStatsService.getRequestStats(validMessage);
 
             const user = getUserFromShares(validMessage.zk_proof, validMessage.x_share, this.hasher, requestStats);
+            console.log(`!@# handleChatMessage: recovered user's secret. idCommitment=`, user.idCommitment, ", secret=", user.secret, ", message=", message);
 
             // Ban User
             await this.userService.banUser(user.idCommitment, user.secret);
@@ -87,11 +92,11 @@ class MessageHandlerService {
 
         // Persist message and broadcast
         const persistedMessage: IMessage = await this.persistMessage(validMessage);
+        console.log(`!@# persistedMessage = `, persistedMessage);
         await this.requestStatsService.saveMessage(validMessage);
-
         const syncMessage: ISyncMessage = {
             type: SyncType.MESSAGE,
-            message: JSON.stringify(persistedMessage)
+            message: JSONBig({ useNativeBigInt: true }).stringify(persistedMessage)
         };
         this.pubSub.publish(syncMessage);
 

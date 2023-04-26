@@ -10,6 +10,7 @@ import PubSub from "./communication/pub_sub";
 import SocketServer from "./communication/socket/socket_server";
 import MessageHandlerService from "./services/message_handler_service";
 import NodeSynchronizer from "./communication/node_sync";
+import SemaphoreSynchronizer from "./semaphore";
 import InterRepSynchronizer from "./interrep";
 import Hasher from "./util/hasher";
 import UserService from "./services/user.service";
@@ -23,7 +24,7 @@ const createServer = (chatRouter: Router, roomRouter: Router, userRouter: Router
     const app = express();
     app.use(cors());
     app.options("*", cors());
-    
+
     app.use(express.json());
 
     app.use("/zk-chat/api/chat", chatRouter);
@@ -36,6 +37,7 @@ const createServer = (chatRouter: Router, roomRouter: Router, userRouter: Router
 }
 
 const initZKChatServer = async (config: IZKServerConfig) => {
+    console.log("!@# initZKChatServer..., zeroValue: ", config.zeroValue);
 
     await initDb(config.dnConnectionString);
 
