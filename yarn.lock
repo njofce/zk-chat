@@ -13869,10 +13869,10 @@ react@^17.0.2:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
 
-reactstrap@^9.0.1:
-  version "9.0.1"
-  resolved "https://registry.yarnpkg.com/reactstrap/-/reactstrap-9.0.1.tgz#a6b205861f3e83da55063bc04ba1a069e969f21d"
-  integrity sha512-89VOv7SRlAlpS7RwXhzOQkSWkuhBR8LBsPGfNHifNL3WhtNP9y1sBdTcTYyH1ee2QtI8zRdwD0T5I/blHiwemg==
+reactstrap@^9.1.9:
+  version "9.1.9"
+  resolved "https://registry.yarnpkg.com/reactstrap/-/reactstrap-9.1.9.tgz#25b7cadef92f09fcf4440d14c1df82df001d7c4a"
+  integrity sha512-kcXHdYLmPK7rXzLotum7RI9uwvDZJ01VtjchAwzfKL8SHFZEvi7+JVsnBojf1ZIswRaTX/s8poAgZFgE8oF0zQ==
   dependencies:
     "@babel/runtime" "^7.12.5"
     "@popperjs/core" "^2.6.0"
