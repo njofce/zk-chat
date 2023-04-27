@@ -1,6 +1,7 @@
 export const PCD_GITHUB_URL = "https://github.com/proofcarryingdata/pcd";
 
 export const IS_PROD = process.env.NODE_ENV === "production";
+console.log(`!@# IS_PROD = `, IS_PROD)
 
 export const PASSPORT_URL = IS_PROD
   ? "https://zupass.org/"

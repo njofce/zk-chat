@@ -20,7 +20,7 @@ describe('Test key exchange service', () => {
 
     let keyExchangeService: KeyExchangeService;
 
-    const timestampTodayMs = 1637837920000;
+    const timestampTodayMs = 1639339300000;
 
     const epoch = BigInt(123);
     const rlnIdentifier = BigInt(456);

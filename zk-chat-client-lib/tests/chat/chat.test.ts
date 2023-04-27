@@ -246,7 +246,9 @@ describe('Chat test', () => {
         expect(sendMessageSpy).toHaveBeenCalledWith(JSONBig({ useNativeBigInt: true }).stringify({
             "zk_proof": expectedProof,
             "x_share": "111",
-            "epoch": "1639339320000",
+            // It's (1639339320000 - 20000) because we divide it by millisecondsPerEpoch.
+            // See src/chat/index.ts::ChatManager.getEpoch for more information.
+            "epoch": "1639339300000",
             "chat_type": "PRIVATE",
             "message_content": "encrypted message",
             "sender": "anon"

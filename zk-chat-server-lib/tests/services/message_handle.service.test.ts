@@ -24,7 +24,7 @@ describe('Test message handle service', () => {
 
     let messageHandlerService: MessageHandlerService;
 
-    const timestampTodayMs = 1637837920000;
+    const timestampTodayMs = 1639339300000;
 
     const publicSignals: RLNPublicSignals = {
         yShare: BigInt(123).toString(),
