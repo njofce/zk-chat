@@ -1,14 +1,16 @@
-export interface ISemaphoreRepGroup {
+export interface IInterRepGroup {
     id: string;
     provider: string;
     name: string;
     size: number;
 }
 
-export interface ISemaphoreRepGroupV2 {
-    id: string;
+export interface IInterRepGroupV2 {
+    root: string;
+    provider: string;
     name: string;
-    deep: number;
+    size: number;
+    numberOfLeaves: number;
 }
 
 export interface IGroupMember {
