@@ -44,16 +44,13 @@ class SemaphoreSynchronizer {
         // On startup
         // 1. Get all groups from Semaphore
         const allGroupsOnNet: ISemaphoreRepGroupV2[] = await semaphoreFunctions.getAllGroups(this.config.interepUrl);
-        console.log("!@# src/semaphore/index.ts::syncCommitmentsFromSemaphore: allGroupsOnNet.length = ", allGroupsOnNet.length);
         const groupsInDb: IGroup[] = await this.groupService.getGroups();
-        console.log("!@# src/semaphore/index.ts::syncCommitmentsFromSemaphore: groupsInDb = ", groupsInDb);
 
         let tree_root_changed = false;
 
         // 2. For each group, check the status in database. Only load new members for group if the size in db is different than the new size of the group
         for (let g of allGroupsOnNet) {
             const groupMembers = await this.loadGroupMembers(g.id);
-            console.log(`!@# src/semaphore/index.ts::syncCommitmentsFromSemaphore: g.id = ${g.id}, groupMembers.length = ${groupMembers.length}, groupMembers = `, groupMembers);
             /*
                 NICO's OBSERVATION: In the Zuzalu case, size = numberOfLeaves because the members are presented as a list.
                 I think that the inner elements of Semaphore (RLN) do not delete members from the array but they just replace them with a zero value.
