@@ -71,14 +71,14 @@ class UserService {
         }
 
         console.log ("Analyzing group with ID and users", groupId, users.length);
-        users.forEach( async (user) => {
+        for (const user of users){
             // No need to do anything if the user was previously added to the tree
             // A user's index is unique within a group, and we use that property to check whether the user was added
             // to the database previously, even though it's identity commitment can be set to zero if the user gets banned.
             const foundUser: IMerkleTreeNode | null = await MerkleTreeNode.findLeafByGroupIdAndIndexInGroup(groupId, user.index);
             if (foundUser) {
                 console.log("User for the given group and index in group exists ", foundUser.hash);
-                return;
+                continue;
             }
 
             // User doesn't exist, create and update tree
@@ -88,7 +88,7 @@ class UserService {
                 throw "The tree is full";
             }
 
-            let currentNode: any = await MerkleTreeNode.create({
+            let currentNode = await MerkleTreeNode.create({
                 key: {
                     index: currentIndex,
                     groupId: groupId,
@@ -154,8 +154,7 @@ class UserService {
                 currentIndex = Math.floor(currentIndex / 2);
             }
 
-        })
-
+        }
         console.log("Synced members!");
         return "Done";
     }
