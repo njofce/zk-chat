@@ -45,10 +45,10 @@ describe('Test interrep sync - subgraph', () => {
             }
         ];
 
-        mockAxios.mockResolvedValue({
+        mockAxios.mockResolvedValue({ 
             data: {
                 data: testGroups
-            }
+            } 
         });
 
         const groups: any[] = await apiFunctions.getAllGroups(baseURL);
@@ -67,7 +67,7 @@ describe('Test interrep sync - subgraph', () => {
             }
         });
 
-        const members: IGroupMember[] = await apiFunctions.getMembersForGroup(baseURL);
+        const members: IGroupMember[] = await apiFunctions.getMembersForGroup(baseURL, "twitter", "not_sufficient");
         expect(members.length).toEqual(6);
         expect(members[0]).toEqual({ index: 0, identityCommitment: 'id-0' });
         expect(members[1]).toEqual({ index: 1, identityCommitment: 'id-1' });
@@ -83,7 +83,7 @@ describe('Test interrep sync - subgraph', () => {
             }
         });
 
-        const removedIndexes: number[] = await apiFunctions.getRemovedMembersForGroup(baseURL);
+        const removedIndexes: number[] = await apiFunctions.getRemovedMembersForGroup(baseURL, "twitter", "not_sufficient");
         expect(removedIndexes.length).toEqual(3);
         expect(removedIndexes[0]).toEqual(0);
         expect(removedIndexes[1]).toEqual(1);

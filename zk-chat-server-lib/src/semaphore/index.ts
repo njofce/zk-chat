@@ -1,7 +1,7 @@
 import { IGroup } from "../persistence/model/group/group.types";
 import UserService from "../services/user.service";
 import GroupService from "../services/group.service";
-import { IGroupMember, ISemaphoreRepGroupV2 } from "./interfaces";
+import { IGroupMember, IInterRepGroupV2 } from "./interfaces";
 import PubSub from "../communication/pub_sub";
 import { SyncType } from "../communication/socket/config";
 import semaphoreFunctions from "./api";
@@ -35,81 +35,63 @@ class SemaphoreSynchronizer {
      * Sync commitments on startup, and schedule a job to sync on a regular interval.
      */
     public sync = async() => {
-        console.log("!@# src/semaphore/index.ts::sync: this.config");
         await this.syncCommitmentsFromSemaphore();
         await this.continuousSync();
     }
 
     public syncCommitmentsFromSemaphore = async() => {
         // On startup
-        // 1. Get all groups from Semaphore
-        const allGroupsOnNet: ISemaphoreRepGroupV2[] = await semaphoreFunctions.getAllGroups(this.config.interepUrl);
-        console.log("!@# src/semaphore/index.ts::syncCommitmentsFromSemaphore: allGroupsOnNet.length = ", allGroupsOnNet.length);
+        // 1. Get all groups from interrep
+        const allGroupsOnNet: IInterRepGroupV2[] = await semaphoreFunctions.getAllGroups(this.config.interepUrl);
         const groupsInDb: IGroup[] = await this.groupService.getGroups();
-        console.log("!@# src/semaphore/index.ts::syncCommitmentsFromSemaphore: groupsInDb = ", groupsInDb);
 
         let tree_root_changed = false;
 
         // 2. For each group, check the status in database. Only load new members for group if the size in db is different than the new size of the group
         for (let g of allGroupsOnNet) {
-            const groupMembers = await this.loadGroupMembers(g.id);
-            console.log(`!@# src/semaphore/index.ts::syncCommitmentsFromSemaphore: g.id = ${g.id}, groupMembers.length = ${groupMembers.length}, groupMembers = `, groupMembers);
-            /*
-                NICO's OBSERVATION: In the Zuzalu case, size = numberOfLeaves because the members are presented as a list.
-                I think that the inner elements of Semaphore (RLN) do not delete members from the array but they just replace them with a zero value.
-                Therefore size = active members and numberOfLeaves = total members.
-                Regarding Zuzalu, I am not sure if size is variable.
-            */
-            // TODO: get the number of leaves from the group api
-            // TODO: get the size of the leaves from the group api
-            const numberOfLeaves = groupMembers.length;
+            const g_id = g.provider + "_" + g.name;
+            const groupInDb: IGroup | undefined = groupsInDb.find(x => x.group_id == g_id && x.name == g.name && x.provider == g.provider);
 
-            const groupInDb: IGroup | undefined = groupsInDb.find(x => x.group_id == g.id);
             if (groupInDb == undefined) {
-                // Group doesn't exist in DB, load all members for that group, paginate over 100
-                console.log("!@# src/semaphore/index.ts::syncCommitmentsFromSemaphore: groupInDb == undefined");
+                // Group doesn't exist, load all members for that group, paginate over 100
+                const groupMembers: IGroupMember[] = await this.loadGroupMembersWithPagination(g.provider, g.name, 0, g.numberOfLeaves);
                 try {
                     // Add all members to the tree
-                    await this.userService.appendUsers(groupMembers, g.id);
+                    await this.userService.appendUsers(groupMembers, g_id);
                     // Persist the group
-                    await this.groupService.saveGroup(g.id, 'Semaphore', g.name, numberOfLeaves, numberOfLeaves);
+                    await this.groupService.saveGroup(g_id, g.provider, g.name, g.size, g.numberOfLeaves);
 
-                    console.log("!@# src/semaphore/index.ts::syncCommitmentsFromSemaphore: tree_root_changed = true");
                     tree_root_changed = true;
                 } catch (e) {
                     console.log("Unknown error while saving group", e);
                 }
             } else {
                 // Group exists locally, load new members only if the number of leaves in interep is > number of leaves stored locally
-                if (numberOfLeaves > groupInDb.number_of_leaves) {
-                    console.log(
-                        "!@# src/semaphore/index.ts::syncCommitmentsFromSemaphore: numberOfLeaves > groupInDb.number_of_leaves, ",
-                        "numberOfLeaves = ", numberOfLeaves, "groupInDb.number_of_leaves = ", groupInDb.number_of_leaves,
-                     );
+                if (g.numberOfLeaves > groupInDb.number_of_leaves) {
+                    // Load members from groupInDb.size up to g.numberOfLeaves
+                    const groupMembers: IGroupMember[] = await this.loadGroupMembersWithPagination(g.provider, g.name, groupInDb.number_of_leaves, g.numberOfLeaves);
                     try {
                         // Add group members to the tree
-                        await this.userService.appendUsers(groupMembers, g.id);
+                        await this.userService.appendUsers(groupMembers, g_id);
                         // Update group leaf count in DB
-                        await this.groupService.updateNumberOfLeaves(g.id, numberOfLeaves);
+                        await this.groupService.updateNumberOfLeaves(g_id, g.numberOfLeaves);
 
-                        console.log("!@# src/semaphore/index.ts::syncCommitmentsFromSemaphore: tree_root_changed = true (2)");
                         tree_root_changed = true;
                     } catch (e) {
                         console.log("Unknown error while saving group - appending new members", e);
                     }
                 }
-                // size is the number of active members in the group (not deleted)
+
                 // Group exists locally, delete members that were removed from interep.
-                if (numberOfLeaves != groupInDb.size) {
-                    console.log("!@# src/semaphore/index.ts::syncCommitmentsFromSemaphore: updating slashed members");
+                if (g.size != groupInDb.size) {
                     // Load all deleted indexes from interep
-                    const indexesOfRemovedMembers: number[] = await this.loadRemovedGroupMembers(g.id);
+                    const indexesOfRemovedMembers: number[] = await this.loadRemovedGroupMembersWithPagination(g.provider, g.name, 0, g.size);
                     try {
                         // Remove members from the tree
                         await this.userService.removeUsersByIndexes(indexesOfRemovedMembers, groupInDb.group_id);
 
                         // Update group size in DB
-                        await this.groupService.updateSize(g.id, numberOfLeaves);
+                        await this.groupService.updateSize(g_id, g.size);
 
                         tree_root_changed = true;
                     } catch (e) {
@@ -119,23 +101,19 @@ class SemaphoreSynchronizer {
             }
         }
 
-        console.log("!@# src/semaphore/index.ts::syncCommitmentsFromSemaphore: tree_root_changed = ", tree_root_changed);
-
         // Publish event only when tree root hash changed
         if (tree_root_changed) {
             this.publishEvent();
-            console.log("!@# src/semaphore/index.ts::syncCommitmentsFromSemaphore: this.publishEvent");
         }
     }
 
-    private async loadGroupMembers(id: string): Promise<IGroupMember[]> {
-        let members = await semaphoreFunctions.getMembersForGroup(this.config.interepUrl, id);
-        return members;
+    private async loadGroupMembersWithPagination(provider: string, name: string, offset: number, to: number): Promise<IGroupMember[]> {
+        const members: IGroupMember[] = await semaphoreFunctions.getMembersForGroup(this.config.interepUrl);
+        return members.slice(offset, to);
     }
 
-    private async loadRemovedGroupMembers(id: string): Promise<number[]> {
-        let indexesOfDeletedMembers = await semaphoreFunctions.getRemovedMembersForGroup(this.config.interepUrl, id);
-        return indexesOfDeletedMembers;
+    private async loadRemovedGroupMembersWithPagination(provider: string, name: string, offset: number, to: number): Promise<number[]> {
+        return await semaphoreFunctions.getRemovedMembersForGroup(this.config.interepUrl);
     }
 
     private async continuousSync() {

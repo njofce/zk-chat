@@ -15727,10 +15727,10 @@ test-pcd-semaphore-signature-pcd@^0.4.3:
     react "^17.0.2"
     typescript "^4.5.2"
 
-test-zk-chat-client@1.0.21:
-  version "1.0.21"
-  resolved "https://registry.yarnpkg.com/test-zk-chat-client/-/test-zk-chat-client-1.0.21.tgz#455dc95ede37f5d1f4ad223ac0fee0b32d7e50a8"
-  integrity sha512-0tX098HYkgs5iKZMoSRmFaGBdL6qP+bdxI6ZyMm5Evb1gf+iR420xDGFkXPxJ4GwWflBBPX7NDZWvpayid6+HQ==
+test-zk-chat-client@1.0.22:
+  version "1.0.22"
+  resolved "https://registry.yarnpkg.com/test-zk-chat-client/-/test-zk-chat-client-1.0.22.tgz#387a1e5bade0b00f3625e4905f167e2d7d0d3dd7"
+  integrity sha512-qZhnQVkxX95nEE3QRO9UJJyw+/HPWs2dG7/w4+KnQlrSLxToLwHd/7lBbeo5YppruF6QvR0J9fr3Os4ww+8Spg==
   dependencies:
     "@zk-kit/identity" "^1.4.1"
     "@zk-kit/protocols" "^1.8.2"
@@ -15743,10 +15743,10 @@ test-zk-chat-client@1.0.21:
     uuid "^8.3.2"
     ws "^8.3.0"
 
-test-zk-chat-server@1.0.26:
-  version "1.0.26"
-  resolved "https://registry.yarnpkg.com/test-zk-chat-server/-/test-zk-chat-server-1.0.26.tgz#f3bba5d23ea089dbf7ffb5d137e7b537c6614fc2"
-  integrity sha512-WBWBVj+6GMsYjfvOCVHJ8AWDFOH48GCi5GNfMOJPw+CV8zWcHAAy1ltajr59oACNcp69Snf06YsDRWqlZKpNDw==
+test-zk-chat-server@1.0.28:
+  version "1.0.28"
+  resolved "https://registry.yarnpkg.com/test-zk-chat-server/-/test-zk-chat-server-1.0.28.tgz#46e1e242526c4ff87876a1a1c2e890ea834c7d04"
+  integrity sha512-M90r/zZ/YKKr7JjehC2Nyy89rg3yUtLhbjqq5HnS3U01IveDfMDD86AxSTyGMNq+Wgdojhtf3UkYCTHOYwCx7g==
   dependencies:
     "@zk-kit/identity" "^1.4.1"
     "@zk-kit/protocols" "^1.8.2"
@@ -16146,7 +16146,7 @@ typescript@^4.9.5:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.9.5.tgz#095979f9bcc0d09da324d58d03ce8f8374cbe65a"
   integrity sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==
 
-"uWebSockets.js@github:uNetworking/uWebSockets.js#v20.4.0", uWebSockets.js@uNetworking/uWebSockets.js#v20.4.0:
+uWebSockets.js@uNetworking/uWebSockets.js#v20.4.0:
   version "20.4.0"
   resolved "https://codeload.github.com/uNetworking/uWebSockets.js/tar.gz/65f39bdff763be3883e6cf18e433dd4fec155845"
 
