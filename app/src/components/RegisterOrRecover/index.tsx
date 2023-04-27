@@ -1,8 +1,6 @@
-import React, { useState } from "react"
 import { useNavigate } from "react-router"
 import styled from "styled-components"
 import * as Colors from "../../constants/colors"
-import RecoverModal from "../Modals/recoverModal"
 import { init, receive_message } from "test-zk-chat-client"
 import { useDispatch } from "react-redux"
 import {
@@ -43,7 +41,6 @@ const StyledRButton = styled.button`
 `
 
 const RegisterOrRecover = () => {
-  const [toggleRecoverModal, setToggleRecoverModal] = useState(false)
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
@@ -93,19 +90,8 @@ const RegisterOrRecover = () => {
     <StyledRegisterWrapper>
       <StyledButtonsContainer>
         <StyledRButton color={Colors.DARK_YELLOW} onClick={handleRegisterClick}>
-          Register
+          Login
         </StyledRButton>
-        <StyledRButton
-          color={Colors.PASTEL_RED}
-          onClick={() => setToggleRecoverModal(true)}
-        >
-          {" "}
-          Recover{" "}
-        </StyledRButton>
-        <RecoverModal
-          toggleRecoverModal={toggleRecoverModal}
-          setToggleRecoverModal={setToggleRecoverModal}
-        />
       </StyledButtonsContainer>
     </StyledRegisterWrapper>
   )
