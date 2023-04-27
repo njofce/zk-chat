@@ -37,14 +37,6 @@ const AppWrapper = () => {
 
   const initializeApp = async () => {
     try {
-      // console.log("!@# AppWrapper/index.tsx: before generateProof")
-      // const proof = await generateProof(
-      //   "1",
-      //   "5566 is the best",
-      //   {depth:16, leaves:[], leavesPerNode:2},
-      //   "123",
-      // );
-      // console.log(`!@# proof=`, proof)
       await init({
         serverUrl: serverUrl,
         socketUrl: socketUrl
