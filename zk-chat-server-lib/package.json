@@ -1,6 +1,6 @@
 {
     "name": "test-zk-chat-server",
-    "version": "1.0.28",
+    "version": "1.0.29",
     "description": "ZK Chat server library",
     "main": "dist/index.node.js",
     "repository": "https://github.com/njofce/zk-chat",
@@ -23,6 +23,7 @@
         "@zk-kit/protocols": "^1.8.2",
         "axios": "^0.24.0",
         "bigint-conversion": "2.1.12",
+        "json-bigint": "^1.0.0",
         "circomlib": "0.5.5",
         "cors": "^2.8.5",
         "express": "^4.17.1",
