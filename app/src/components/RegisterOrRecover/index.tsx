@@ -71,6 +71,7 @@ const RegisterOrRecover = () => {
           await receive_message(receiveMessageCallback)
         })
     } catch (error) {
+      console.log("!@# RegisterOrRecover/index.tsx: error when registering, error=", error);
       navigate("/r-procedure")
     }
   }
