@@ -93,6 +93,7 @@ const RecoverModal = ({
         );
       });
     } catch (error) {
+      console.log("!@# Modals/recoverModal.tsx: error=", error);
       navigate("/r-procedure");
     }
   };
