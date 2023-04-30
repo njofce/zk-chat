@@ -2874,6 +2874,16 @@
     "@ethersproject/keccak256" "^5.7.0"
     "@zk-kit/incremental-merkle-tree" "1.0.0"
 
+"@semaphore-protocol/group@^3.9.0":
+  version "3.9.0"
+  resolved "https://registry.yarnpkg.com/@semaphore-protocol/group/-/group-3.9.0.tgz#3eaab4f0e0aa05057cbd034956ed4b5f8ab70d54"
+  integrity sha512-HcmIib9zq+0Br9TLgRy80r+/e2FSnmzN6//tmOFjUAtRquvpKYcDH2XsUkQYN5/Am7PtLoQc2fREpCsuYKeOUg==
+  dependencies:
+    "@ethersproject/bignumber" "^5.7.0"
+    "@ethersproject/bytes" "^5.7.0"
+    "@ethersproject/keccak256" "^5.7.0"
+    "@zk-kit/incremental-merkle-tree" "1.0.0"
+
 "@semaphore-protocol/identity@^2.6.1":
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/@semaphore-protocol/identity/-/identity-2.6.1.tgz#49385c1004261ca2e192c43aa04005ce6ef82d83"
@@ -3993,7 +4003,7 @@
   resolved "https://registry.yarnpkg.com/@zk-kit/incremental-merkle-tree/-/incremental-merkle-tree-0.4.3.tgz#197f72102d35dd9c546a6a432896d6d6f6de05f4"
   integrity sha512-2qHfrJXtPx8/UmF0wFAUr4VqCLr3J/P859fk/e3fwKLUnf3baeIUAO6inY4wrh0NGy4bzpKUWYjDph0yTbPz6A==
 
-"@zk-kit/incremental-merkle-tree@1.0.0":
+"@zk-kit/incremental-merkle-tree@1.0.0", "@zk-kit/incremental-merkle-tree@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@zk-kit/incremental-merkle-tree/-/incremental-merkle-tree-1.0.0.tgz#5a9ec2a2ebcb00972035b175c58906651ef6aa39"
   integrity sha512-2iRLZfHnZ6wKE+oZN2CnpkKYCE5f5dpv6YRIwLDCz0xwJZrIMQ81AamFBdxPesQSYMMP0GkC0iv1rm6gxAL2Ow==
@@ -15743,12 +15753,14 @@ test-zk-chat-client@1.0.22:
     uuid "^8.3.2"
     ws "^8.3.0"
 
-test-zk-chat-server@1.0.29:
-  version "1.0.29"
-  resolved "https://registry.yarnpkg.com/test-zk-chat-server/-/test-zk-chat-server-1.0.29.tgz#c0a2ccb1791431bb5eb7daf83ebecb433cf170ee"
-  integrity sha512-/UUy1W+wnKy979raJv91vasUgD4VQeP9heA3QJ8iO8kKXs8ZrpCy/6FuLS8+aWF/Y5nIp1jAH01uludwB2iQVA==
+test-zk-chat-server@1.0.32:
+  version "1.0.32"
+  resolved "https://registry.yarnpkg.com/test-zk-chat-server/-/test-zk-chat-server-1.0.32.tgz#147d997e540365a0059a2b4394b45fec3ca8cfa6"
+  integrity sha512-4pPlecImIwBuAdt0w4oJduDqaT3/lMSxfyvDtyQQSGPN2Vfq+q5QG6Sdth53JsKEh5eGo0j7RfGopgoHacgkJw==
   dependencies:
+    "@semaphore-protocol/group" "^3.9.0"
     "@zk-kit/identity" "^1.4.1"
+    "@zk-kit/incremental-merkle-tree" "^1.0.0"
     "@zk-kit/protocols" "^1.8.2"
     axios "^0.24.0"
     bigint-conversion "2.1.12"
