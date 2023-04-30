@@ -48,14 +48,14 @@ services:
       - 'traefik.enable=true'
       - 'traefik.docker.network=rlnanonymouschat_apinetwork'
 
-      - 'traefik.http.routers.zkchathttp.rule=Host(`api.zkchat.org`)'
+      - 'traefik.http.routers.zkchathttp.rule=Host(`api.test-zk-chat.mhchia.com`)'
       - "traefik.http.routers.zkchathttp.service=zk_chat_http"
       - 'traefik.http.routers.zkchathttp.tls=true'
       - 'traefik.http.routers.zkchathttp.tls.certresolver=lets-encrypt'
 
       - "traefik.http.services.zk_chat_http.loadbalancer.server.port=8080"
 
-      - 'traefik.http.routers.zkchatws.rule=Host(`api-ws.zkchat.org`)'
+      - 'traefik.http.routers.zkchatws.rule=Host(`api-ws.test-zk-chat.mhchia.com`)'
       - "traefik.http.routers.zkchatws.service=zk_chat_ws"
       - 'traefik.http.routers.zkchatws.tls=true'
       - 'traefik.http.routers.zkchatws.tls.certresolver=lets-encrypt'
@@ -99,15 +99,15 @@ services:
     labels:
       - 'traefik.enable=true'
       - 'traefik.docker.network=rlnanonymouschat_apinetwork'
-      - 'traefik.http.routers.client.rule=Host(`www.zkchat.org`) || Host(`zkchat.org`)'
+      - 'traefik.http.routers.client.rule=Host(`www.test-zk-chat.mhchia.com`) || Host(`test-zk-chat.mhchia.com`)'
       - 'traefik.http.routers.client.tls=true'
       - 'traefik.http.routers.client.tls.certresolver=lets-encrypt'
 
     environment:
       - PORT=3000
-      - REACT_APP_SERVER_HOST=https://api.zkchat.org
-      - REACT_APP_SOCKET_HOST=wss://api-ws.zkchat.org
-      - REACT_APP_ENV=https://www.zkchat.org
+      - REACT_APP_SERVER_HOST=https://api.test-zk-chat.mhchia.com
+      - REACT_APP_SOCKET_HOST=wss://api-ws.test-zk-chat.mhchia.com
+      - REACT_APP_ENV=https://www.test-zk-chat.mhchia.com
     depends_on:
       - mongo
       - redis
