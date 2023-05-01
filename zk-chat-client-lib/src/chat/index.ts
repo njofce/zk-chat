@@ -8,7 +8,7 @@ import ProfileManager from "../profile";
 import Hasher from "../hasher";
 import { IFuncGenerateProof } from "src/types";
 
-const SECONDS_PER_EPOCH = 100;
+const SECONDS_PER_EPOCH = 10;
 
 /**
  * The core component that is responsible for creating valid ZK proofs for a message, encrypting and dispatching it, as well as receiving and decrypting messages

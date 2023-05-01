@@ -5,7 +5,7 @@ import { getYShareFromFullProof } from './types';
 
 
 // TODO: Should be in config?
-const SECONDS_PER_EPOCH = 100;
+const SECONDS_PER_EPOCH = 10;
 
 export function verifyEpoch(epoch: string, allowedDelay: number): boolean {
     const millisecondsPerEpoch = SECONDS_PER_EPOCH * 1000;
