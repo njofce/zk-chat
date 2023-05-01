@@ -8,7 +8,7 @@ services:
       - '80:80'
       - '443:443'
     volumes:
-      - ../traefik:/etc/traefik
+      - ./traefik:/etc/traefik
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - apinetwork
