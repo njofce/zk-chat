@@ -248,7 +248,7 @@ describe('Chat test', () => {
             "x_share": "111",
             // It's (1639339320000 - 20000) because we divide it by millisecondsPerEpoch.
             // See src/chat/index.ts::ChatManager.getEpoch for more information.
-            "epoch": "1639339300000",
+            "epoch": "1639339320000",
             "chat_type": "PRIVATE",
             "message_content": "encrypted message",
             "sender": "anon"
